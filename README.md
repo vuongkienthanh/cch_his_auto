@@ -1,4 +1,5 @@
 # Automate your HIS workflow at CCH
+using `python` and [`selenium`](https://www.selenium.dev/)
 
 ### Install from git
 
@@ -14,7 +15,7 @@ uv add git+https://github.com/vuongkienthanh/cch_his_auto
 
 ### Usage:
 
-- Initialize driver
+- Initialize driver (also a selenium driver, with some convenient methods)
 ```python
 from cch_his_auto import Driver
 driver = Driver()
