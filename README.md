@@ -1,5 +1,17 @@
 # Automate your HIS workflow at CCH
 
+### Install from git
+
+```sh
+pip install git+https://github.com/vuongkienthanh/cch_his_auto
+```
+
+or using (`uv`)[https://docs.astral.sh/uv/]
+
+```sh
+uv add git+https://github.com/vuongkienthanh/cch_his_auto
+```
+
 ### Usage:
 
 - Initialize driver
