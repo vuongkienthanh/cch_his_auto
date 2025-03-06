@@ -57,7 +57,7 @@ class Driver(webdriver.Chrome):
     def waiting_to_be(self, css: str, to_be: str, /) -> WebElement:
         logger.info(f"---waiting {css} to be {to_be}")
         WebDriverWait(self, 120).until(lambda _: self.finding(css).is_displayed())
-        if to_be and self.finding(css).text.strip() != "":
+        if to_be:
             for _ in range(120):
                 time.sleep(1)
                 if self.finding(css).text.strip().startswith(to_be.strip()):

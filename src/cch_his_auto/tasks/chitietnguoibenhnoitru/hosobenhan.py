@@ -6,7 +6,7 @@ from selenium.webdriver import Keys
 from selenium.common import NoSuchElementException
 
 from cch_his_auto.driver import Driver, DriverFn
-from cch_his_auto.tasks import raw_page_sign_name as s
+from cch_his_auto.tasks import editor_sign_name as s
 from cch_his_auto.tasks.common import click_sign_btn
 
 logger = logging.getLogger()
