@@ -12,7 +12,7 @@ def pick(driver: Driver, name: str) -> bool:
     logger.info(f"======= finding link {name} ======")
     for _ in range(30):
         time.sleep(1)
-        for ele in driver.findings(".ant-dropdown-menu li a"):
+        for ele in driver.find_all(".ant-dropdown-menu li a"):
             if ele.text == name:
                 ele.click()
                 time.sleep(3)
@@ -33,14 +33,14 @@ def phieuchidinh(driver: Driver):
         for _ in range(45):
             time.sleep(1)
             logger.info("checking finish the sign button ")
-            for w in driver.findings(".__button button"):
+            for w in driver.find_all(".__button button"):
                 if w.text == "Hủy ký Bác sĩ":
                     finish = True
                     break
             if finish:
                 logging.info("phieu chi dinh already signed")
                 break
-            for w in driver.findings(".__button button"):
+            for w in driver.find_all(".__button button"):
                 if w.text == "Ký Bác sĩ":
                     logger.info("clicking the sign button ")
                     w.click()
@@ -48,7 +48,7 @@ def phieuchidinh(driver: Driver):
                     break
         logging.info("finish phieu chi dinh")
         logging.info("clicking close button")
-        driver.findings("button[aria-label='Close']")[1].click()
+        driver.find_all("button[aria-label='Close']")[1].click()
         time.sleep(3)
 
 def phieuthuchienylenh_bs(driver: Driver, arr: s.Row):

@@ -13,21 +13,21 @@ def choose_dept(driver: Driver, dept: str):
     for _ in range(120):
         time.sleep(1)
         try:
-            ele = driver.finding(".ant-modal-body input")
+            ele = driver.find(".ant-modal-body input")
             logger.info("found dept picker")
             ActionChains(driver).send_keys_to_element(
                 ele, Keys.ARROW_DOWN
             ).send_keys_to_element(ele, dept).send_keys_to_element(
                 ele, Keys.ENTER
             ).click(
-                driver.finding(
+                driver.find(
                     ".ant-modal-body .bottom-action .bottom-action-right button"
                 )
             ).perform()
             break
         except:
             try:
-                ele = driver.finding(".khoaLamViec div span")
+                ele = driver.find(".khoaLamViec div span")
                 if ele.text.strip() == dept:
                     logger.info("dept already set")
                     break
@@ -44,7 +44,7 @@ def click_sign_btn(
     for _ in range(120):
         time.sleep(1)
         try:
-            if driver.finding(post_btn_css).text.strip() == post_btn_text:
+            if driver.find(post_btn_css).text.strip() == post_btn_text:
                 break
         except (NoSuchElementException, StaleElementReferenceException):
             break

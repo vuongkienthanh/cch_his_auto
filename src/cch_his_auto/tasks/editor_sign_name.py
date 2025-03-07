@@ -10,7 +10,7 @@ def sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
     driver.waiting(btn_css)
     for _ in range(100):
         time.sleep(1)
-        if driver.finding(btn_css).text.strip() == btn_txt:
+        if driver.find(btn_css).text.strip() == btn_txt:
             time.sleep(5)
             break
     else:

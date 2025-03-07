@@ -17,13 +17,13 @@ def filter_trangthainguoibenh(driver: Driver, row_indexes: list[int]):
     )
     driver.waiting(".ant-popover label", "danh sach trang thai nguoi benh")
     logger.info("uncheck all boxes in trạng thái người bệnh")
-    for ele in driver.findings(".ant-popover .ant-checkbox-checked"):
+    for ele in driver.find_all(".ant-popover .ant-checkbox-checked"):
         ele.click()
 
     for i in row_indexes:
         driver.clicking(
             f".ant-popover label:nth-child({i}) .ant-checkbox",
-            driver.finding(f".ant-popover label:nth-child({i})").text,
+            driver.find(f".ant-popover label:nth-child({i})").text,
         )
     time.sleep(2)
     driver.clicking(
@@ -37,9 +37,9 @@ def filter_thoigiannhapvien(driver: Driver, start: dt.date, end: dt.date):
     driver.waiting(".date-1 .ant-picker-input input")
     logger.info("+++++ typing thoi gian vao khoa: start date & end date")
     ActionChains(driver).send_keys_to_element(
-        driver.finding(".date-1 .ant-picker-input input"), start.strftime(FMT)
+        driver.find(".date-1 .ant-picker-input input"), start.strftime(FMT)
     ).pause(1).send_keys_to_element(
-        driver.finding(".date-1 .ant-picker-input:nth-child(3) input"),
+        driver.find(".date-1 .ant-picker-input:nth-child(3) input"),
         end.strftime(FMT),
     ).send_keys(Keys.ENTER).perform()
     driver.clicking(".ant-popover .content-popover +div button", "Tìm button")

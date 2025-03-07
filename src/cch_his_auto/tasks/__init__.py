@@ -14,7 +14,7 @@ def login(driver: Driver, username: str, password: str):
     for _ in range(120):
         time.sleep(1)
         try:
-            driver.finding(".login-body")
+            driver.find(".login-body")
             logger.info("found login screen")
             logger.info("typing username and password")
             inputs = driver.find_elements(By.TAG_NAME, "input")
@@ -26,7 +26,7 @@ def login(driver: Driver, username: str, password: str):
             break
         except:
             try:
-                driver.finding(".card")
+                driver.find(".card")
                 logger.info("found main screen")
                 break
             except:

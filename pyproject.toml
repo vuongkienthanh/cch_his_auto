@@ -10,3 +10,11 @@ dependencies = ["selenium>=4.29.0"]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+ 
+[tool.uv]
+package = true
+
+[dependency-groups]
+dev = [
+    "pdoc>=15.0.1",
+]

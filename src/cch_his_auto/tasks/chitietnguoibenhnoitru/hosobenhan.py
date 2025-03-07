@@ -34,7 +34,7 @@ def filter(driver: Driver, name: str) -> bool:
     for _ in range(20):
         time.sleep(1)
         try:
-            ele = driver.finding(
+            ele = driver.find(
                 ".right-content tbody tr:nth-child(2) td:nth-child(2) div"
             )
             if ele.text.strip().startswith(name):
@@ -57,7 +57,7 @@ def is_row_expandable(driver: Driver, idx: int) -> bool:
     logger.info(f"checking {name}: expandable")
     time.sleep(1)
     try:
-        ele = driver.finding(
+        ele = driver.find(
             f".right-content tbody tr:nth-child({idx}) td:nth-child(1) button"
         )
     except:
@@ -73,7 +73,7 @@ def expand_row(driver: Driver, idx: int):
 
 def sign_new_tab(driver: Driver, idx: int, sign_fn: DriverFn):
     tab0 = driver.current_window_handle
-    datakey = driver.finding(f".ant-table-tbody tr:nth-child({idx})").get_attribute(
+    datakey = driver.find(f".ant-table-tbody tr:nth-child({idx})").get_attribute(
         "data-row-key"
     )
     logger.info(f"data row key = {datakey}")
@@ -94,7 +94,7 @@ def filter_check_expand_sign_curent(driver: Driver, name: str):
     if filter(driver, name):
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
-            for i in range(3, len(driver.findings("tbody .ant-table-row-level-1")) + 3):
+            for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
                 if not is_row_hoanthanh(driver, i):
                     logger.info("hoan thanh: no")
                     driver.clicking(f"tbody tr:nth-child({i})")
@@ -115,7 +115,7 @@ def filter_check_expand_sign_new_tab(driver: Driver, name: str, sign_fn: DriverF
     if filter(driver, name):
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
-            for i in range(3, len(driver.findings("tbody .ant-table-row-level-1")) + 3):
+            for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
                 if not is_row_hoanthanh(driver, i):
                     logger.info("hoan thanh: no")
                     driver.clicking(f"tbody tr:nth-child({i})")

@@ -25,7 +25,7 @@ def cancel(driver: Driver):
                 break
 
 def clear(driver: Driver):
-    for ele in driver.findings(".ant-form .ant-select-selection-item-remove"):
+    for ele in driver.find_all(".ant-form .ant-select-selection-item-remove"):
         ele.click()
 
 def dropmenu(driver: Driver):

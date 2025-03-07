@@ -19,12 +19,26 @@ stdout = logging.StreamHandler(sys.stdout)
 logger.addHandler(stdout)
 
 class DriverFn(Protocol):
+    "A function typing hint that accepts Driver as first argument"
+
+    def __init__(self, *args, **kwargs) -> None:
+        "@private"
+        super().__init__(*args, **kwargs)
+
     def __call__(self, driver: "Driver", *args, **kwargs) -> None: ...
 
 class Driver(webdriver.Chrome):
-    """Preconfigured chrome driver"""
+    """
+    Preconfigured chrome driver with some convenient methods.
+    """
 
-    def __init__(self, headless: bool = False, profile_path: PurePath | None = None):
+    def __init__(
+        self, headless: bool = False, profile_path: PurePath | str | None = None
+    ):
+        """
+        - `headless`: run driver in headless mode
+        - `profile_path`: provide a profile path for more efficient subsequent use
+        """
         logger.info("opening chrome ...")
         options = webdriver.ChromeOptions()
         options.add_argument("--disable-infobars")
@@ -42,36 +56,50 @@ class Driver(webdriver.Chrome):
 
         super().__init__(options=options)
 
-    def finding(self, css: str) -> WebElement:
+    def find(self, css: str) -> WebElement:
+        "Find element by `css`"
         return self.find_element(By.CSS_SELECTOR, css)
 
-    def findings(self, css: str) -> list[WebElement]:
+    def find_all(self, css: str) -> list[WebElement]:
+        "Find all elements by `css`"
         return self.find_elements(By.CSS_SELECTOR, css)
 
     def waiting(self, css: str, /, name: str = "") -> WebElement:
+        """
+        Waiting element by `css`.
+        You can also provide a `name` for logging
+        """
         logger.info(f"---waiting {name or css}")
-        WebDriverWait(self, 120).until(lambda _: self.finding(css).is_displayed())
+        WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         logger.info(f"---done waiting {name or css}")
-        return self.finding(css)
+        return self.find(css)
 
-    def waiting_to_be(self, css: str, to_be: str, /) -> WebElement:
-        logger.info(f"---waiting {css} to be {to_be}")
-        WebDriverWait(self, 120).until(lambda _: self.finding(css).is_displayed())
+    def waiting_to_be(self, css: str, to_be: str, /, name: str = "") -> WebElement:
+        """
+        Waiting element by `css` with textContent equals `to_be`.
+        You can also provide a `name` for logging
+        """
+        logger.info(f"---waiting {name or css} to be {to_be}")
+        WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         if to_be:
             for _ in range(120):
                 time.sleep(1)
-                if self.finding(css).text.strip().startswith(to_be.strip()):
+                if self.find(css).text.strip().startswith(to_be.strip()):
                     logger.info(f"-->> found {to_be}")
                     break
             else:
-                txt = self.finding(css).text.strip()
-                ctx = f"{css} with to_be {to_be} != textContent {txt}"
+                txt = self.find(css).text.strip()
+                ctx = f"{name or css} with to_be {to_be} != textContent {txt}"
                 logger.error(f"---no such element: {ctx}")
                 raise NoSuchElementException(ctx)
-        logger.info(f"---done waiting {css} to be {to_be}")
-        return self.finding(css)
+        logger.info(f"---done waiting {name or css} to be {to_be}")
+        return self.find(css)
 
     def clicking(self, css: str, /, name: str = "") -> None:
+        """
+        Clicking element by `css`.
+        You can also provide a `name` for logging
+        """
         logger.info(f"---clicking {name or css}")
         logger.setLevel(logging.CRITICAL)
         ele = self.waiting(css, name)
@@ -80,11 +108,15 @@ class Driver(webdriver.Chrome):
         logger.info(f"---done clicking {name or css}")
 
     def goto(self, url: str) -> None:
+        "Go to `url`"
         logger.info(f"---goto {url}")
         self.get(url)
 
     def goto_newtab_do_smth_then_goback(self, main_tab: str, fn: DriverFn) -> None:
-        """main_tab: driver.current_window_handle"""
+        """
+        Go to a tab different than `main_tab` and execute `fn`.
+        - `main_tab`: you can can this using `driver.current_window_handle`
+        """
         logger.info("---go to new tab")
         for window_handle in self.window_handles:
             if window_handle != main_tab:
@@ -99,10 +131,15 @@ class Driver(webdriver.Chrome):
         self.switch_to.window(main_tab)
 
     def clear_input(self, css: str) -> WebElement:
+        "Find element by `css` then clear it"
         logger.info("clearing input")
+        logger.setLevel(logging.CRITICAL)
         ele = self.waiting(css)
+        logger.setLevel(logging.INFO)
         v = ele.get_attribute("value")
         assert v is not None
         ele.send_keys(Keys.CONTROL, "a")
         ele.send_keys(Keys.DELETE)
         return ele
+
+__all__ = ["Driver", "DriverFn"]
