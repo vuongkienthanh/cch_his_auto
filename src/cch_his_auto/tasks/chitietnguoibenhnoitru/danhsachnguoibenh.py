@@ -1,3 +1,8 @@
+"""
+### Tasks that operate on *Danh sách người bệnh*
+###### inside "*Chi tiết người bệnh nội trú*
+"""
+
 import logging
 import time
 
@@ -5,9 +10,9 @@ from selenium.webdriver import Keys
 
 from cch_his_auto.driver import Driver
 
-logger = logging.getLogger()
+_logger = logging.getLogger()
 
-def start(driver: Driver):
+def open(driver: Driver):
     driver.clicking(
         ".thong-tin-benh-nhan .bunch-icon div:last-child",
         "xem danh sach nguoi benh",
@@ -20,8 +25,9 @@ def close(driver: Driver):
     time.sleep(5)
 
 def filter_patient(driver: Driver, id: int) -> bool:
+    "Filter patient based on `id`"
     ele = driver.clear_input(".ant-drawer .searching input")
-    logger.info(f"+++++ typing {id} to search entry")
+    _logger.info(f"+++++ typing {id} to search entry")
     ele.send_keys(str(id))
     ele.send_keys(Keys.ENTER)
     time.sleep(2)
@@ -32,6 +38,7 @@ def filter_patient(driver: Driver, id: int) -> bool:
         return False
 
 def goto_patient(driver: Driver, id: int):
+    "Filter patient based on `id`, then open that patient"
     if filter_patient(driver, id):
         driver.clicking("tbody tr:nth-child(2)", "first row")
         driver.waiting_to_be(

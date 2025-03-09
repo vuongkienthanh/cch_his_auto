@@ -1,20 +1,25 @@
+"""
+### Tasks that can happen at any place
+"""
+
 import logging
 import time
 
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common import NoSuchElementException, StaleElementReferenceException
+from selenium.common import NoSuchElementException
 
 from cch_his_auto.driver import Driver
 
-logger = logging.getLogger()
+_logger = logging.getLogger()
 
 def choose_dept(driver: Driver, dept: str):
+    "Choose department with exact `dept`"
     for _ in range(120):
         time.sleep(1)
         try:
             ele = driver.find(".ant-modal-body input")
-            logger.info("found dept picker")
+            _logger.info("found dept picker")
             ActionChains(driver).send_keys_to_element(
                 ele, Keys.ARROW_DOWN
             ).send_keys_to_element(ele, dept).send_keys_to_element(
@@ -29,23 +34,12 @@ def choose_dept(driver: Driver, dept: str):
             try:
                 ele = driver.find(".khoaLamViec div span")
                 if ele.text.strip() == dept:
-                    logger.info("dept already set")
+                    _logger.info("dept already set")
                     break
                 else:
-                    logger.info(f"dept not set to {dept}")
+                    _logger.info(f"dept not set to {dept}")
                     driver.clicking(".khoaLamViec div span")
             except NoSuchElementException:
                 ...
 
-def click_sign_btn(
-    driver: Driver, pre_btn_css: str, post_btn_css: str, post_btn_text: str
-):
-    driver.clicking(pre_btn_css, "clicking Ký tên")
-    for _ in range(120):
-        time.sleep(1)
-        try:
-            if driver.find(post_btn_css).text.strip() == post_btn_text:
-                break
-        except (NoSuchElementException, StaleElementReferenceException):
-            break
-    time.sleep(2)
+__all__ = ["choose_dept"]
