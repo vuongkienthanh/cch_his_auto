@@ -59,17 +59,19 @@ def phieuchidinh(driver: Driver):
         time.sleep(3)
 
 def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, bool]):
-    "`open` *Phiếu thực hiện y lệnh*, then sign it (bác sĩ)"
-    main_tab = driver.current_window_handle
-    if open(driver, "Phiếu thực hiện y lệnh"):
-        driver.goto_newtab_do_smth_then_goback(
-            main_tab, partial(e.phieuthuchienylenh_bs, arr=arr)
-        )
+    "`open` *Phiếu thực hiện y lệnh*, then sign it (bác sĩ). Won't do anything if all False"
+    if any(arr):
+        main_tab = driver.current_window_handle
+        if open(driver, "Phiếu thực hiện y lệnh"):
+            driver.goto_newtab_do_smth_then_goback(
+                main_tab, partial(e.phieuthuchienylenh_bs, arr=arr)
+            )
 
 def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, bool]):
-    "`open` *Phiếu thực hiện y lệnh*, then sign it (điều dưỡng)"
-    main_tab = driver.current_window_handle
-    if open(driver, "Phiếu thực hiện y lệnh"):
-        driver.goto_newtab_do_smth_then_goback(
-            main_tab, partial(e.phieuthuchienylenh_dd, arr=arr)
-        )
+    "`open` *Phiếu thực hiện y lệnh*, then sign it (điều dưỡng). Won't do anything if all False"
+    if any(arr):
+        main_tab = driver.current_window_handle
+        if open(driver, "Phiếu thực hiện y lệnh"):
+            driver.goto_newtab_do_smth_then_goback(
+                main_tab, partial(e.phieuthuchienylenh_dd, arr=arr)
+            )

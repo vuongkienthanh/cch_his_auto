@@ -5,7 +5,10 @@ description = "Automate your HIS workflow at CCH "
 readme = "README.md"
 authors = [{ name = "vuongkienthanh", email = "thanhstardust@outlook.com" }]
 requires-python = ">=3.12"
-dependencies = ["selenium>=4.29.0"]
+dependencies = [
+    "selenium>=4.29.0",
+    "validators>=0.34.0",
+]
 
 [build-system]
 requires = ["hatchling"]

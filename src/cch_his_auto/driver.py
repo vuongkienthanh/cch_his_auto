@@ -68,6 +68,7 @@ class Driver(webdriver.Chrome):
         _logger.info(f"---waiting {name or css}")
         WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         _logger.info(f"---done waiting {name or css}")
+        time.sleep(2)
         return self.find(css)
 
     def waiting_to_be(self, css: str, to_be: str, /, name: str = "") -> WebElement:
@@ -89,6 +90,7 @@ class Driver(webdriver.Chrome):
                 _logger.error(f"---no such element: {ctx}")
                 raise NoSuchElementException(ctx)
         _logger.info(f"---done waiting {name or css} to be {to_be}")
+        time.sleep(2)
         return self.find(css)
 
     def clicking(self, css: str, /, name: str = "") -> None:
@@ -102,11 +104,13 @@ class Driver(webdriver.Chrome):
         ActionChains(self).scroll_to_element(ele).pause(1).click(ele).perform()
         _logger.setLevel(logging.INFO)
         _logger.info(f"---done clicking {name or css}")
+        time.sleep(2)
 
     def goto(self, url: str) -> None:
         "Go to `url`"
         _logger.info(f"---goto {url}")
         self.get(url)
+        time.sleep(2)
 
     def goto_newtab_do_smth_then_goback(self, main_tab: str, fn: DriverFn) -> None:
         """
@@ -125,6 +129,7 @@ class Driver(webdriver.Chrome):
         _logger.info("---going back to main tab")
         self.close()
         self.switch_to.window(main_tab)
+        time.sleep(2)
 
     def clear_input(self, css: str) -> WebElement:
         "Find element by `css` then clear it"
@@ -136,6 +141,7 @@ class Driver(webdriver.Chrome):
         assert v is not None
         ele.send_keys(Keys.CONTROL, "a")
         ele.send_keys(Keys.DELETE)
+        time.sleep(2)
         return ele
 
 __all__ = ["Driver", "DriverFn"]
