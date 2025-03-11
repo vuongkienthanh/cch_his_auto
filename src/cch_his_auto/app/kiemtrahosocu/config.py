@@ -1,14 +1,16 @@
 from typing import TypedDict
 import json
-
 import os.path
 
-FILEPATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+from . import APP_PATH
+
+FILEPATH = os.path.join(APP_PATH, "config.json")
 
 class Config(TypedDict):
     headless: bool
     username: str
     password: str
+    department: str
     csv_path: str
 
 def save(config: Config):
@@ -24,5 +26,6 @@ def load() -> Config:
             "headless": False,
             "username": "",
             "password": "",
+            "department": "",
             "csv_path": "",
         }

@@ -2,17 +2,17 @@ import tkinter as tk
 from tkinter import messagebox
 import os.path
 
+TITLE = "Ký tờ điều trị hằng ngày"
+APP_PATH = os.path.dirname(os.path.abspath(__file__))
+PROFILE_PATH = os.path.join(APP_PATH, "Profile")
+
 from . import config
 from .patient_list import PatientFrame
 from ..common.username_password import UsernamePasswordFrame
-
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.auth import login, logout
 from cch_his_auto.tasks.todieutri import ingiayto as igt
 from cch_his_auto.tasks.todieutri import dangkyPHCN as dk
-
-TITLE = "Ký tờ điều trị hằng ngày"
-PROFILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Profile")
 
 class App(tk.Frame):
     def __init__(self):

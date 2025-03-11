@@ -1,11 +1,12 @@
 from typing import TypedDict
 import json
+import os.path
+from . import APP_PATH
+
+FILEPATH = os.path.join(APP_PATH, "config.json")
+PHCN_ORDER = ["bú nuốt", "giao tiếp", "hô hấp", "vận động"]
 
 from validators import url
-import os.path
-
-FILEPATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
-PHCN_ORDER = ["bú nuốt", "giao tiếp", "hô hấp", "vận động"]
 
 class LogInfo(TypedDict):
     username: str
