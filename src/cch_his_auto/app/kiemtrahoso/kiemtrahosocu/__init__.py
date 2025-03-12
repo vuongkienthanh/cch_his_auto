@@ -5,16 +5,20 @@ import os.path
 
 TITLE = "Kiểm tra hồ sơ cũ"
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
-PROFILE_PATH = os.path.join(APP_PATH, "Profile")
+
+from . import config
+from . import db
+
+from ..common import process
+
+from cch_his_auto.app.common.username_password import UsernamePasswordFrame
+from cch_his_auto.app import PROFILE_PATH
 
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.auth import login
 from cch_his_auto.tasks import danhsachnguoibenhnoitru
-from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan, danhsachnguoibenh
+from cch_his_auto.tasks.chitietnguoibenhnoitru import danhsachnguoibenh
 from cch_his_auto.tasks.common import choose_dept
-from ..common.username_password import UsernamePasswordFrame
-from . import config
-from . import db
 
 class App(tk.Frame):
     def __init__(self):
@@ -27,8 +31,8 @@ class App(tk.Frame):
         dept_row.grid(row=1, column=0, sticky="NEWS", padx=(50, 0))
         dept_row.columnconfigure(1, weight=1)
         tk.Label(dept_row, text="Khoa lâm sàng:", justify="right").grid(row=0, column=0)
-        dept = tk.StringVar()
-        dept_entry = tk.Entry(dept_row, textvariable=dept)
+        dept_var = tk.StringVar()
+        dept_entry = tk.Entry(dept_row, textvariable=dept_var)
         dept_entry.grid(row=0, column=1, sticky="w")
 
         csv_help_label = tk.Label(
@@ -56,7 +60,7 @@ class App(tk.Frame):
             headless.set(cf["headless"])
             bacsi.set_username(cf["username"])
             bacsi.set_password(cf["password"])
-            dept.set(cf["department"])
+            dept_var.set(cf["department"])
             csv_path_var.set(cf["csv_path"])
 
         def get_config() -> config.Config:
@@ -64,7 +68,7 @@ class App(tk.Frame):
                 "headless": headless.get(),
                 "username": bacsi.get_username(),
                 "password": bacsi.get_password(),
-                "department": dept.get(),
+                "department": dept_var.get(),
                 "csv_path": csv_path_var.get().strip(),
             }
 
@@ -128,12 +132,3 @@ def first_patient(driver: Driver, id: int):
 def next_patient(driver: Driver, id: int):
     danhsachnguoibenh.open(driver)
     danhsachnguoibenh.goto_patient(driver, id)
-
-def process(driver: Driver):
-    hosobenhan.open(driver)
-    hosobenhan.tobiabenhannhikhoa(driver)
-    hosobenhan.mucAbenhannhikhoa(driver)
-    hosobenhan.mucBtongketbenhan(driver)
-    hosobenhan.phieuchidinhxetnghiem(driver)
-    hosobenhan.todieutri(driver)
-    hosobenhan.close(driver)

@@ -4,11 +4,13 @@ import os.path
 
 TITLE = "Ký tờ điều trị hằng ngày"
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
-PROFILE_PATH = os.path.join(APP_PATH, "Profile")
 
 from . import config
 from .patient_list import PatientFrame
-from ..common.username_password import UsernamePasswordFrame
+
+from cch_his_auto.app.common.username_password import UsernamePasswordFrame
+from cch_his_auto.app import PROFILE_PATH
+
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.auth import login, logout
 from cch_his_auto.tasks.todieutri import ingiayto as igt
