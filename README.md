@@ -13,7 +13,7 @@ or using [`uv`](https://docs.astral.sh/uv/)
 uv add git+https://github.com/vuongkienthanh/cch_his_auto
 ```
 
-## Usage
+## Build your own workflow
 
 - Initialize driver (also a [selenium driver](https://www.selenium.dev/documentation/overview/), with some convenient methods)
 ```python
@@ -41,4 +41,9 @@ login(driver, username, password)
 - Close the driver when finished
 ```python
 driver.close()
+```
+
+## Or use my GUI which is built for my daily tasks
+```sh
+uv run src/cch_his_auto/app
 ```
