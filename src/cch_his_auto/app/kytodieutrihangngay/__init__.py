@@ -8,13 +8,15 @@ APP_PATH = os.path.dirname(os.path.abspath(__file__))
 from . import config
 from .patient_list import PatientFrame
 
-from cch_his_auto.app.common_ui.LogInfo import UsernamePasswordFrame
 from cch_his_auto.app import PROFILE_PATH
+from cch_his_auto.app.common_ui.LogInfo import UsernamePasswordFrame
+from cch_his_auto.app.patient_db import create_connection, exists, save_db
 
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.auth import login, logout
 from cch_his_auto.tasks.todieutri import ingiayto as igt
-from cch_his_auto.tasks.todieutri import dangkyPHCN as dk
+from cch_his_auto.tasks.todieutri import dangkyPHCN as dkphcn
+from cch_his_auto.tasks.chitietnguoibenhnoitru import get_signature
 
 class App(tk.Frame):
     def __init__(self):
@@ -121,7 +123,7 @@ def run(cf: config.Config):
                     cf["dieuduong"]["username"],
                     cf["dieuduong"]["password"],
                 )
-                run_dd(driver, cf)
+                run_dd_w_check_signature(driver, cf)
                 driver.close()
                 messagebox.showerror(message="chưa nhập bác sĩ")
             case _:
@@ -132,8 +134,22 @@ def run(cf: config.Config):
         messagebox.showerror(message="không có bệnh nhân")
 
 def run_bs(driver: Driver, config: config.Config):
+    con = create_connection()
     for p in config["patients"]:
         driver.goto(p["url"])
+        ma_hs = int(
+            driver.waiting(
+                ".patient-information .additional-item:nth-child(2) .info"
+            ).text
+        )
+        if not exists(con, ma_hs):
+            driver.clicking(".home-breadcrumbs div:nth-child(4) a")
+            driver.waiting(".patient-information .additional-item:nth-child(2) .info")
+            url = driver.current_url.encode()
+            signature = get_signature(driver)
+            save_db(con, url, signature)
+            driver.goto(p["url"])
+
         if p["ky_xetnghiem"]:
             igt.phieuchidinh(driver)
         if p["ky_todieutri"]:
@@ -141,18 +157,41 @@ def run_bs(driver: Driver, config: config.Config):
         if p["ky_3tra"]:
             igt.phieuthuchienylenh_bs(driver, p["ky_3tra"]["bacsi"])
         if any(p["phcn"]):
-            dk.open(driver)
-            dk.clear(driver)
+            dkphcn.open(driver)
+            dkphcn.clear(driver)
             for ph, fn in zip(
-                p["phcn"], [dk.bunuot, dk.giaotiep, dk.hohap, dk.vandong]
+                p["phcn"],
+                [dkphcn.bunuot, dkphcn.giaotiep, dkphcn.hohap, dkphcn.vandong],
             ):
                 if ph:
                     fn(driver)
-            dk.closemenu(driver)
-            dk.save(driver)
+            dkphcn.closemenu(driver)
+            dkphcn.save(driver)
+
+    con.close()
 
 def run_dd(driver: Driver, config: config.Config):
     for p in config["patients"]:
         driver.goto(p["url"])
         if p["ky_3tra"]:
             igt.phieuthuchienylenh_dd(driver, p["ky_3tra"]["dieuduong"])
+
+def run_dd_w_check_signature(driver: Driver, config: config.Config):
+    con = create_connection()
+    for p in config["patients"]:
+        driver.goto(p["url"])
+        ma_hs = int(
+            driver.waiting(
+                ".patient-information .additional-item:nth-child(2) .info"
+            ).text
+        )
+        if not exists(con, ma_hs):
+            driver.clicking(".home-breadcrumbs div:nth-child(4) a")
+            driver.waiting(".patient-information .additional-item:nth-child(2) .info")
+            url = driver.current_url.encode()
+            signature = get_signature(driver)
+            save_db(con, url, signature)
+            driver.goto(p["url"])
+        if p["ky_3tra"]:
+            igt.phieuthuchienylenh_dd(driver, p["ky_3tra"]["dieuduong"])
+    con.close()

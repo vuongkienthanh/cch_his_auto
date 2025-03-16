@@ -2,7 +2,7 @@ import tkinter as tk
 from typing import cast
 
 from .config import PHCN_ORDER, Patient
-from ..common.scrollable_frame import ScrollFrame
+from ..common_ui.scrollable_frame import ScrollFrame
 
 class PatientFrame(tk.Frame):
     def __init__(self, parent):

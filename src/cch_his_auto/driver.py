@@ -112,9 +112,9 @@ class Driver(webdriver.Chrome):
         self.get(url)
         time.sleep(2)
 
-    def goto_newtab_do_smth_then_goback(self, main_tab: str, fn: DriverFn) -> None:
+    def goto_newtab(self, main_tab: str) -> None:
         """
-        Go to a tab different than `main_tab` and execute `fn`.
+        Go to a tab different than `main_tab`
         - `main_tab`: you can can this using `driver.current_window_handle`
         """
         _logger.info("---go to new tab")
@@ -125,6 +125,13 @@ class Driver(webdriver.Chrome):
         else:
             self.quit()
             raise Exception("cant go to new tab")
+
+    def goto_newtab_do_smth_then_goback(self, main_tab: str, fn: DriverFn) -> None:
+        """
+        Go to a tab different than `main_tab` and execute `fn`.
+        - `main_tab`: you can can this using `driver.current_window_handle`
+        """
+        self.goto_newtab(main_tab)
         fn(self)
         _logger.info("---going back to main tab")
         self.close()

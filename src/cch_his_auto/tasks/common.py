@@ -33,8 +33,8 @@ def choose_dept(driver: Driver, dept: str):
             break
         except:
             try:
-                ele = driver.find(".khoaLamViec div span")
-                if ele.text.strip().lower() == dept.lower():
+                khoaspan = driver.find(".khoaLamViec div span")
+                if khoaspan.text.strip().lower() == dept.lower():
                     _logger.info("dept already set")
                     break
                 else:
@@ -42,3 +42,11 @@ def choose_dept(driver: Driver, dept: str):
                     driver.clicking(".khoaLamViec div span")
             except NoSuchElementException:
                 ...
+
+def draw_patient_name(driver:Driver):
+    # get img src
+    # createelement
+    # setattr src
+    # get canvas
+    # c.getContext('2d').drawImage(ele, 0,0, 400,200)
+    ...

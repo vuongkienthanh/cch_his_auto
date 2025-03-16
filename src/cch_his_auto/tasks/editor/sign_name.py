@@ -15,7 +15,7 @@ def sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
     for _ in range(100):
         time.sleep(1)
         if driver.find(btn_css).text.strip() == btn_txt:
-            time.sleep(5)
+            time.sleep(2)
             break
     else:
         return
@@ -117,20 +117,27 @@ def phieuCT(driver: Driver):
         img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(13) .sign-image img",
     )
 
-def phieuMRI_2(driver: Driver):
-    "*Phiếu chỉ định MRI, bs điều trị và bs tư vấn*"
+def phieuMRI_1(driver: Driver):
+    "*Phiếu chỉ định MRI, bs chỉ định*"
     sign(
         driver,
-        name="phieu MRI bs dieu tri",
+        name="phieu MRI bs chi dinh",
         btn_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(22) .sign-image button",
-        btn_txt="Xác nhận ký Bác sĩ điều trị",
+        btn_txt="Xác nhận ký Bác sĩ chỉ định",
         img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(22) .sign-image img",
     )
-    time.sleep(2)
+
+def phieuMRI_2(driver: Driver):
+    "*Phiếu chỉ định MRI, bs thực hiện*"
     sign(
         driver,
-        name="phieu MRI bs tu van",
+        name="phieu MRI bs thuc hien",
         btn_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25) .sign-image button",
-        btn_txt="Xác nhận ký Bác sĩ điều trị",
+        btn_txt="Xác nhận ký Bác sĩ thực hiện",
         img_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25) .sign-image img",
     )
+
+def phieuMRI_3(driver: Driver):
+    "*Phiếu chỉ định MRI, bs chỉ định & thực hiện*"
+    phieuMRI_1(driver)
+    phieuMRI_2(driver)

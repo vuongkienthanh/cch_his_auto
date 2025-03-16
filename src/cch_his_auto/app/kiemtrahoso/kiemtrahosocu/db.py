@@ -10,7 +10,7 @@ def create_connection():
 
     con.executescript(f"""
     CREATE TABLE IF NOT EXISTS {DB_NAME} (
-        id INTERGER PRIMARY KEY
+        id INTEGER PRIMARY KEY
     );
     """)
     return con

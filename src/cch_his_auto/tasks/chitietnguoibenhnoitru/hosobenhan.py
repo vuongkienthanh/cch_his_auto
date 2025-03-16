@@ -42,7 +42,7 @@ def filter(driver: Driver, name: str) -> bool:
                 ".right-content tbody tr:nth-child(2) td:nth-child(2) div"
             )
             if ele.text.strip().startswith(name):
-                _logger.error("filtered with result found")
+                _logger.info(f"found {name}")
                 return True
         except NoSuchElementException:
             pass
@@ -125,7 +125,7 @@ def filter_check_expand_sign_curent(driver: Driver, name: str):
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
             for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
-                if is_row_chuaky(driver ,i):
+                if is_row_chuaky(driver, i):
                     _logger.info("hoan thanh or dang ky: no")
                     driver.clicking(f"tbody tr:nth-child({i})")
                     time.sleep(1)
@@ -133,7 +133,7 @@ def filter_check_expand_sign_curent(driver: Driver, name: str):
                 else:
                     _logger.info("hoan thanh: yes")
         else:
-            if is_row_chuaky(driver ,2):
+            if is_row_chuaky(driver, 2):
                 _logger.info("hoan thanh or dang ky: no")
                 driver.clicking("tbody tr:nth-child(2)")
                 sign_current(driver)
@@ -147,7 +147,7 @@ def filter_check_expand_sign_new_tab(driver: Driver, name: str, sign_fn: DriverF
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
             for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
-                if is_row_chuaky(driver ,i):
+                if is_row_chuaky(driver, i):
                     _logger.info("hoan thanh or dang ky: no")
                     driver.clicking(f"tbody tr:nth-child({i})")
                     time.sleep(1)
@@ -155,7 +155,7 @@ def filter_check_expand_sign_new_tab(driver: Driver, name: str, sign_fn: DriverF
                 else:
                     _logger.info("hoan thanh: yes")
         else:
-            if is_row_chuaky(driver ,2):
+            if is_row_chuaky(driver, 2):
                 _logger.info("hoan thanh or dang ky: no")
                 sign_new_tab(driver, 2, sign_fn)
             else:
@@ -197,8 +197,9 @@ def phieuCT(driver: Driver):
     filter_check_expand_sign_new_tab(
         driver, name="Phiếu chỉ định chụp cắt lớp vi tính (CT)", sign_fn=e.phieuCT
     )
+
 def phieuMRI(driver: Driver):
     "Filter and sign name: *Phiếu chỉ định chụp MRI*"
     filter_check_expand_sign_new_tab(
-        driver, name="Phiếu chỉ định chụp cộng hưởng từ (MRI)", sign_fn=e.phieuMRI_2
+        driver, name="Phiếu chỉ định chụp cộng hưởng từ (MRI)", sign_fn=e.phieuMRI_3
     )

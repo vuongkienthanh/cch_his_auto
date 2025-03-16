@@ -9,11 +9,11 @@ from . import config
 
 from cch_his_auto.app import PROFILE_PATH
 from cch_his_auto.app.common_ui.LogInfo import UsernamePasswordDeptFrame
-from cch_his_auto.app.kiemtrahoso.common_tasks import process
 
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.auth import login
 from cch_his_auto.tasks import danhsachnguoibenhnoitru
+from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan
 from cch_his_auto.tasks.common import choose_dept
 
 class App(tk.Frame):
@@ -37,12 +37,6 @@ class App(tk.Frame):
         )
         id_var = tk.StringVar()
         tk.Entry(mainframe, textvariable=id_var).grid(row=0, column=1, sticky="w")
-        tk.Label(
-            mainframe,
-            text=process.__doc__ or "",
-            justify="left",
-            anchor="w",
-        ).grid(row=1, column=0, sticky="NEW", padx=20, columnspan=2)
 
         def load():
             cf = config.load()
@@ -80,7 +74,6 @@ class App(tk.Frame):
             fg="#ffffff",
         )
         run_btn.grid(row=2, column=0, pady=5)
-        run_btn.bind("<Button-1>", lambda _: run(get_config()))
         btns.grid(row=0, column=1, rowspan=2, padx=20, sticky="S", pady=(0, 20))
 
 def run(cf: config.Config):
@@ -91,3 +84,14 @@ def run(cf: config.Config):
     danhsachnguoibenhnoitru.goto_patient(driver, cf["id"])
     process(driver)
     driver.quit()
+
+def process(driver: Driver):
+    hosobenhan.open(driver)
+    # hosobenhan.tobiabenhannhikhoa(driver)
+    hosobenhan.mucAbenhannhikhoa(driver)
+    # hosobenhan.mucBtongketbenhan(driver)
+    hosobenhan.phieuchidinhxetnghiem(driver)
+    hosobenhan.todieutri(driver)
+    hosobenhan.phieuCT(driver)
+    hosobenhan.phieuMRI(driver)
+    hosobenhan.close(driver)

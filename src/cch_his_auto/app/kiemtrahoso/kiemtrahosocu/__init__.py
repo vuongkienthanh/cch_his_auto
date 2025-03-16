@@ -11,12 +11,11 @@ from . import db
 
 from cch_his_auto.app import PROFILE_PATH
 from cch_his_auto.app.common_ui.LogInfo import UsernamePasswordDeptFrame
-from cch_his_auto.app.kiemtrahoso.common_tasks import process
 
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.auth import login
 from cch_his_auto.tasks import danhsachnguoibenhnoitru
-from cch_his_auto.tasks.chitietnguoibenhnoitru import danhsachnguoibenh
+from cch_his_auto.tasks.chitietnguoibenhnoitru import danhsachnguoibenh, hosobenhan
 from cch_his_auto.tasks.common import choose_dept
 
 class App(tk.Frame):
@@ -139,3 +138,20 @@ def first_patient(driver: Driver, id: int):
 def next_patient(driver: Driver, id: int):
     danhsachnguoibenh.open(driver)
     danhsachnguoibenh.goto_patient(driver, id)
+
+def process(driver: Driver):
+    """
+    Chức năng hiện tại:
+        + Tờ bìa, mục A, mục B
+        + phiếu chỉ định, tờ điều trị
+        + Phiếu CT, MRI
+    """
+    hosobenhan.open(driver)
+    hosobenhan.tobiabenhannhikhoa(driver)
+    hosobenhan.mucAbenhannhikhoa(driver)
+    hosobenhan.mucBtongketbenhan(driver)
+    hosobenhan.phieuchidinhxetnghiem(driver)
+    hosobenhan.todieutri(driver)
+    hosobenhan.phieuCT(driver)
+    hosobenhan.phieuMRI(driver)
+    hosobenhan.close(driver)

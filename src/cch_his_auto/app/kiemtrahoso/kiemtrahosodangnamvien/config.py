@@ -13,6 +13,7 @@ class Config(TypedDict):
     department: str
     id: int
 
+
 def save(config: Config):
     with open(FILEPATH, "w") as f:
         json.dump(config, f, indent=4)
