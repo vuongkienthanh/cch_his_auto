@@ -8,7 +8,7 @@ APP_PATH = os.path.dirname(os.path.abspath(__file__))
 from . import config
 from .patient_list import PatientFrame
 
-from cch_his_auto.app.common.username_password import UsernamePasswordFrame
+from cch_his_auto.app.common.LogInfo import UsernamePasswordFrame
 from cch_his_auto.app import PROFILE_PATH
 
 from cch_his_auto.driver import Driver
@@ -20,25 +20,30 @@ class App(tk.Frame):
     def __init__(self):
         super().__init__()
         self.columnconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
 
-        staff_info = tk.LabelFrame(self, text="Thông tin đăng nhập")
-        bacsi = UsernamePasswordFrame(staff_info, label="Bác sĩ")
-        dieuduong = UsernamePasswordFrame(staff_info, label="Điều dưỡng")
-        staff_info.grid(row=0, column=0, sticky="N", columnspan=2)
+        info = tk.LabelFrame(self, text="Thông tin đăng nhập")
+        bacsi = UsernamePasswordFrame(info, text="Bác sĩ")
+        dieuduong = UsernamePasswordFrame(info, text="Điều dưỡng")
+        headless = tk.BooleanVar()
+        headless_btn = tk.Checkbutton(
+            info,
+            text="Headless Chrome",
+            variable=headless,
+            onvalue=True,
+            offvalue=False,
+        )
+        headless_btn.grid(row=1, column=0, columnspan=2, pady=5)
+
+        info.grid(row=0, column=0, sticky="N", pady=20)
         bacsi.grid(row=0, column=0)
         dieuduong.grid(row=0, column=1)
 
-        patientframe = PatientFrame(self)
-        patientframe.grid(row=1, column=0, sticky="NSEW", rowspan=7)
-
-        headless = tk.BooleanVar()
-        headless_btn = tk.Checkbutton(
-            self, text="headless", variable=headless, onvalue=True, offvalue=False
-        )
-        headless_btn.grid(row=1, column=1)
+        mainframe = PatientFrame(self)
+        mainframe.grid(row=1, column=0, sticky="NSEW")
 
         def load():
-            patientframe.clear()
+            mainframe.clear()
             cf = config.load()
             headless.set(cf["headless"])
             bacsi.set_username(cf["bacsi"]["username"])
@@ -46,7 +51,7 @@ class App(tk.Frame):
             dieuduong.set_username(cf["dieuduong"]["username"])
             dieuduong.set_password(cf["dieuduong"]["password"])
             for p in cf["patients"]:
-                patientframe.add_patient(p)
+                mainframe.add_patient(p)
 
         def get_config() -> config.Config:
             return {
@@ -59,7 +64,7 @@ class App(tk.Frame):
                     "username": dieuduong.get_username(),
                     "password": dieuduong.get_password(),
                 },
-                "patients": patientframe.get_patients(),
+                "patients": mainframe.get_patients(),
             }
 
         def save():
@@ -67,24 +72,25 @@ class App(tk.Frame):
             if messagebox.askyesno(message="Save?"):
                 messagebox.Message(default=messagebox.OK, message="Đã lưu").show()
 
-        load_btn = tk.Button(self, text="Load", command=load, width=10)
-        load_btn.grid(row=2, column=1)
-        save_btn = tk.Button(self, text="Save", command=save, width=10)
-        save_btn.grid(row=3, column=1)
-
+        btns = tk.Frame(self)
+        load_btn = tk.Button(btns, text="Load", command=load, width=10)
+        load_btn.grid(row=0, column=0, pady=5)
+        save_btn = tk.Button(btns, text="Save", command=save, width=10)
+        save_btn.grid(row=1, column=0, pady=5)
         new_btn = tk.Button(
-            self, text="Add", command=lambda: patientframe.add_new(), width=10
+            btns, text="Add", command=lambda: mainframe.add_new(), width=10
         )
-        new_btn.grid(row=5, column=1)
+        new_btn.grid(row=2, column=0, pady=5)
         run_btn = tk.Button(
-            self,
+            btns,
             text="RUN",
             command=lambda: run(get_config()),
             width=10,
             bg="#ff0073",
             fg="#ffffff",
         )
-        run_btn.grid(row=6, column=1, padx=20)
+        run_btn.grid(row=3, column=0, pady=5)
+        btns.grid(row=0, column=1, rowspan=2, padx=20, sticky="S", pady=(0, 20))
 
 def run(cf: config.Config):
     if config.is_patient_list_valid(cf):

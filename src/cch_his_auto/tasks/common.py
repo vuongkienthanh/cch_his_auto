@@ -29,11 +29,12 @@ def choose_dept(driver: Driver, dept: str):
                     ".ant-modal-body .bottom-action .bottom-action-right button"
                 )
             ).perform()
+            driver.waiting(".khoaLamViec div span")
             break
         except:
             try:
                 ele = driver.find(".khoaLamViec div span")
-                if ele.text.strip() == dept:
+                if ele.text.strip().lower() == dept.lower():
                     _logger.info("dept already set")
                     break
                 else:
@@ -41,5 +42,3 @@ def choose_dept(driver: Driver, dept: str):
                     driver.clicking(".khoaLamViec div span")
             except NoSuchElementException:
                 ...
-
-__all__ = ["choose_dept"]

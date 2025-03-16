@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import cast
 from cch_his_auto.app import kytodieutrihangngay
-from cch_his_auto.app import kiemtrahosocu
+from cch_his_auto.app import kiemtrahoso
 
 class MainApp(tk.Tk):
     def __init__(self):
@@ -13,10 +13,11 @@ class MainApp(tk.Tk):
             "<Control-a>",
             lambda e: cast(tk.Entry, e.widget).select_range(0, "end"),
         )
-
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
         nb = ttk.Notebook(self)
-        nb.pack(fill="both")
-        nb.add(kytodieutrihangngay.App(), text=kytodieutrihangngay.TITLE)
-        nb.add(kiemtrahosocu.App(), text=kiemtrahosocu.TITLE, sticky="NSEW")
+        nb.grid(row=0, column=0, sticky="NSEW")
+        nb.add(kytodieutrihangngay.App(), text=kytodieutrihangngay.TITLE, sticky="NSEW")
+        nb.add(kiemtrahoso.App(), text=kiemtrahoso.TITLE, sticky="NSEW")
 
 MainApp().mainloop()

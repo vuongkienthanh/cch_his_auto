@@ -36,6 +36,8 @@ class PatientFrame(tk.Frame):
         phcn.grid(row=0, column=4, sticky="NSEW")
         delete_btn.grid(row=0, column=5, sticky="NSWE", padx=(0, 15))
 
+        self.rowconfigure(1, weight=1)
+        self.columnconfigure(0, weight=1)
         self.listframe = PatientList(self)
         self.listframe.grid(row=1, column=0, sticky="NSEW")
 

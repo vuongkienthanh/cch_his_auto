@@ -24,7 +24,7 @@ def filter_listing(con: sqlite3.Connection, csv_path: str) -> list[int]:
     with open(csv_path, mode="r", encoding="utf-8-sig") as f:
         for id in f.readlines():
             if con.execute(
-                "SELECT EXISTS( SELECT * FROM kiemtrahosocu WHERE id =?)", (id,)
+                f"SELECT EXISTS( SELECT * FROM {DB_NAME} WHERE id =?)", (id,)
             ).fetchone() == (0,):
                 listing.append(int(id))
     return listing
