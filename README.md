@@ -17,7 +17,7 @@ uv add git+https://github.com/vuongkienthanh/cch_his_auto
 
 - Initialize driver (also a [selenium driver](https://www.selenium.dev/documentation/overview/), with some convenient methods)
 ```python
-from cch_his_auto import Driver
+from cch_his_auto.driver import Driver
 driver = Driver()
 ```
 

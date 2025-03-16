@@ -7,10 +7,9 @@ APP_PATH = os.path.dirname(os.path.abspath(__file__))
 
 from . import config
 
-from ..common import process, APP_DETAIL
-
-from cch_his_auto.app.common.LogInfo import UsernamePasswordDeptFrame
 from cch_his_auto.app import PROFILE_PATH
+from cch_his_auto.app.common_ui.LogInfo import UsernamePasswordDeptFrame
+from cch_his_auto.app.kiemtrahoso.common_tasks import process
 
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.auth import login
@@ -40,7 +39,7 @@ class App(tk.Frame):
         tk.Entry(mainframe, textvariable=id_var).grid(row=0, column=1, sticky="w")
         tk.Label(
             mainframe,
-            text=APP_DETAIL,
+            text=process.__doc__ or "",
             justify="left",
             anchor="w",
         ).grid(row=1, column=0, sticky="NEW", padx=20, columnspan=2)

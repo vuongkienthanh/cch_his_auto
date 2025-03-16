@@ -7,7 +7,7 @@ import logging
 from selenium.common import StaleElementReferenceException
 from selenium.webdriver import ActionChains, Keys
 
-from cch_his_auto import Driver
+from cch_his_auto.driver import Driver
 
 _logger = logging.getLogger()
 

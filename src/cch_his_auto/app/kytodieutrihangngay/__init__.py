@@ -8,7 +8,7 @@ APP_PATH = os.path.dirname(os.path.abspath(__file__))
 from . import config
 from .patient_list import PatientFrame
 
-from cch_his_auto.app.common.LogInfo import UsernamePasswordFrame
+from cch_his_auto.app.common_ui.LogInfo import UsernamePasswordFrame
 from cch_his_auto.app import PROFILE_PATH
 
 from cch_his_auto.driver import Driver

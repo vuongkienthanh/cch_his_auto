@@ -85,7 +85,7 @@ def filter_patient(driver: Driver, id: int) -> bool:
     except:
         return False
 
-def goto_patient(driver: Driver, id:int):
+def goto_patient(driver: Driver, id: int):
     "Filter patient based on `id`, then open that patient"
     if filter_patient(driver, id):
         driver.clicking(

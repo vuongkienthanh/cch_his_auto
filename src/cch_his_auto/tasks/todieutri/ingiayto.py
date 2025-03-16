@@ -6,7 +6,7 @@ import logging
 import time
 from functools import partial
 
-from cch_his_auto import Driver
+from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.editor import sign_name as e
 
 _logger = logging.getLogger()

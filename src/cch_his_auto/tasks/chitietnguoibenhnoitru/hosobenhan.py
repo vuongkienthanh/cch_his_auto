@@ -61,8 +61,15 @@ def is_row_dangky(driver: Driver, idx: int) -> bool:
     "Check if row at `idx` is *Đang ký*, first row is id=2"
     ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
-    _logger.info(f"checking {name}: Hoan thanh")
+    _logger.info(f"checking {name}: Dang ky")
     return ele.text.strip() == "Đang ký"
+
+def is_row_chuaky(driver: Driver, idx: int) -> bool:
+    "Check if row at `idx` is *Chưa ký*, first row is id=2"
+    ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
+    name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
+    _logger.info(f"checking {name}: Chua ky")
+    return ele.text.strip() == "Chưa ký"
 
 def is_row_expandable(driver: Driver, idx: int) -> bool:
     "Check if row at `idx` is expandable, first row is id=2"
@@ -118,7 +125,7 @@ def filter_check_expand_sign_curent(driver: Driver, name: str):
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
             for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
-                if not is_row_hoanthanh(driver, i) or not is_row_dangky(driver, i):
+                if is_row_chuaky(driver ,i):
                     _logger.info("hoan thanh or dang ky: no")
                     driver.clicking(f"tbody tr:nth-child({i})")
                     time.sleep(1)
@@ -126,9 +133,9 @@ def filter_check_expand_sign_curent(driver: Driver, name: str):
                 else:
                     _logger.info("hoan thanh: yes")
         else:
-            if not is_row_hoanthanh(driver, 2) or not is_row_dangky(driver, 2):
-                driver.clicking("tbody tr:nth-child(2)")
+            if is_row_chuaky(driver ,2):
                 _logger.info("hoan thanh or dang ky: no")
+                driver.clicking("tbody tr:nth-child(2)")
                 sign_current(driver)
             else:
                 _logger.info("hoan thanh: yes")
@@ -140,7 +147,7 @@ def filter_check_expand_sign_new_tab(driver: Driver, name: str, sign_fn: DriverF
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
             for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
-                if not is_row_hoanthanh(driver, i) or not is_row_dangky(driver, i):
+                if is_row_chuaky(driver ,i):
                     _logger.info("hoan thanh or dang ky: no")
                     driver.clicking(f"tbody tr:nth-child({i})")
                     time.sleep(1)
@@ -148,7 +155,7 @@ def filter_check_expand_sign_new_tab(driver: Driver, name: str, sign_fn: DriverF
                 else:
                     _logger.info("hoan thanh: yes")
         else:
-            if not is_row_hoanthanh(driver, 2) or not is_row_dangky(driver, 2):
+            if is_row_chuaky(driver ,2):
                 _logger.info("hoan thanh or dang ky: no")
                 sign_new_tab(driver, 2, sign_fn)
             else:
@@ -184,3 +191,14 @@ def phieuchidinhxetnghiem(driver: Driver):
 def todieutri(driver: Driver):
     "Filter and sign name: *Tờ điều trị*"
     filter_check_expand_sign_new_tab(driver, name="Tờ điều trị", sign_fn=e.todieutri)
+
+def phieuCT(driver: Driver):
+    "Filter and sign name: *Phiếu chỉ định chụp CT*"
+    filter_check_expand_sign_new_tab(
+        driver, name="Phiếu chỉ định chụp cắt lớp vi tính (CT)", sign_fn=e.phieuCT
+    )
+def phieuMRI(driver: Driver):
+    "Filter and sign name: *Phiếu chỉ định chụp MRI*"
+    filter_check_expand_sign_new_tab(
+        driver, name="Phiếu chỉ định chụp cộng hưởng từ (MRI)", sign_fn=e.phieuMRI
+    )

@@ -29,7 +29,7 @@ def tobiabenhannhikhoa(driver: Driver):
     sign(
         driver,
         name="to bia benh an nhi khoa",
-        btn_css=".layout-line-item div:nth-child(2) .sign-image",
+        btn_css=".layout-line-item div:nth-child(2) .sign-image button",
         btn_txt="Xác nhận ký Trưởng khoa",
         img_css=".layout-line-item div:nth-child(2) .sign-image img",
     )
@@ -39,7 +39,7 @@ def mucAbenhannhikhoa(driver: Driver):
     sign(
         driver,
         name="muc A",
-        btn_css=".sign-image",
+        btn_css=".sign-image button",
         btn_txt="Xác nhận ký Bác sĩ làm bệnh án",
         img_css=".sign-image img",
     )
@@ -49,7 +49,7 @@ def mucBtongketbenhan(driver: Driver):
     sign(
         driver,
         name="muc B",
-        btn_css="td:nth-child(3) .sign-image",
+        btn_css="td:nth-child(3) .sign-image button",
         btn_txt="Xác nhận ký Bác sĩ điều trị",
         img_css="td:nth-child(3) .sign-image img",
     )
@@ -59,7 +59,7 @@ def todieutri(driver: Driver):
     sign(
         driver,
         name="to dieu tri",
-        btn_css=".sign-image",
+        btn_css=".sign-image button",
         btn_txt="Xác nhận ký Bác sĩ điều trị",
         img_css=".sign-image img",
     )
@@ -106,3 +106,31 @@ def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
                 continue
     _logger.info("finish sign page: phieu thuc hien y lenh dd")
     time.sleep(2)
+
+def phieuCT(driver: Driver):
+    "*Phiếu chỉ định CT*"
+    sign(
+        driver,
+        name="phieu CT",
+        btn_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(13) .sign-image button",
+        btn_txt="Xác nhận ký Bác sĩ điều trị",
+        img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(13) .sign-image img",
+    )
+
+def phieuMRI(driver: Driver):
+    "Phiếu chỉ định MRI"
+    sign(
+        driver,
+        name="phieu MRI bs dieu tri",
+        btn_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(22) .sign-image button",
+        btn_txt="Xác nhận ký Bác sĩ điều trị",
+        img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(22) .sign-image img",
+    )
+    time.sleep(2)
+    sign(
+        driver,
+        name="phieu MRI bs tu van",
+        btn_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25) .sign-image button",
+        btn_txt="Xác nhận ký Bác sĩ điều trị",
+        img_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25) .sign-image img",
+    )
