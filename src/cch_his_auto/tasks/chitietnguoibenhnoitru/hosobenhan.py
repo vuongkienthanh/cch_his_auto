@@ -10,7 +10,7 @@ from selenium.webdriver import Keys
 from selenium.common import NoSuchElementException, StaleElementReferenceException
 
 from cch_his_auto.driver import Driver, DriverFn
-from cch_his_auto.tasks.editor import sign_name as e
+from cch_his_auto.tasks.editor import sign_staff_name as e
 
 _logger = logging.getLogger()
 

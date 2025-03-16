@@ -15,6 +15,7 @@ class LogInfo(TypedDict):
 class Ky_3tra(TypedDict):
     bacsi: tuple[bool, bool, bool, bool, bool]
     dieuduong: tuple[bool, bool, bool, bool, bool]
+    benhnhan: tuple[bool, bool, bool, bool, bool]
 
 class Patient(TypedDict):
     url: str
@@ -29,6 +30,7 @@ class Config(TypedDict):
     bacsi: LogInfo
     dieuduong: LogInfo
     patients: list[Patient]
+    department: str
 
 def save(config: Config):
     with open(FILEPATH, "w") as f:
@@ -50,6 +52,7 @@ def load() -> Config:
                 "password": "",
             },
             "patients": [],
+            "department":""
         }
 
 def is_patient_list_valid(config: Config) -> bool:

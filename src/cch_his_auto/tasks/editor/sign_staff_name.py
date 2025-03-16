@@ -5,17 +5,22 @@
 import logging
 import time
 
+from selenium.common import NoSuchElementException
+
 from cch_his_auto.driver import Driver
 
 _logger = logging.getLogger()
 
 def sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
     "@private"
-    driver.waiting(btn_css)
-    for _ in range(100):
+    try:
+        driver.waiting(btn_css)
+    except NoSuchElementException:
+        return
+    for _ in range(20):
         time.sleep(1)
         if driver.find(btn_css).text.strip() == btn_txt:
-            time.sleep(2)
+            time.sleep(1)
             break
     else:
         return

@@ -7,7 +7,8 @@ import time
 from functools import partial
 
 from cch_his_auto.driver import Driver
-from cch_his_auto.tasks.editor import sign_name as e
+from cch_his_auto.tasks.editor import sign_staff_name as e
+from cch_his_auto.tasks.editor import sign_patient_name
 
 _logger = logging.getLogger()
 
@@ -59,19 +60,30 @@ def phieuchidinh(driver: Driver):
         time.sleep(3)
 
 def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, bool]):
-    "`open` *Phiếu thực hiện y lệnh*, then sign it (bác sĩ). Won't do anything if all False"
-    if any(arr):
-        main_tab = driver.current_window_handle
-        if open(driver, "Phiếu thực hiện y lệnh"):
-            driver.goto_newtab_do_smth_then_goback(
-                main_tab, partial(e.phieuthuchienylenh_bs, arr=arr)
-            )
+    "`open` *Phiếu thực hiện y lệnh*, then sign it (bác sĩ)"
+    main_tab = driver.current_window_handle
+    if open(driver, "Phiếu thực hiện y lệnh"):
+        driver.goto_newtab_do_smth_then_goback(
+            main_tab, partial(e.phieuthuchienylenh_bs, arr=arr)
+        )
 
 def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, bool]):
-    "`open` *Phiếu thực hiện y lệnh*, then sign it (điều dưỡng). Won't do anything if all False"
-    if any(arr):
-        main_tab = driver.current_window_handle
-        if open(driver, "Phiếu thực hiện y lệnh"):
-            driver.goto_newtab_do_smth_then_goback(
-                main_tab, partial(e.phieuthuchienylenh_dd, arr=arr)
-            )
+    "`open` *Phiếu thực hiện y lệnh*, then sign it (điều dưỡng)"
+    main_tab = driver.current_window_handle
+    if open(driver, "Phiếu thực hiện y lệnh"):
+        driver.goto_newtab_do_smth_then_goback(
+            main_tab, partial(e.phieuthuchienylenh_dd, arr=arr)
+        )
+
+def phieuthuchienylenh_bn(
+    driver: Driver, arr: tuple[bool, bool, bool, bool, bool], signature: str
+):
+    "`open` *Phiếu thực hiện y lệnh*, then sign it (bệnh nhân)"
+    main_tab = driver.current_window_handle
+    if open(driver, "Phiếu thực hiện y lệnh"):
+        driver.goto_newtab_do_smth_then_goback(
+            main_tab,
+            partial(
+                sign_patient_name.phieuthuchienylenh, arr=arr, signature=signature
+            ),
+        )

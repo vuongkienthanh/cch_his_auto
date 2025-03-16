@@ -68,7 +68,7 @@ class PatientList(ScrollFrame):
         line.grid(row=len(self.viewPort.grid_slaves()), column=0, sticky="EW")
 
     def get_patients(self) -> list[Patient]:
-        return [cast(Line, p).to_patient() for p in self.viewPort.grid_slaves()[::-1]]
+        return [cast(Line, p).get_patient() for p in self.viewPort.grid_slaves()[::-1]]
 
     def clear(self):
         for w in self.viewPort.grid_slaves():
@@ -91,6 +91,11 @@ class Line(tk.Frame):
         self.dd_2_var = tk.BooleanVar()
         self.dd_3_var = tk.BooleanVar()
         self.dd_4_var = tk.BooleanVar()
+        self.bn_0_var = tk.BooleanVar()
+        self.bn_1_var = tk.BooleanVar()
+        self.bn_2_var = tk.BooleanVar()
+        self.bn_3_var = tk.BooleanVar()
+        self.bn_4_var = tk.BooleanVar()
         self.bunuot_var = tk.BooleanVar()
         self.giaotiep_var = tk.BooleanVar()
         self.hohap_var = tk.BooleanVar()
@@ -106,18 +111,27 @@ class Line(tk.Frame):
         tdt_checkbox.select()
 
         k3t = tk.Frame(self, borderwidth=10)
+
         k3t_bs = tk.LabelFrame(k3t, text="Bác sĩ")
-        k3t_dd = tk.LabelFrame(k3t, text="Điều dưỡng")
         k3t_bs_0 = tk.Checkbutton(k3t_bs, variable=self.bs_0_var)
         k3t_bs_1 = tk.Checkbutton(k3t_bs, variable=self.bs_1_var)
         k3t_bs_2 = tk.Checkbutton(k3t_bs, variable=self.bs_2_var)
         k3t_bs_3 = tk.Checkbutton(k3t_bs, variable=self.bs_3_var)
         k3t_bs_4 = tk.Checkbutton(k3t_bs, variable=self.bs_4_var)
+
+        k3t_dd = tk.LabelFrame(k3t, text="Điều dưỡng")
         k3t_dd_0 = tk.Checkbutton(k3t_dd, variable=self.dd_0_var)
         k3t_dd_1 = tk.Checkbutton(k3t_dd, variable=self.dd_1_var)
         k3t_dd_2 = tk.Checkbutton(k3t_dd, variable=self.dd_2_var)
         k3t_dd_3 = tk.Checkbutton(k3t_dd, variable=self.dd_3_var)
         k3t_dd_4 = tk.Checkbutton(k3t_dd, variable=self.dd_4_var)
+
+        k3t_bn = tk.LabelFrame(k3t, text="Bệnh nhân")
+        k3t_bn_0 = tk.Checkbutton(k3t_bn, variable=self.bn_0_var)
+        k3t_bn_1 = tk.Checkbutton(k3t_bn, variable=self.bn_1_var)
+        k3t_bn_2 = tk.Checkbutton(k3t_bn, variable=self.bn_2_var)
+        k3t_bn_3 = tk.Checkbutton(k3t_bn, variable=self.bn_3_var)
+        k3t_bn_4 = tk.Checkbutton(k3t_bn, variable=self.bn_4_var)
 
         phcn = tk.Frame(self)
         bunuot = tk.Checkbutton(phcn, variable=self.bunuot_var, text=PHCN_ORDER[0])
@@ -144,12 +158,14 @@ class Line(tk.Frame):
         tdt_checkbox.grid(row=0, column=2)
 
         k3t.grid(row=0, column=3)
+
         k3t_bs.grid(row=0, column=0)
         k3t_bs_0.grid(row=0, column=0)
         k3t_bs_1.grid(row=0, column=1)
         k3t_bs_2.grid(row=0, column=2)
         k3t_bs_3.grid(row=0, column=3)
         k3t_bs_4.grid(row=0, column=4)
+
         k3t_dd.grid(row=1, column=0)
         k3t_dd_0.grid(row=0, column=0)
         k3t_dd_1.grid(row=0, column=1)
@@ -157,6 +173,12 @@ class Line(tk.Frame):
         k3t_dd_3.grid(row=0, column=3)
         k3t_dd_4.grid(row=0, column=4)
 
+        k3t_bn.grid(row=2, column=0)
+        k3t_bn_0.grid(row=0, column=0)
+        k3t_bn_1.grid(row=0, column=1)
+        k3t_bn_2.grid(row=0, column=2)
+        k3t_bn_3.grid(row=0, column=3)
+        k3t_bn_4.grid(row=0, column=4)
         phcn.grid(
             row=0,
             column=4,
@@ -183,12 +205,17 @@ class Line(tk.Frame):
         self.dd_2_var.set(patient["ky_3tra"]["dieuduong"][2])
         self.dd_3_var.set(patient["ky_3tra"]["dieuduong"][3])
         self.dd_4_var.set(patient["ky_3tra"]["dieuduong"][4])
+        self.bn_0_var.set(patient["ky_3tra"]["benhnhan"][0])
+        self.bn_1_var.set(patient["ky_3tra"]["benhnhan"][1])
+        self.bn_2_var.set(patient["ky_3tra"]["benhnhan"][2])
+        self.bn_3_var.set(patient["ky_3tra"]["benhnhan"][3])
+        self.bn_4_var.set(patient["ky_3tra"]["benhnhan"][4])
         self.bunuot_var.set(patient["phcn"][0])
         self.giaotiep_var.set(patient["phcn"][1])
         self.hohap_var.set(patient["phcn"][2])
         self.vandong_var.set(patient["phcn"][3])
 
-    def to_patient(self) -> Patient:
+    def get_patient(self) -> Patient:
         return {
             "url": self.url_var.get(),
             "note": self.note_var.get(),
@@ -208,6 +235,13 @@ class Line(tk.Frame):
                     self.dd_2_var.get(),
                     self.dd_3_var.get(),
                     self.dd_4_var.get(),
+                ),
+                "benhnhan": (
+                    self.bn_0_var.get(),
+                    self.bn_1_var.get(),
+                    self.bn_2_var.get(),
+                    self.bn_3_var.get(),
+                    self.bn_4_var.get(),
                 ),
             },
             "phcn": (
