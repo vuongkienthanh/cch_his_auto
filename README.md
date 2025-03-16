@@ -43,7 +43,7 @@ login(driver, username, password)
 driver.close()
 ```
 
-## Or use my GUI which is built for my daily tasks
+## Or use GUI which is built for my daily tasks
 ```sh
-uv run src/cch_his_auto/app
+uv run src/cch_his_auto/app/main.py
 ```

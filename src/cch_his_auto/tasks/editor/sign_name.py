@@ -117,8 +117,8 @@ def phieuCT(driver: Driver):
         img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(13) .sign-image img",
     )
 
-def phieuMRI(driver: Driver):
-    "Phiếu chỉ định MRI"
+def phieuMRI_2(driver: Driver):
+    "*Phiếu chỉ định MRI, bs điều trị và bs tư vấn*"
     sign(
         driver,
         name="phieu MRI bs dieu tri",

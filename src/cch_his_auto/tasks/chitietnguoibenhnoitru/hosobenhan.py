@@ -200,5 +200,5 @@ def phieuCT(driver: Driver):
 def phieuMRI(driver: Driver):
     "Filter and sign name: *Phiếu chỉ định chụp MRI*"
     filter_check_expand_sign_new_tab(
-        driver, name="Phiếu chỉ định chụp cộng hưởng từ (MRI)", sign_fn=e.phieuMRI
+        driver, name="Phiếu chỉ định chụp cộng hưởng từ (MRI)", sign_fn=e.phieuMRI_2
     )
