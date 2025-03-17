@@ -80,6 +80,7 @@ def choose_dept(driver: Driver, dept: str):
                 ...
 
 def login_then_choose_dept(driver: Driver, username: str, password: str, dept: str):
+    "`login` and goto `danhsachnguoibenhnoitru.URL` then `choose_dept`"
     login(driver, username, password)
     driver.goto(danhsachnguoibenhnoitru.URL)
     choose_dept(driver, dept)

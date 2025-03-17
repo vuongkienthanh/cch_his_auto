@@ -2,8 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import cast
 
-from cch_his_auto.app import kytodieutrihangngay
-from cch_his_auto.app import kiemtrahoso
+from cch_his_auto.app import kiemtrahoso, kybangkexuatvien, kytodieutrihangngay
 
 class MainApp(tk.Tk):
     def __init__(self):
@@ -21,8 +20,9 @@ class MainApp(tk.Tk):
         self.geometry(f"{w * 1200}x{h * 900}")
         nb = ttk.Notebook(self)
         nb.grid(row=0, column=0, sticky="NSEW")
-        nb.add(kytodieutrihangngay.App(), text=kytodieutrihangngay.TITLE, sticky="NSEW")
-        nb.add(kiemtrahoso.App(), text=kiemtrahoso.TITLE, sticky="NSEW")
+
+        for m in [kytodieutrihangngay, kiemtrahoso, kybangkexuatvien]:
+            nb.add(m.App(), text=m.TITLE, sticky="NSEW")
 
 if __name__ == "__main__":
     MainApp().mainloop()

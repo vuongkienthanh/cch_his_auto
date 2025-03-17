@@ -1,14 +1,13 @@
 import os.path
+import tkinter as tk
+from tkinter import messagebox, filedialog
 
 TITLE = "Kiểm tra hồ sơ cũ"
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
 
-import tkinter as tk
-from tkinter import messagebox, filedialog
-
 from . import config
-from ..common import process, first_patient, next_patient
-
+from ..common import process
+from cch_his_auto.app.common_tasks.navigation import first_patient, next_patient
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks import danhsachnguoibenhnoitru
 
@@ -23,8 +22,10 @@ class App(tk.Frame):
         info = tk.LabelFrame(self, text="Thông tin đăng nhập")
         bacsi = UsernamePasswordDeptFrame(info, text="Bác sĩ ký tên")
         bacsi.grid(row=0, column=0)
-        headless = tk.BooleanVar()
-        headless_btn = tk.Checkbutton(info, variable=headless, text="Headless Chrome")
+        headless_var = tk.BooleanVar()
+        headless_btn = tk.Checkbutton(
+            info, variable=headless_var, text="Headless Chrome"
+        )
         headless_btn.grid(row=1, column=0, pady=5)
         info.grid(row=0, column=0, sticky="N", pady=20)
 
@@ -59,7 +60,7 @@ class App(tk.Frame):
 
         def load():
             cf = config.load()
-            headless.set(cf["headless"])
+            headless_var.set(cf["headless"])
             bacsi.set_username(cf["username"])
             bacsi.set_password(cf["password"])
             bacsi.set_department(cf["department"])
@@ -67,7 +68,7 @@ class App(tk.Frame):
 
         def get_config() -> config.Config:
             return {
-                "headless": headless.get(),
+                "headless": headless_var.get(),
                 "username": bacsi.get_username(),
                 "password": bacsi.get_password(),
                 "department": bacsi.get_department(),

@@ -1,14 +1,16 @@
+import os.path
+import sqlite3
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
-import os.path
 
-TITLE = "Kiểm tra hồ sơ đang nằm viện"
+TITLE = "Ký bảng kê xuất viện"
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
 
 from . import config
-from ..common import process
 from cch_his_auto.app.common_tasks.navigation import first_patient, next_patient
+from cch_his_auto.app.common_tasks.signature import get_signature
 from cch_his_auto.driver import Driver
+from cch_his_auto.app.ma_hs_db import create_connection
 
 class App(tk.Frame):
     def __init__(self):
@@ -19,8 +21,8 @@ class App(tk.Frame):
         from cch_his_auto.app.common_ui.staff_info import UsernamePasswordDeptFrame
 
         info = tk.LabelFrame(self, text="Thông tin đăng nhập")
-        bacsi = UsernamePasswordDeptFrame(info, text="Bác sĩ ký tên")
-        bacsi.grid(row=0, column=0)
+        staff = UsernamePasswordDeptFrame(info, text="Nhân viên")
+        staff.grid(row=0, column=0)
         headless_var = tk.BooleanVar()
         headless_btn = tk.Checkbutton(
             info, variable=headless_var, text="Headless Chrome"
@@ -35,28 +37,22 @@ class App(tk.Frame):
         )
         dsmahs = scrolledtext.ScrolledText(mainframe)
         dsmahs.grid(row=1, column=0, padx=20, sticky="NSEW")
-        tk.Label(
-            mainframe,
-            text=process.__doc__ or "",
-            justify="left",
-            anchor="w",
-        ).grid(row=2, column=0, sticky="SEW", padx=20)
 
         def load():
             cf = config.load()
             headless_var.set(cf["headless"])
-            bacsi.set_username(cf["username"])
-            bacsi.set_password(cf["password"])
-            bacsi.set_department(cf["department"])
+            staff.set_username(cf["username"])
+            staff.set_password(cf["password"])
+            staff.set_department(cf["department"])
             dsmahs.delete("1.0", "end")
             dsmahs.insert("1.0", cf["ds_ma_hs"])
 
         def get_config() -> config.Config:
             return {
                 "headless": headless_var.get(),
-                "username": bacsi.get_username(),
-                "password": bacsi.get_password(),
-                "department": bacsi.get_department(),
+                "username": staff.get_username(),
+                "password": staff.get_password(),
+                "department": staff.get_department(),
                 "ds_ma_hs": dsmahs.get("1.0", "end"),
             }
 
@@ -85,20 +81,27 @@ def run(cf: config.Config):
     from cch_his_auto.tasks.auth import login_then_choose_dept
     from cch_his_auto.app import PROFILE_PATH
 
-    driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-
-    # set up HIS
-    login_then_choose_dept(driver, cf["username"], cf["password"], cf["department"])
-
     listing = [int(ma_hs) for ma_hs in cf["ds_ma_hs"].strip().splitlines()]
+    print(listing)
 
-    ma_hs = listing.pop()
-    first_patient(driver, ma_hs)
-    process(driver)
+    # driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
+    #
+    # # set up HIS
+    # login_then_choose_dept(driver, cf["username"], cf["password"], cf["department"])
 
-    while len(listing) > 0:
-        ma_hs = listing.pop()
-        next_patient(driver, ma_hs)
-        process(driver)
+    # con = create_connection()
+    #
+    # ma_hs = listing.pop()
+    # first_patient(driver, ma_hs)
+    # process(driver, con, ma_hs)
+    #
+    # while len(listing) > 0:
+    #     ma_hs = listing.pop()
+    #     next_patient(driver, ma_hs)
+    #     process(driver, con, ma_hs)
+    #
+    # con.close()
+    # driver.quit()
 
-    driver.quit()
+def process(driver: Driver, con: sqlite3.Connection, ma_hs: int):
+    signature = get_signature(driver, con, ma_hs)

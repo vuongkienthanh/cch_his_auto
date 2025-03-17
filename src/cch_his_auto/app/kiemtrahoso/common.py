@@ -1,6 +1,5 @@
 from cch_his_auto.driver import Driver
-from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan, danhsachnguoibenh
-from cch_his_auto.tasks import danhsachnguoibenhnoitru
+from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan
 
 def process(driver: Driver):
     """
@@ -20,10 +19,3 @@ def process(driver: Driver):
     hosobenhan.phieuMRI(driver)
     hosobenhan.giaiphaubenh(driver)
     hosobenhan.close(driver)
-
-def first_patient(driver: Driver, ma_hs: int):
-    danhsachnguoibenhnoitru.goto_patient(driver, ma_hs)
-
-def next_patient(driver: Driver, ma_hs: int):
-    danhsachnguoibenh.open(driver)
-    danhsachnguoibenh.goto_patient(driver, ma_hs)
