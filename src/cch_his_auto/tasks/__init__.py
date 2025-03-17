@@ -6,7 +6,6 @@
 
 from cch_his_auto.tasks import (
     auth,
-    common,
     editor,
     danhsachnguoibenhnoitru,
     chitietnguoibenhnoitru,
@@ -15,7 +14,6 @@ from cch_his_auto.tasks import (
 
 __all__ = [
     "auth",
-    "common",
     "editor",
     "danhsachnguoibenhnoitru",
     "chitietnguoibenhnoitru",

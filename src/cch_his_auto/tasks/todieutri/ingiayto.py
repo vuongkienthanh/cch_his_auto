@@ -7,8 +7,7 @@ import time
 from functools import partial
 
 from cch_his_auto.driver import Driver
-from cch_his_auto.tasks.editor import sign_staff_name as e
-from cch_his_auto.tasks.editor import sign_patient_name
+from cch_his_auto.tasks.editor import sign_staff_name, sign_patient_name
 
 _logger = logging.getLogger()
 
@@ -32,7 +31,7 @@ def todieutri(driver: Driver):
     "`open` *Tờ điều trị*, then sign it"
     main_tab = driver.current_window_handle
     if open(driver, name="Tờ điều trị"):
-        driver.goto_newtab_do_smth_then_goback(main_tab, e.todieutri)
+        driver.goto_newtab_do_smth_then_goback(main_tab, sign_staff_name.todieutri)
 
 def phieuchidinh(driver: Driver):
     "`open` *Phiếu chỉ định* , then sign it"
@@ -64,7 +63,7 @@ def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
     main_tab = driver.current_window_handle
     if open(driver, "Phiếu thực hiện y lệnh"):
         driver.goto_newtab_do_smth_then_goback(
-            main_tab, partial(e.phieuthuchienylenh_bs, arr=arr)
+            main_tab, partial(sign_staff_name.phieuthuchienylenh_bs, arr=arr)
         )
 
 def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, bool]):
@@ -72,7 +71,7 @@ def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
     main_tab = driver.current_window_handle
     if open(driver, "Phiếu thực hiện y lệnh"):
         driver.goto_newtab_do_smth_then_goback(
-            main_tab, partial(e.phieuthuchienylenh_dd, arr=arr)
+            main_tab, partial(sign_staff_name.phieuthuchienylenh_dd, arr=arr)
         )
 
 def phieuthuchienylenh_bn(
@@ -83,7 +82,5 @@ def phieuthuchienylenh_bn(
     if open(driver, "Phiếu thực hiện y lệnh"):
         driver.goto_newtab_do_smth_then_goback(
             main_tab,
-            partial(
-                sign_patient_name.phieuthuchienylenh, arr=arr, signature=signature
-            ),
+            partial(sign_patient_name.phieuthuchienylenh, arr=arr, signature=signature),
         )

@@ -70,29 +70,29 @@ def filter_boloc_thoigiannhapvien(driver: Driver, start: dt.date, end: dt.date):
         driver.find(".date-1 .ant-picker-input:nth-child(3) input"), end_d
     ).send_keys(Keys.ENTER).perform()
 
-def filter_patient(driver: Driver, id: int) -> bool:
-    "Filter patient based on `id`"
+def filter_patient(driver: Driver, ma_hs: int) -> bool:
+    "Filter patient based on `ma_hs`"
     ele = driver.clear_input(".base-search_component .ant-col:nth-child(2) input")
-    _logger.info(f"+++++ typing {id} to search entry")
-    ele.send_keys(str(id))
+    _logger.info(f"+++++ typing {ma_hs} to search entry")
+    ele.send_keys(str(ma_hs))
     ele.send_keys(Keys.ENTER)
     time.sleep(2)
     try:
         driver.waiting_to_be(
-            ".ant-table-body tbody tr:nth-child(2) td:nth-child(8)", str(id)
+            ".ant-table-body tbody tr:nth-child(2) td:nth-child(8)", str(ma_hs)
         )
         return True
     except:
         return False
 
-def goto_patient(driver: Driver, id: int):
-    "Filter patient based on `id`, then open that patient"
-    if filter_patient(driver, id):
+def goto_patient(driver: Driver, ma_hs: int):
+    "Filter patient based on `ma_hs`, then open that patient"
+    if filter_patient(driver, ma_hs):
         driver.clicking(
             ".ant-table-body tbody tr:nth-child(2) td:nth-child(30)",
             "first row",
         )
         driver.waiting_to_be(
-            ".patient-information .ant-row span:nth-child(2) b", str(id)
+            ".patient-information .ant-row span:nth-child(2) b", str(ma_hs)
         )
         time.sleep(2)

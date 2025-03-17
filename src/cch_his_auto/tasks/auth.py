@@ -6,8 +6,12 @@ import logging
 import time
 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common import NoSuchElementException
 
 from cch_his_auto.driver import Driver
+from cch_his_auto.tasks import danhsachnguoibenhnoitru
 
 _logger = logging.getLogger()
 
@@ -44,3 +48,42 @@ def logout(driver: Driver):
     driver.clicking(".ant-popover .item-action:nth-child(3)", "logout")
     _logger.info("finish logout")
     driver.waiting(".login-body")
+
+def choose_dept(driver: Driver, dept: str):
+    "Choose department with exact `dept`"
+    for _ in range(120):
+        time.sleep(1)
+        try:
+            ele = driver.find(".ant-modal-body input")
+            _logger.info("found dept picker")
+            ActionChains(driver).send_keys_to_element(
+                ele, Keys.ARROW_DOWN
+            ).send_keys_to_element(ele, dept).send_keys_to_element(
+                ele, Keys.ENTER
+            ).click(
+                driver.find(
+                    ".ant-modal-body .bottom-action .bottom-action-right button"
+                )
+            ).perform()
+            driver.waiting(".khoaLamViec div span")
+            break
+        except:
+            try:
+                khoa = driver.find(".khoaLamViec div span")
+                if khoa.text.strip().lower() == dept.lower():
+                    _logger.info("dept already set")
+                    break
+                else:
+                    _logger.info(f"dept not set to {dept}")
+                    driver.clicking(".khoaLamViec div span")
+            except NoSuchElementException:
+                ...
+
+def login_then_choose_dept(driver: Driver, username: str, password: str, dept: str):
+    login(driver, username, password)
+    driver.goto(danhsachnguoibenhnoitru.URL)
+    choose_dept(driver, dept)
+
+def logout_then_login(driver: Driver, username: str, password: str):
+    logout(driver)
+    login(driver, username, password)

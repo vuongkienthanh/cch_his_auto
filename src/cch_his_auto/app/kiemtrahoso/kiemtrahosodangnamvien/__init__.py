@@ -1,26 +1,23 @@
-import tkinter as tk
-from tkinter import messagebox
 import os.path
 
 TITLE = "Kiểm tra hồ sơ đang nằm viện"
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
 
-from . import config
+import tkinter as tk
+from tkinter import messagebox, scrolledtext
 
-from cch_his_auto.app import PROFILE_PATH
-from cch_his_auto.app.common_ui.LogInfo import UsernamePasswordDeptFrame
+from . import config
+from ..common import process, first_patient, next_patient
 
 from cch_his_auto.driver import Driver
-from cch_his_auto.tasks.auth import login
-from cch_his_auto.tasks import danhsachnguoibenhnoitru
-from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan
-from cch_his_auto.tasks.common import choose_dept
 
 class App(tk.Frame):
     def __init__(self):
         super().__init__()
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
+
+        from cch_his_auto.app.common_ui.staff_info import UsernamePasswordDeptFrame
 
         info = tk.LabelFrame(self, text="Thông tin đăng nhập")
         bacsi = UsernamePasswordDeptFrame(info, text="Bác sĩ ký tên")
@@ -32,11 +29,17 @@ class App(tk.Frame):
 
         mainframe = tk.Frame(self)
         mainframe.grid(row=1, column=0, sticky="NSEW")
-        tk.Label(mainframe, text="Mã hồ sơ:", justify="right").grid(
-            row=0, column=0, padx=(20, 0)
+        tk.Label(mainframe, text="Danh sách mã hồ sơ:", anchor="w").grid(
+            row=0, column=0, padx=20, sticky="NEW"
         )
-        id_var = tk.StringVar()
-        tk.Entry(mainframe, textvariable=id_var).grid(row=0, column=1, sticky="w")
+        dsmahs = scrolledtext.ScrolledText(mainframe)
+        dsmahs.grid(row=1, column=0, padx=20, sticky="NSEW")
+        tk.Label(
+            mainframe,
+            text=process.__doc__ or "",
+            justify="left",
+            anchor="w",
+        ).grid(row=2, column=0, sticky="SEW", padx=20)
 
         def load():
             cf = config.load()
@@ -44,7 +47,7 @@ class App(tk.Frame):
             bacsi.set_username(cf["username"])
             bacsi.set_password(cf["password"])
             bacsi.set_department(cf["department"])
-            id_var.set(str(cf["id"]))
+            dsmahs.insert("1.0", cf["ds_ma_hs"])
 
         def get_config() -> config.Config:
             return {
@@ -52,7 +55,7 @@ class App(tk.Frame):
                 "username": bacsi.get_username(),
                 "password": bacsi.get_password(),
                 "department": bacsi.get_department(),
-                "id": int(id_var.get()),
+                "ds_ma_hs": dsmahs.get("1.0", "end"),
             }
 
         def save():
@@ -77,21 +80,23 @@ class App(tk.Frame):
         btns.grid(row=0, column=1, rowspan=2, padx=20, sticky="S", pady=(0, 20))
 
 def run(cf: config.Config):
-    driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-    login(driver, cf["username"], cf["password"])
-    driver.goto(danhsachnguoibenhnoitru.URL)
-    choose_dept(driver, cf["department"])
-    danhsachnguoibenhnoitru.goto_patient(driver, cf["id"])
-    process(driver)
-    driver.quit()
+    from cch_his_auto.tasks.auth import login_then_choose_dept
+    from cch_his_auto.app import PROFILE_PATH
 
-def process(driver: Driver):
-    hosobenhan.open(driver)
-    # hosobenhan.tobiabenhannhikhoa(driver)
-    hosobenhan.mucAbenhannhikhoa(driver)
-    # hosobenhan.mucBtongketbenhan(driver)
-    hosobenhan.phieuchidinhxetnghiem(driver)
-    hosobenhan.todieutri(driver)
-    hosobenhan.phieuCT(driver)
-    hosobenhan.phieuMRI(driver)
-    hosobenhan.close(driver)
+    driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
+
+    # set up HIS
+    login_then_choose_dept(driver, cf["username"], cf["password"], cf["department"])
+
+    listing = [int(ma_hs) for ma_hs in cf["ds_ma_hs"].strip().splitlines()]
+
+    ma_hs = listing.pop()
+    first_patient(driver, ma_hs)
+    process(driver)
+
+    while len(listing) > 0:
+        ma_hs = listing.pop()
+        next_patient(driver, ma_hs)
+        process(driver)
+
+    driver.quit()

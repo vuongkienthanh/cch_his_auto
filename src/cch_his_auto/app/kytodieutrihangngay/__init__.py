@@ -1,11 +1,10 @@
-import tkinter as tk
-from tkinter import messagebox
 import os.path
-import logging
 
 TITLE = "Ký tờ điều trị hằng ngày"
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
-_logger = logging.getLogger()
+
+import tkinter as tk
+from tkinter import messagebox
 
 from . import config
 
@@ -18,22 +17,22 @@ class App(tk.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
 
-        from cch_his_auto.app.common_ui.LogInfo import UsernamePasswordFrame
+        from cch_his_auto.app.common_ui.staff_info import UsernamePasswordFrame
         from .patient_list import PatientFrame
 
         info = tk.LabelFrame(self, text="Thông tin đăng nhập")
         bacsi = UsernamePasswordFrame(info, text="Bác sĩ")
         dieuduong = UsernamePasswordFrame(info, text="Điều dưỡng")
         dept_var = tk.StringVar()
-        tk.Label(info, text="Khoa lâm sàng:", justify="right").grid(row=1, column=0)
-        tk.Entry(info, textvariable=dept_var).grid(row=1, column=1)
+        tk.Label(info, text="Khoa lâm sàng:", justify="right").grid(
+            row=1, column=0, sticky="E"
+        )
+        tk.Entry(info, textvariable=dept_var).grid(row=1, column=1, sticky="W")
         headless_var = tk.BooleanVar()
         headless_btn = tk.Checkbutton(
             info,
             text="Headless Chrome",
             variable=headless_var,
-            onvalue=True,
-            offvalue=False,
         )
 
         info.grid(row=0, column=0, sticky="N", pady=20)
@@ -98,17 +97,21 @@ class App(tk.Frame):
 
 def run(cf: config.Config):
     from cch_his_auto.app import PROFILE_PATH
-    from cch_his_auto.tasks.auth import login, logout
+    from cch_his_auto.tasks.auth import login_then_choose_dept, logout_then_login
 
     if config.is_patient_list_valid(cf):
         bs, dd = config.is_bs_valid(cf), config.is_dd_valid(cf)
         match (bs, dd):
             case (True, True):
                 driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-                login(driver, cf["bacsi"]["username"], cf["bacsi"]["password"])
+                login_then_choose_dept(
+                    driver,
+                    cf["bacsi"]["username"],
+                    cf["bacsi"]["password"],
+                    cf["department"],
+                )
                 run_bs(driver, cf)
-                logout(driver)
-                login(
+                logout_then_login(
                     driver,
                     cf["dieuduong"]["username"],
                     cf["dieuduong"]["password"],
@@ -118,17 +121,23 @@ def run(cf: config.Config):
                 driver.close()
             case (True, False):
                 driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-                login(driver, cf["bacsi"]["username"], cf["bacsi"]["password"])
+                login_then_choose_dept(
+                    driver,
+                    cf["bacsi"]["username"],
+                    cf["bacsi"]["password"],
+                    cf["department"],
+                )
                 run_bs(driver, cf)
                 run_bn(driver, cf)
                 driver.close()
                 messagebox.showerror(message="chưa nhập điều dưỡng")
             case (False, True):
                 driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-                login(
+                login_then_choose_dept(
                     driver,
                     cf["dieuduong"]["username"],
                     cf["dieuduong"]["password"],
+                    cf["department"],
                 )
                 run_dd(driver, cf)
                 run_bn(driver, cf)
@@ -172,38 +181,19 @@ def run_dd(driver: Driver, cf: config.Config):
             igt.phieuthuchienylenh_dd(driver, p["ky_3tra"]["dieuduong"])
 
 def run_bn(driver: Driver, cf: config.Config):
-    from cch_his_auto.app.patient_db import (
-        create_connection,
-        exists_in_db,
-        save_db,
-        get_signature_from_db,
-    )
-    from cch_his_auto.tasks import danhsachnguoibenhnoitru as dsnbnt
-    from cch_his_auto.tasks.common import choose_dept
-    from cch_his_auto.tasks.chitietnguoibenhnoitru import finding_signature
-
-    driver.goto(dsnbnt.URL)
-    choose_dept(driver, cf["department"])
+    from cch_his_auto.app.ma_hs_db import create_connection
+    from cch_his_auto.app.common_tasks.signature import get_signature
 
     con = create_connection()
     for p in cf["patients"]:
         driver.goto(p["url"])
         ma_hs = int(
             driver.waiting(
-                ".patient-information .additional-item:nth-child(2) .info"
+                ".patient-information .additional-item:nth-child(2) .info",
+                "ma ho so",
             ).text
         )
-        if not exists_in_db(con, ma_hs):
-            _logger.info("patient signature not found")
-            url = driver.current_url
-            driver.clicking(".home-breadcrumbs div:nth-child(4) a")
-            driver.waiting(".patient-information .additional-item:nth-child(2) .info")
-            signature = finding_signature(driver)
-            save_db(con, ma_hs, url, signature)
-            _logger.info("patient signature saved")
-            driver.goto(p["url"])
+        signature = get_signature(driver, con, ma_hs)
         if any(p["ky_3tra"]["benhnhan"]):
-            igt.phieuthuchienylenh_bn(
-                driver, p["ky_3tra"]["benhnhan"], get_signature_from_db(con, ma_hs)
-            )
+            igt.phieuthuchienylenh_bn(driver, p["ky_3tra"]["benhnhan"], signature)
     con.close()

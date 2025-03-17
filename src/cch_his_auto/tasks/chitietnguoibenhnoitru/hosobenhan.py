@@ -10,7 +10,7 @@ from selenium.webdriver import Keys
 from selenium.common import NoSuchElementException, StaleElementReferenceException
 
 from cch_his_auto.driver import Driver, DriverFn
-from cch_his_auto.tasks.editor import sign_staff_name as e
+from cch_his_auto.tasks.editor import sign_staff_name as sign_staff_name
 
 _logger = logging.getLogger()
 
@@ -167,13 +167,15 @@ def tobiabenhannhikhoa(driver: Driver):
     filter_check_expand_sign_new_tab(
         driver,
         name="Tờ bìa bệnh án Nhi khoa",
-        sign_fn=e.tobiabenhannhikhoa,
+        sign_fn=sign_staff_name.tobiabenhannhikhoa,
     )
 
 def mucAbenhannhikhoa(driver: Driver):
     "Filter and sign name: *Mục A bệnh án nhi khoa*"
     filter_check_expand_sign_new_tab(
-        driver, name="Mục A - Bệnh án Nhi khoa", sign_fn=e.mucAbenhannhikhoa
+        driver,
+        name="Mục A - Bệnh án Nhi khoa",
+        sign_fn=sign_staff_name.mucAbenhannhikhoa,
     )
 
 def mucBtongketbenhan(driver: Driver):
@@ -181,7 +183,7 @@ def mucBtongketbenhan(driver: Driver):
     filter_check_expand_sign_new_tab(
         driver,
         name="Mục B - Tổng kết Bệnh án (Nội khoa, Nhi Khoa, Truyền nhiễm, Sơ sinh, Da liễu, DD-PHCN, HHTM)",
-        sign_fn=e.mucBtongketbenhan,
+        sign_fn=sign_staff_name.mucBtongketbenhan,
     )
 
 def phieuchidinhxetnghiem(driver: Driver):
@@ -190,16 +192,30 @@ def phieuchidinhxetnghiem(driver: Driver):
 
 def todieutri(driver: Driver):
     "Filter and sign name: *Tờ điều trị*"
-    filter_check_expand_sign_new_tab(driver, name="Tờ điều trị", sign_fn=e.todieutri)
+    filter_check_expand_sign_new_tab(
+        driver, name="Tờ điều trị", sign_fn=sign_staff_name.todieutri
+    )
 
 def phieuCT(driver: Driver):
     "Filter and sign name: *Phiếu chỉ định chụp CT*"
     filter_check_expand_sign_new_tab(
-        driver, name="Phiếu chỉ định chụp cắt lớp vi tính (CT)", sign_fn=e.phieuCT
+        driver,
+        name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
+        sign_fn=sign_staff_name.phieuCT,
     )
 
 def phieuMRI(driver: Driver):
     "Filter and sign name: *Phiếu chỉ định chụp MRI*"
     filter_check_expand_sign_new_tab(
-        driver, name="Phiếu chỉ định chụp cộng hưởng từ (MRI)", sign_fn=e.phieuMRI_3
+        driver,
+        name="Phiếu chỉ định chụp cộng hưởng từ (MRI)",
+        sign_fn=sign_staff_name.phieuMRI_3,
+    )
+
+def giaiphaubenh(driver: Driver):
+    "Filter and sign name: *Phiếu xét nghiệm giải phẫu bệnh sinh thiết*"
+    filter_check_expand_sign_new_tab(
+        driver,
+        name="Phiếu xét nghiệm giải phẫu bệnh sinh thiết",
+        sign_fn=sign_staff_name.giaiphaubenh,
     )

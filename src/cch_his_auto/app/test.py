@@ -4,14 +4,14 @@ def run():
     from cch_his_auto.tasks.auth import login
     from cch_his_auto.tasks import danhsachnguoibenhnoitru
     from cch_his_auto.tasks.common import choose_dept
-    from cch_his_auto.tasks.chitietnguoibenhnoitru import finding_signature
+    from cch_his_auto.tasks.chitietnguoibenhnoitru import get_signature_from_web
 
     driver = Driver(profile_path=PROFILE_PATH)
     login(driver, "thanh.vuong", "96700840aB;")
     driver.goto(danhsachnguoibenhnoitru.URL)
     choose_dept(driver, "Khoa Ngoại thần kinh")
     danhsachnguoibenhnoitru.goto_patient(driver, 2412271409)
-    print(finding_signature(driver))
+    print(get_signature_from_web(driver))
 
     driver.quit()
 

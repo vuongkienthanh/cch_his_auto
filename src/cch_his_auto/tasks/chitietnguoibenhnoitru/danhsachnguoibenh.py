@@ -24,24 +24,24 @@ def close(driver: Driver):
     driver.clicking(".ant-drawer-mask", "close danh sach nguoi benh")
     time.sleep(5)
 
-def filter_patient(driver: Driver, id: int) -> bool:
-    "Filter patient based on `id`"
+def filter_patient(driver: Driver, ma_hs: int) -> bool:
+    "Filter patient based on `ma_hs`"
     ele = driver.clear_input(".ant-drawer .searching input")
-    _logger.info(f"+++++ typing {id} to search entry")
-    ele.send_keys(str(id))
+    _logger.info(f"+++++ typing {ma_hs} to search entry")
+    ele.send_keys(str(ma_hs))
     ele.send_keys(Keys.ENTER)
     time.sleep(2)
     try:
-        driver.waiting_to_be("tbody tr:nth-child(2) td:nth-child(3)", str(id))
+        driver.waiting_to_be("tbody tr:nth-child(2) td:nth-child(3)", str(ma_hs))
         return True
     except:
         return False
 
-def goto_patient(driver: Driver, id: int):
-    "Filter patient based on `id`, then open that patient"
-    if filter_patient(driver, id):
+def goto_patient(driver: Driver, ma_hs: int):
+    "Filter patient based on `ma_hs`, then open that patient"
+    if filter_patient(driver, ma_hs):
         driver.clicking("tbody tr:nth-child(2)", "first row")
         driver.waiting_to_be(
-            ".patient-information .ant-row span:nth-child(2) b", str(id)
+            ".patient-information .ant-row span:nth-child(2) b", str(ma_hs)
         )
         time.sleep(2)

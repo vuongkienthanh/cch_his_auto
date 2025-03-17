@@ -10,21 +10,21 @@ def create_connection():
 
     con.executescript(f"""
     CREATE TABLE IF NOT EXISTS {DB_NAME} (
-        id INTEGER PRIMARY KEY
+        ma_hs INTEGER PRIMARY KEY
     );
     """)
     return con
 
-def save_db(con: sqlite3.Connection, id: int):
-    con.execute(f"INSERT INTO {DB_NAME} VALUES (?)", (id,))
+def save_db(con: sqlite3.Connection, ma_hs: int):
+    con.execute(f"INSERT INTO {DB_NAME} VALUES (?)", (ma_hs,))
     con.commit()
 
 def filter_listing(con: sqlite3.Connection, csv_path: str) -> list[int]:
     listing = []
     with open(csv_path, mode="r", encoding="utf-8-sig") as f:
-        for id in f.readlines():
+        for ma_hs in f.readlines():
             if con.execute(
-                f"SELECT EXISTS( SELECT * FROM {DB_NAME} WHERE id =?)", (id,)
+                f"SELECT EXISTS( SELECT * FROM {DB_NAME} WHERE ma_hs =?)", (ma_hs,)
             ).fetchone() == (0,):
-                listing.append(int(id))
+                listing.append(int(ma_hs))
     return listing

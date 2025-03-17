@@ -11,8 +11,14 @@ class Config(TypedDict):
     username: str
     password: str
     department: str
-    id: int
-
+    ds_ma_hs: str
+    # tobia: bool
+    # mucA: bool
+    # mucB: bool
+    # phieuchidinh:bool
+    # todieutri:bool
+    # phieuCT: bool
+    # phieuMRI1:bool
 
 def save(config: Config):
     with open(FILEPATH, "w") as f:
@@ -28,5 +34,5 @@ def load() -> Config:
             "username": "",
             "password": "",
             "department": "",
-            "id": 0,
+            "ds_ma_hs": "",
         }

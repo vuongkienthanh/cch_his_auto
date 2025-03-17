@@ -18,7 +18,7 @@ class MainApp(tk.Tk):
         self.columnconfigure(0, weight=1)
         h = self.winfo_height()
         w = self.winfo_width()
-        self.geometry(f"{w*1200}x{h * 900}")
+        self.geometry(f"{w * 1200}x{h * 900}")
         nb = ttk.Notebook(self)
         nb.grid(row=0, column=0, sticky="NSEW")
         nb.add(kytodieutrihangngay.App(), text=kytodieutrihangngay.TITLE, sticky="NSEW")

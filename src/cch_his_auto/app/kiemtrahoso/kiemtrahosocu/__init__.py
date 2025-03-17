@@ -1,28 +1,24 @@
-import tkinter as tk
-from tkinter import messagebox
-from tkinter import filedialog
 import os.path
 
 TITLE = "Kiểm tra hồ sơ cũ"
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
 
-from . import config
-from . import db
+import tkinter as tk
+from tkinter import messagebox, filedialog
 
-from cch_his_auto.app import PROFILE_PATH
-from cch_his_auto.app.common_ui.LogInfo import UsernamePasswordDeptFrame
+from . import config
+from ..common import process, first_patient, next_patient
 
 from cch_his_auto.driver import Driver
-from cch_his_auto.tasks.auth import login
 from cch_his_auto.tasks import danhsachnguoibenhnoitru
-from cch_his_auto.tasks.chitietnguoibenhnoitru import danhsachnguoibenh, hosobenhan
-from cch_his_auto.tasks.common import choose_dept
 
 class App(tk.Frame):
     def __init__(self):
         super().__init__()
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
+
+        from cch_his_auto.app.common_ui.staff_info import UsernamePasswordDeptFrame
 
         info = tk.LabelFrame(self, text="Thông tin đăng nhập")
         bacsi = UsernamePasswordDeptFrame(info, text="Bác sĩ ký tên")
@@ -104,6 +100,10 @@ def run(cf: config.Config):
     if not os.path.exists(cf["csv_path"]):
         return
 
+    from . import db
+    from cch_his_auto.app import PROFILE_PATH
+    from cch_his_auto.tasks.auth import login_then_choose_dept
+
     con = db.create_connection()
     listing = db.filter_listing(con, cf["csv_path"])
 
@@ -113,45 +113,19 @@ def run(cf: config.Config):
     driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
 
     # set up HIS
-    login(driver, cf["username"], cf["password"])
-    driver.goto(danhsachnguoibenhnoitru.URL)
-    choose_dept(driver, cf["department"])
+    login_then_choose_dept(driver, cf["username"], cf["password"], cf["department"])
     danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
 
-    id = listing.pop()
-    first_patient(driver, id)
+    ma_hs = listing.pop()
+    first_patient(driver, ma_hs)
     process(driver)
-    db.save_db(con, id)
+    db.save_db(con, ma_hs)
 
     while len(listing) > 0:
-        id = listing.pop()
-        next_patient(driver, id)
+        ma_hs = listing.pop()
+        next_patient(driver, ma_hs)
         process(driver)
-        db.save_db(con, id)
+        db.save_db(con, ma_hs)
 
     driver.quit()
     con.close()
-
-def first_patient(driver: Driver, id: int):
-    danhsachnguoibenhnoitru.goto_patient(driver, id)
-
-def next_patient(driver: Driver, id: int):
-    danhsachnguoibenh.open(driver)
-    danhsachnguoibenh.goto_patient(driver, id)
-
-def process(driver: Driver):
-    """
-    Chức năng hiện tại:
-        + Tờ bìa, mục A, mục B
-        + phiếu chỉ định, tờ điều trị
-        + Phiếu CT, MRI
-    """
-    hosobenhan.open(driver)
-    hosobenhan.tobiabenhannhikhoa(driver)
-    hosobenhan.mucAbenhannhikhoa(driver)
-    hosobenhan.mucBtongketbenhan(driver)
-    hosobenhan.phieuchidinhxetnghiem(driver)
-    hosobenhan.todieutri(driver)
-    hosobenhan.phieuCT(driver)
-    hosobenhan.phieuMRI(driver)
-    hosobenhan.close(driver)

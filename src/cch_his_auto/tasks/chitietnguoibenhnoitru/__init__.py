@@ -7,7 +7,7 @@ from cch_his_auto.driver import Driver
 URL = "http://emr.ndtp.org/quan-ly-noi-tru/chi-tiet-nguoi-benh-noi-tru/"
 "All tasks in this submodule work under this url."
 
-def finding_signature(driver: Driver) -> str:
+def get_signature_from_web(driver: Driver) -> str:
     "get signature src of current patient"
     from .indieuduong import open, goto
 

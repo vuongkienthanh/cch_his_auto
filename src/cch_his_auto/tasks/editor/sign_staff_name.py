@@ -146,3 +146,13 @@ def phieuMRI_3(driver: Driver):
     "*Phiếu chỉ định MRI, bs chỉ định & thực hiện*"
     phieuMRI_1(driver)
     phieuMRI_2(driver)
+
+def giaiphaubenh(driver: Driver):
+    "*Phiếu xét nghiệm giải phẫu bệnh sinh thiết*"
+    sign(
+        driver,
+        name="phieu giai phau benh",
+        btn_css=".sign-image button",
+        btn_txt="Xác nhận ký BÁC SĨ ĐIỀU TRỊ",
+        img_css=".sign-image img",
+    )
