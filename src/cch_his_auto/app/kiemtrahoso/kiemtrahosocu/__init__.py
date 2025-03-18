@@ -104,9 +104,12 @@ def run(cf: config.Config):
     from . import db
     from cch_his_auto.app import PROFILE_PATH
     from cch_his_auto.tasks.auth import login_then_choose_dept
+    from cch_his_auto.app.common_tasks.signature import get_signature_wo_goback
+    from cch_his_auto.app.ma_hs_db import create_connection
 
-    con = db.create_connection()
-    listing = db.filter_listing(con, cf["csv_path"])
+    local_con = db.create_connection()
+    ma_hs_con = create_connection()
+    listing = db.filter_listing(local_con, cf["csv_path"])
 
     if len(listing) == 0:
         return
@@ -119,15 +122,18 @@ def run(cf: config.Config):
 
     ma_hs = listing.pop()
     first_patient(driver, ma_hs)
-    process(driver)
-    db.save_db(con, ma_hs)
+    signature = get_signature_wo_goback(driver, ma_hs_con, ma_hs)
+    process(driver, signature)
+    db.save_db(local_con, ma_hs)
 
     while len(listing) > 0:
         ma_hs = listing.pop()
+        signature = get_signature_wo_goback(driver, ma_hs_con, ma_hs)
         next_patient(driver, ma_hs)
-        process(driver)
-        db.save_db(con, ma_hs)
+        process(driver, signature)
+        db.save_db(local_con, ma_hs)
 
+    local_con.close()
+    ma_hs_con.close()
     driver.quit()
-    con.close()
     messagebox.showinfo(message="finish")

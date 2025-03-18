@@ -8,6 +8,7 @@ import time
 
 from cch_his_auto.tasks.chitietnguoibenhnoitru import indieuduong
 from cch_his_auto.driver import Driver
+from cch_his_auto.tasks.editor.sign_patient_name import sign_patient
 
 def open(driver: Driver):
     indieuduong.goto(driver, "Bảng kê chi phí BHYT")
@@ -28,22 +29,5 @@ def sign_staff(driver: Driver):
 
 def sign_patient(driver: Driver, signature: str):
     driver.clicking(".ant-row:nth-child(26) .ant-col:nth-child(4) .sign-image button")
-    driver.waiting("canvas")
-    script = """
-        let c = document.querySelector('canvas');
-        let ctx = c.getContext('2d');
-        let image = new Image();
-        image.onload = function() {{
-            ctx.drawImage(image, 0, 0, 400, 200);
-        }};
-        image.src = '{signature}'
-        """.format(signature=signature)
-
-    driver.execute_script(script)
-    time.sleep(5)
-    driver.clicking("canvas")
-    driver.clicking(
-        ".ant-modal .bottom-action-right button",
-        "save after finish drawing",
-    )
+    sign_patient(driver, signature)
     driver.waiting(".ant-row:nth-child(26) .ant-col:nth-child(4) .sign-image img")

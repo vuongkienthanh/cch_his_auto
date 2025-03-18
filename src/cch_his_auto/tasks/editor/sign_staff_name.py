@@ -8,6 +8,7 @@ import time
 from selenium.common import NoSuchElementException
 
 from cch_his_auto.driver import Driver
+from cch_his_auto.tasks.editor import sign_patient_name
 
 _logger = logging.getLogger()
 
@@ -19,9 +20,11 @@ def sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
         return
     for _ in range(20):
         time.sleep(1)
-        if driver.find(btn_css).text.strip() == btn_txt:
-            time.sleep(1)
-            break
+        try:
+            if driver.find(btn_css).text.strip() == btn_txt:
+                break
+        except:
+            ...
     else:
         return
     driver.clicking(btn_css)
@@ -122,7 +125,7 @@ def phieuCT(driver: Driver):
         img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(13) .sign-image img",
     )
 
-def phieuMRI_1(driver: Driver):
+def phieuMRI_bschidinh(driver: Driver):
     "*Phiếu chỉ định MRI, bs chỉ định*"
     sign(
         driver,
@@ -132,20 +135,21 @@ def phieuMRI_1(driver: Driver):
         img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(22) .sign-image img",
     )
 
-def phieuMRI_2(driver: Driver):
+def phieuMRI_bsthuchien(driver: Driver):
     "*Phiếu chỉ định MRI, bs thực hiện*"
     sign(
         driver,
         name="phieu MRI bs thuc hien",
-        btn_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25) .sign-image button",
+        btn_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25)>div[data-type=block]:nth-child(1) .sign-image button",
         btn_txt="Xác nhận ký Bác sĩ thực hiện",
-        img_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25) .sign-image img",
+        img_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25)>div[data-type=block]:nth-child(1) .sign-image img",
     )
 
-def phieuMRI_3(driver: Driver):
-    "*Phiếu chỉ định MRI, bs chỉ định & thực hiện*"
-    phieuMRI_1(driver)
-    phieuMRI_2(driver)
+def phieuMRI_all(driver: Driver, signature: str):
+    "*Phiếu chỉ định MRI all*"
+    phieuMRI_bschidinh(driver)
+    phieuMRI_bsthuchien(driver)
+    sign_patient_name.phieuMRI(driver, signature)
 
 def giaiphaubenh(driver: Driver):
     "*Phiếu xét nghiệm giải phẫu bệnh sinh thiết*"

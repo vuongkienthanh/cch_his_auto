@@ -84,8 +84,11 @@ class App(tk.Frame):
 def run(cf: config.Config):
     from cch_his_auto.tasks.auth import login_then_choose_dept
     from cch_his_auto.app import PROFILE_PATH
+    from cch_his_auto.app.common_tasks.signature import get_signature_wo_goback
+    from cch_his_auto.app.ma_hs_db import create_connection
 
     driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
+    ma_hs_con = create_connection()
 
     # set up HIS
     login_then_choose_dept(driver, cf["username"], cf["password"], cf["department"])
@@ -94,12 +97,15 @@ def run(cf: config.Config):
 
     ma_hs = listing.pop()
     first_patient(driver, ma_hs)
-    process(driver)
+    signature = get_signature_wo_goback(driver, ma_hs_con, ma_hs)
+    process(driver,signature)
 
     while len(listing) > 0:
         ma_hs = listing.pop()
         next_patient(driver, ma_hs)
-        process(driver)
+        signature = get_signature_wo_goback(driver, ma_hs_con, ma_hs)
+        process(driver,signature)
 
+    ma_hs_con.close()
     driver.quit()
     messagebox.showinfo(message="finish")

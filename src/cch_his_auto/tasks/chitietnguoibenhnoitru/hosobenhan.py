@@ -5,6 +5,8 @@
 
 import time
 import logging
+from enum import StrEnum
+from functools import partial
 
 from selenium.webdriver import Keys
 from selenium.common import NoSuchElementException, StaleElementReferenceException
@@ -13,6 +15,11 @@ from cch_his_auto.driver import Driver, DriverFn
 from cch_his_auto.tasks.editor import sign_staff_name as sign_staff_name
 
 _logger = logging.getLogger()
+
+class Status(StrEnum):
+    CHUAKY = "Chưa ký"
+    DANGKY = "Đang ký"
+    HOANTHANH = "Hoàn thành"
 
 def open(driver: Driver):
     driver.clicking(
@@ -50,26 +57,33 @@ def filter(driver: Driver, name: str) -> bool:
         _logger.error("filtered with no result")
         return False
 
-def is_row_hoanthanh(driver: Driver, idx: int) -> bool:
-    "Check if row at `idx` is *Hoàn thành*, first row is id=2"
+def is_row(driver: Driver, idx: int, status: Status) -> bool:
+    "Check if row at `idx` is _status_, first row is id=2"
     ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
-    _logger.info(f"checking {name}: Hoan thanh")
-    return ele.text.strip() == "Hoàn thành"
+    _logger.info(f"checking {name}: {status}")
+    return ele.text.strip() == status
 
-def is_row_dangky(driver: Driver, idx: int) -> bool:
-    "Check if row at `idx` is *Đang ký*, first row is id=2"
-    ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
-    name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
-    _logger.info(f"checking {name}: Dang ky")
-    return ele.text.strip() == "Đang ký"
-
-def is_row_chuaky(driver: Driver, idx: int) -> bool:
-    "Check if row at `idx` is *Chưa ký*, first row is id=2"
-    ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
-    name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
-    _logger.info(f"checking {name}: Chua ky")
-    return ele.text.strip() == "Chưa ký"
+# def is_row_hoanthanh(driver: Driver, idx: int) -> bool:
+#     "Check if row at `idx` is *Hoàn thành*, first row is id=2"
+#     ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
+#     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
+#     _logger.info(f"checking {name}: Hoan thanh")
+#     return ele.text.strip() == "Hoàn thành"
+#
+# def is_row_dangky(driver: Driver, idx: int) -> bool:
+#     "Check if row at `idx` is *Đang ký*, first row is id=2"
+#     ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
+#     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
+#     _logger.info(f"checking {name}: Dang ky")
+#     return ele.text.strip() == "Đang ký"
+#
+# def is_row_chuaky(driver: Driver, idx: int) -> bool:
+#     "Check if row at `idx` is *Chưa ký*, first row is id=2"
+#     ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
+#     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
+#     _logger.info(f"checking {name}: Chua ky")
+#     return ele.text.strip() == "Chưa ký"
 
 def is_row_expandable(driver: Driver, idx: int) -> bool:
     "Check if row at `idx` is expandable, first row is id=2"
@@ -119,35 +133,39 @@ def sign_current(driver: Driver):
             break
     time.sleep(2)
 
-def filter_check_expand_sign_curent(driver: Driver, name: str):
+def filter_check_expand_sign_curent(
+    driver: Driver, name: str, status_list: list[Status]
+):
     "@private"
     if filter(driver, name):
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
             for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
-                if is_row_chuaky(driver, i):
-                    _logger.info("hoan thanh or dang ky: no")
+                if any([is_row(driver, i, status) for status in status_list]):
+                    _logger.info("hoan thanh: no")
                     driver.clicking(f"tbody tr:nth-child({i})")
                     time.sleep(1)
                     sign_current(driver)
                 else:
                     _logger.info("hoan thanh: yes")
         else:
-            if is_row_chuaky(driver, 2):
-                _logger.info("hoan thanh or dang ky: no")
+            if any([is_row(driver, 2, status) for status in status_list]):
+                _logger.info("hoan thanh: no")
                 driver.clicking("tbody tr:nth-child(2)")
                 sign_current(driver)
             else:
                 _logger.info("hoan thanh: yes")
     time.sleep(3)
 
-def filter_check_expand_sign_new_tab(driver: Driver, name: str, sign_fn: DriverFn):
+def filter_check_expand_sign_new_tab(
+    driver: Driver, name: str, sign_fn: DriverFn, status_list: list[Status]
+):
     "@private"
     if filter(driver, name):
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
             for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
-                if is_row_chuaky(driver, i):
+                if any([is_row(driver, i, status) for status in status_list]):
                     _logger.info("hoan thanh or dang ky: no")
                     driver.clicking(f"tbody tr:nth-child({i})")
                     time.sleep(1)
@@ -155,7 +173,7 @@ def filter_check_expand_sign_new_tab(driver: Driver, name: str, sign_fn: DriverF
                 else:
                     _logger.info("hoan thanh: yes")
         else:
-            if is_row_chuaky(driver, 2):
+            if any([is_row(driver, 2, status) for status in status_list]):
                 _logger.info("hoan thanh or dang ky: no")
                 sign_new_tab(driver, 2, sign_fn)
             else:
@@ -168,6 +186,7 @@ def tobiabenhannhikhoa(driver: Driver):
         driver,
         name="Tờ bìa bệnh án Nhi khoa",
         sign_fn=sign_staff_name.tobiabenhannhikhoa,
+        status_list=[Status.CHUAKY],
     )
 
 def mucAbenhannhikhoa(driver: Driver):
@@ -176,6 +195,7 @@ def mucAbenhannhikhoa(driver: Driver):
         driver,
         name="Mục A - Bệnh án Nhi khoa",
         sign_fn=sign_staff_name.mucAbenhannhikhoa,
+        status_list=[Status.CHUAKY],
     )
 
 def mucBtongketbenhan(driver: Driver):
@@ -184,16 +204,22 @@ def mucBtongketbenhan(driver: Driver):
         driver,
         name="Mục B - Tổng kết Bệnh án (Nội khoa, Nhi Khoa, Truyền nhiễm, Sơ sinh, Da liễu, DD-PHCN, HHTM)",
         sign_fn=sign_staff_name.mucBtongketbenhan,
+        status_list=[Status.CHUAKY],
     )
 
 def phieuchidinhxetnghiem(driver: Driver):
     "Filter and sign name: *Phiếu chỉ định xét nghiệm*"
-    filter_check_expand_sign_curent(driver, name="Phiếu chỉ định xét nghiệm")
+    filter_check_expand_sign_curent(
+        driver, name="Phiếu chỉ định xét nghiệm", status_list=[Status.CHUAKY]
+    )
 
 def todieutri(driver: Driver):
     "Filter and sign name: *Tờ điều trị*"
     filter_check_expand_sign_new_tab(
-        driver, name="Tờ điều trị", sign_fn=sign_staff_name.todieutri
+        driver,
+        name="Tờ điều trị",
+        sign_fn=sign_staff_name.todieutri,
+        status_list=[Status.CHUAKY],
     )
 
 def phieuCT(driver: Driver):
@@ -202,14 +228,16 @@ def phieuCT(driver: Driver):
         driver,
         name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
         sign_fn=sign_staff_name.phieuCT,
+        status_list=[Status.CHUAKY],
     )
 
-def phieuMRI(driver: Driver):
+def phieuMRI(driver: Driver, signature: str):
     "Filter and sign name: *Phiếu chỉ định chụp MRI*"
     filter_check_expand_sign_new_tab(
         driver,
         name="Phiếu chỉ định chụp cộng hưởng từ (MRI)",
-        sign_fn=sign_staff_name.phieuMRI_3,
+        sign_fn=partial(sign_staff_name.phieuMRI_all, signature=signature),
+        status_list=[Status.CHUAKY, Status.DANGKY],
     )
 
 def giaiphaubenh(driver: Driver):
@@ -218,4 +246,5 @@ def giaiphaubenh(driver: Driver):
         driver,
         name="Phiếu xét nghiệm giải phẫu bệnh sinh thiết",
         sign_fn=sign_staff_name.giaiphaubenh,
+        status_list=[Status.CHUAKY],
     )

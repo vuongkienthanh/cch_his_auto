@@ -1,7 +1,7 @@
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan
 
-def process(driver: Driver):
+def process(driver: Driver, signature:str):
     """
     Chức năng hiện tại:
         + Tờ bìa, mục A, mục B
@@ -16,6 +16,6 @@ def process(driver: Driver):
     hosobenhan.phieuchidinhxetnghiem(driver)
     hosobenhan.todieutri(driver)
     hosobenhan.phieuCT(driver)
-    hosobenhan.phieuMRI(driver)
+    hosobenhan.phieuMRI(driver, signature)
     hosobenhan.giaiphaubenh(driver)
     hosobenhan.close(driver)
