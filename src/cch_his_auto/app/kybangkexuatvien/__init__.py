@@ -60,7 +60,7 @@ class App(tk.Frame):
         def save():
             if messagebox.askyesno(message="Save?"):
                 config.save(get_config())
-                messagebox.Message(default=messagebox.OK, message="Đã lưu").show()
+                messagebox.showinfo(message="Đã lưu")
 
         btns = tk.Frame(self)
         load_btn = tk.Button(btns, text="Load", command=load, width=10)
@@ -102,6 +102,7 @@ def run(cf: config.Config):
 
     con.close()
     driver.quit()
+    messagebox.showinfo(message="finish")
 
 def process(driver: Driver, con: sqlite3.Connection, ma_hs: int):
     signature = get_signature_wo_goback(driver, con, ma_hs)

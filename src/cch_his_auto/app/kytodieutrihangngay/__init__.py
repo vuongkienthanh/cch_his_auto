@@ -73,7 +73,7 @@ class App(tk.Frame):
         def save():
             if messagebox.askyesno(message="Save?"):
                 config.save(get_config())
-                messagebox.Message(default=messagebox.OK, message="Đã lưu").show()
+                messagebox.showinfo(message="Đã lưu")
 
         btns = tk.Frame(self)
         load_btn = tk.Button(btns, text="Load", command=load, width=10)
