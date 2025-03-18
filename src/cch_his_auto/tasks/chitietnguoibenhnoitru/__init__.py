@@ -2,6 +2,7 @@
 ### Tasks that operate on *Chi tiết người bệnh nội trú*
 """
 
+import time
 from cch_his_auto.driver import Driver
 
 URL = "http://emr.ndtp.org/quan-ly-noi-tru/chi-tiet-nguoi-benh-noi-tru/"
@@ -9,7 +10,7 @@ URL = "http://emr.ndtp.org/quan-ly-noi-tru/chi-tiet-nguoi-benh-noi-tru/"
 
 def get_signature_from_web(driver: Driver) -> str:
     "get signature src of current patient"
-    from .indieuduong import open, goto
+    from .indieuduong import open, goto, close
 
     main_tab = driver.current_window_handle
     open(driver)
@@ -19,4 +20,6 @@ def get_signature_from_web(driver: Driver) -> str:
     ans = ele.get_dom_attribute("src").strip()
     driver.close()
     driver.switch_to.window(main_tab)
+    close(driver)
+    time.sleep(1)
     return ans

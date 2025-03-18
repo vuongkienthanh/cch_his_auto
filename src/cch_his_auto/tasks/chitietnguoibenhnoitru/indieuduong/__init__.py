@@ -13,13 +13,13 @@ from cch_his_auto.driver import Driver
 _logger = logging.getLogger()
 
 def open(driver: Driver):
-    driver.clicking(".footer-btn .right button:nth-child(3)", "In điều dưỡng")
+    driver.clicking(".footer-btn .right button:nth-child(3)", "open In điều dưỡng")
     driver.waiting(".ant-popover .ant-select", "Tìm kiếm tên phiếu in")
     driver.waiting(".ant-popover .ant-select-item", "Tìm kiếm tên phiếu in - item")
     time.sleep(2)
 
 def close(driver: Driver):
-    driver.clicking(".ant-modal button[aria-label='Close']", "close In điều dưỡng")
+    driver.clicking(".footer-btn .right button:nth-child(3)", "close In điều dưỡng")
     time.sleep(2)
 
 def goto(driver: Driver, name: str):
