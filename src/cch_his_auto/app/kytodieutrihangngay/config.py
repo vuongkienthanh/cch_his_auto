@@ -1,6 +1,7 @@
 from typing import TypedDict
 import json
 import os.path
+import os
 
 from . import APP_PATH
 
@@ -8,7 +9,6 @@ FILEPATH = os.path.join(APP_PATH, "config.json")
 PHCN_ORDER = ["bú nuốt", "giao tiếp", "hô hấp", "vận động"]
 
 from validators import url
-
 
 class LogInfo(TypedDict):
     username: str
@@ -35,6 +35,7 @@ class Config(TypedDict):
     department: str
 
 def save(config: Config):
+    os.makedirs(APP_PATH)
     with open(FILEPATH, "w") as f:
         json.dump(config, f, indent=4)
 
@@ -54,7 +55,7 @@ def load() -> Config:
                 "password": "",
             },
             "patients": [],
-            "department":""
+            "department": "",
         }
 
 def is_patient_list_valid(config: Config) -> bool:

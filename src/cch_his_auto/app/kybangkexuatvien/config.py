@@ -1,6 +1,7 @@
 from typing import TypedDict
 import os.path
 import json
+import os
 
 from . import APP_PATH
 
@@ -14,6 +15,7 @@ class Config(TypedDict):
     ds_ma_hs: str
 
 def save(config: Config):
+    os.makedirs(APP_PATH)
     with open(FILEPATH, "w") as f:
         json.dump(config, f, indent=4)
 

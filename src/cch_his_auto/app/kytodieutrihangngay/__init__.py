@@ -71,8 +71,8 @@ class App(tk.Frame):
             }
 
         def save():
-            config.save(get_config())
             if messagebox.askyesno(message="Save?"):
+                config.save(get_config())
                 messagebox.Message(default=messagebox.OK, message="Đã lưu").show()
 
         btns = tk.Frame(self)
