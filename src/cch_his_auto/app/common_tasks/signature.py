@@ -8,7 +8,9 @@ from cch_his_auto.app.ma_hs_db import exists_in_db, save_db, get_signature_from_
 from cch_his_auto.tasks.chitietnguoibenhnoitru import get_signature_from_web
 from cch_his_auto.tasks.danhsachnguoibenhnoitru import URL, goto_patient
 
-def get_signature(driver: Driver, con: sqlite3.Connection, ma_hs: int) -> str:
+def goto_dsnbnt_get_signature(
+    driver: Driver, con: sqlite3.Connection, ma_hs: int
+) -> str:
     if not exists_in_db(con, ma_hs):
         _logger.info("***** patient signature not found in db")
         working_url = driver.current_url
@@ -27,7 +29,7 @@ def get_signature(driver: Driver, con: sqlite3.Connection, ma_hs: int) -> str:
         _logger.info("***** patient signature found in db")
         return get_signature_from_db(con, ma_hs)
 
-def get_signature_wo_goback(driver: Driver, con: sqlite3.Connection, ma_hs: int) -> str:
+def get_signature_in_ctnbnt(driver: Driver, con: sqlite3.Connection, ma_hs: int) -> str:
     if not exists_in_db(con, ma_hs):
         _logger.info("***** patient signature not found in db")
         url = driver.current_url

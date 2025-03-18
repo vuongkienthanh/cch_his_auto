@@ -182,7 +182,7 @@ def run_dd(driver: Driver, cf: config.Config):
 
 def run_bn(driver: Driver, cf: config.Config):
     from cch_his_auto.app.ma_hs_db import create_connection
-    from cch_his_auto.app.common_tasks.signature import get_signature
+    from cch_his_auto.app.common_tasks.signature import goto_dsnbnt_get_signature
 
     con = create_connection()
     for p in cf["patients"]:
@@ -193,7 +193,7 @@ def run_bn(driver: Driver, cf: config.Config):
                 "ma ho so",
             ).text
         )
-        signature = get_signature(driver, con, ma_hs)
+        signature = goto_dsnbnt_get_signature(driver, con, ma_hs)
         if any(p["ky_3tra"]["benhnhan"]):
             igt.phieuthuchienylenh_bn(driver, p["ky_3tra"]["benhnhan"], signature)
     con.close()

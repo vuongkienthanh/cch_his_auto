@@ -8,7 +8,7 @@ APP_PATH = os.path.dirname(os.path.abspath(__file__))
 
 from . import config
 from cch_his_auto.app.common_tasks.navigation import first_patient, next_patient
-from cch_his_auto.app.common_tasks.signature import get_signature_wo_goback
+from cch_his_auto.app.common_tasks.signature import get_signature_in_ctnbnt
 from cch_his_auto.driver import Driver
 from cch_his_auto.app.ma_hs_db import create_connection
 from cch_his_auto.tasks.chitietnguoibenhnoitru.indieuduong import bangkechiphiBHYT
@@ -105,7 +105,7 @@ def run(cf: config.Config):
     messagebox.showinfo(message="finish")
 
 def process(driver: Driver, con: sqlite3.Connection, ma_hs: int):
-    signature = get_signature_wo_goback(driver, con, ma_hs)
+    signature = get_signature_in_ctnbnt(driver, con, ma_hs)
     bangkechiphiBHYT.open(driver)
     bangkechiphiBHYT.goto_iframe(driver)
     bangkechiphiBHYT.sign_staff(driver)

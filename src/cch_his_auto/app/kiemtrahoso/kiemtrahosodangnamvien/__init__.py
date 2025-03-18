@@ -2,13 +2,14 @@ import tkinter as tk
 from tkinter import messagebox, scrolledtext
 import os.path
 
-TITLE = "Kiểm tra hồ sơ đang nằm viện"
+TITLE = "Kiểm tra hồ sơ"
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
 
 from . import config
-from ..common import process
 from cch_his_auto.app.common_tasks.navigation import first_patient, next_patient
 from cch_his_auto.driver import Driver
+from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan
+from cch_his_auto.tasks import danhsachnguoibenhnoitru
 
 class App(tk.Frame):
     def __init__(self):
@@ -30,11 +31,15 @@ class App(tk.Frame):
 
         mainframe = tk.Frame(self)
         mainframe.grid(row=1, column=0, sticky="NSEW")
-        tk.Label(mainframe, text="Danh sách mã hồ sơ:", anchor="w").grid(
-            row=0, column=0, padx=20, sticky="NEW"
+        discharged_var = tk.BooleanVar()
+        tk.Checkbutton(mainframe, text="đã xuất viện", variable=discharged_var).grid(
+            row=0, column=0, padx=20, pady=20, sticky="W"
         )
-        dsmahs = scrolledtext.ScrolledText(mainframe)
-        dsmahs.grid(row=1, column=0, padx=20, sticky="NSEW")
+        tk.Label(mainframe, text="Danh sách mã hồ sơ:", anchor="w").grid(
+            row=1, column=0, padx=20, sticky="NEW"
+        )
+        listing_entry = scrolledtext.ScrolledText(mainframe)
+        listing_entry.grid(row=2, column=0, padx=20, sticky="NSEW")
         tk.Label(
             mainframe,
             text=process.__doc__ or "",
@@ -48,8 +53,9 @@ class App(tk.Frame):
             bacsi.set_username(cf["username"])
             bacsi.set_password(cf["password"])
             bacsi.set_department(cf["department"])
-            dsmahs.delete("1.0", "end")
-            dsmahs.insert("1.0", cf["ds_ma_hs"])
+            listing_entry.delete("1.0", "end")
+            listing_entry.insert("1.0", cf["listing"])
+            discharged_var.set(cf["discharged"])
 
         def get_config() -> config.Config:
             return {
@@ -57,7 +63,8 @@ class App(tk.Frame):
                 "username": bacsi.get_username(),
                 "password": bacsi.get_password(),
                 "department": bacsi.get_department(),
-                "ds_ma_hs": dsmahs.get("1.0", "end"),
+                "listing": listing_entry.get("1.0", "end"),
+                "discharged": discharged_var.get(),
             }
 
         def save():
@@ -84,28 +91,49 @@ class App(tk.Frame):
 def run(cf: config.Config):
     from cch_his_auto.tasks.auth import login_then_choose_dept
     from cch_his_auto.app import PROFILE_PATH
-    from cch_his_auto.app.common_tasks.signature import get_signature_wo_goback
+    from cch_his_auto.app.common_tasks.signature import get_signature_in_ctnbnt
     from cch_his_auto.app.ma_hs_db import create_connection
 
     driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-    ma_hs_con = create_connection()
+    con = create_connection()
 
     # set up HIS
     login_then_choose_dept(driver, cf["username"], cf["password"], cf["department"])
+    if cf["discharged"]:
+        danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
 
-    listing = [int(ma_hs) for ma_hs in cf["ds_ma_hs"].strip().splitlines()]
+    listing = [int(ma_hs) for ma_hs in cf["listing"].strip().splitlines()]
 
     ma_hs = listing.pop()
     first_patient(driver, ma_hs)
-    signature = get_signature_wo_goback(driver, ma_hs_con, ma_hs)
-    process(driver,signature)
+    signature = get_signature_in_ctnbnt(driver, con, ma_hs)
+    process(driver, signature)
 
     while len(listing) > 0:
         ma_hs = listing.pop()
         next_patient(driver, ma_hs)
-        signature = get_signature_wo_goback(driver, ma_hs_con, ma_hs)
-        process(driver,signature)
+        signature = get_signature_in_ctnbnt(driver, con, ma_hs)
+        process(driver, signature)
 
-    ma_hs_con.close()
+    con.close()
     driver.quit()
     messagebox.showinfo(message="finish")
+
+def process(driver: Driver, signature: str):
+    """
+    Chức năng hiện tại:
+        + Tờ bìa, mục A, mục B
+        + phiếu chỉ định, tờ điều trị
+        + Phiếu CT, MRI
+        + Phiếu giải phẫu bệnh
+    """
+    hosobenhan.open(driver)
+    hosobenhan.tobiabenhannhikhoa(driver)
+    hosobenhan.mucAbenhannhikhoa(driver)
+    hosobenhan.mucBtongketbenhan(driver)
+    hosobenhan.phieuchidinhxetnghiem(driver)
+    hosobenhan.todieutri(driver)
+    hosobenhan.phieuCT(driver)
+    hosobenhan.phieuMRI(driver, signature)
+    hosobenhan.giaiphaubenh(driver)
+    hosobenhan.close(driver)

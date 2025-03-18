@@ -12,14 +12,8 @@ class Config(TypedDict):
     username: str
     password: str
     department: str
-    ds_ma_hs: str
-    # tobia: bool
-    # mucA: bool
-    # mucB: bool
-    # phieuchidinh:bool
-    # todieutri:bool
-    # phieuCT: bool
-    # phieuMRI1:bool
+    listing: str
+    discharged: bool
 
 def save(config: Config):
     os.makedirs(APP_PATH, exist_ok=True)
@@ -36,5 +30,6 @@ def load() -> Config:
             "username": "",
             "password": "",
             "department": "",
-            "ds_ma_hs": "",
+            "listing": "",
+            "discharged": False,
         }
