@@ -26,3 +26,15 @@ def get_signature(driver: Driver, con: sqlite3.Connection, ma_hs: int) -> str:
     else:
         _logger.info("***** patient signature found in db")
         return get_signature_from_db(con, ma_hs)
+
+def get_signature_wo_goback(driver: Driver, con: sqlite3.Connection, ma_hs: int) -> str:
+    if not exists_in_db(con, ma_hs):
+        _logger.info("***** patient signature not found in db")
+        url = driver.current_url
+        signature = get_signature_from_web(driver)
+        save_db(con, ma_hs, url, signature)
+        _logger.info("patient signature saved")
+        return signature
+    else:
+        _logger.info("***** patient signature found in db")
+        return get_signature_from_db(con, ma_hs)

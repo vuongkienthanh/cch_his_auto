@@ -18,6 +18,9 @@ build-backend = "hatchling.build"
 package = true
 
 [dependency-groups]
+build = [
+    "pyinstaller>=6.12.0",
+]
 dev = [
     "pdoc>=15.0.1",
 ]

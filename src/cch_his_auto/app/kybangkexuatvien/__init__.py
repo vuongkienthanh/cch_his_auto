@@ -8,9 +8,10 @@ APP_PATH = os.path.dirname(os.path.abspath(__file__))
 
 from . import config
 from cch_his_auto.app.common_tasks.navigation import first_patient, next_patient
-from cch_his_auto.app.common_tasks.signature import get_signature
+from cch_his_auto.app.common_tasks.signature import get_signature_wo_goback
 from cch_his_auto.driver import Driver
 from cch_his_auto.app.ma_hs_db import create_connection
+from cch_his_auto.tasks.chitietnguoibenhnoitru.indieuduong import bangkechiphiBHYT
 
 class App(tk.Frame):
     def __init__(self):
@@ -82,26 +83,31 @@ def run(cf: config.Config):
     from cch_his_auto.app import PROFILE_PATH
 
     listing = [int(ma_hs) for ma_hs in cf["ds_ma_hs"].strip().splitlines()]
-    print(listing)
 
-    # driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-    #
-    # # set up HIS
-    # login_then_choose_dept(driver, cf["username"], cf["password"], cf["department"])
+    driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
 
-    # con = create_connection()
-    #
-    # ma_hs = listing.pop()
-    # first_patient(driver, ma_hs)
-    # process(driver, con, ma_hs)
-    #
-    # while len(listing) > 0:
-    #     ma_hs = listing.pop()
-    #     next_patient(driver, ma_hs)
-    #     process(driver, con, ma_hs)
-    #
-    # con.close()
-    # driver.quit()
+    # set up HIS
+    login_then_choose_dept(driver, cf["username"], cf["password"], cf["department"])
+
+    con = create_connection()
+
+    ma_hs = listing.pop()
+    first_patient(driver, ma_hs)
+    process(driver, con, ma_hs)
+
+    while len(listing) > 0:
+        ma_hs = listing.pop()
+        next_patient(driver, ma_hs)
+        process(driver, con, ma_hs)
+
+    con.close()
+    driver.quit()
 
 def process(driver: Driver, con: sqlite3.Connection, ma_hs: int):
-    signature = get_signature(driver, con, ma_hs)
+    signature = get_signature_wo_goback(driver, con, ma_hs)
+    bangkechiphiBHYT.open(driver)
+    bangkechiphiBHYT.goto_iframe(driver)
+    bangkechiphiBHYT.sign_staff(driver)
+    bangkechiphiBHYT.sign_patient(driver, signature)
+    bangkechiphiBHYT.goout_iframe(driver)
+    bangkechiphiBHYT.close(driver)

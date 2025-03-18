@@ -3,3 +3,5 @@
 **/config.json
 **/Profile/
 **/.db
+build/
+dist/
