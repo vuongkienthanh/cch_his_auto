@@ -7,10 +7,8 @@ TITLE = "Ký bảng kê xuất viện"
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
 
 from . import config
-from cch_his_auto.app.common_tasks.navigation import first_patient, next_patient
 from cch_his_auto.app.common_tasks.signature import get_signature_in_ctnbnt
 from cch_his_auto.driver import Driver
-from cch_his_auto.app.ma_hs_db import create_connection
 from cch_his_auto.tasks.chitietnguoibenhnoitru.indieuduong import bangkechiphiBHYT
 
 class App(tk.Frame):
@@ -79,17 +77,19 @@ class App(tk.Frame):
         btns.grid(row=0, column=1, rowspan=2, padx=20, sticky="S", pady=(0, 20))
 
 def run(cf: config.Config):
-    from cch_his_auto.tasks.auth import login_then_choose_dept
     from cch_his_auto.app import PROFILE_PATH
+    from cch_his_auto.app.common_tasks.navigation import first_patient, next_patient
+    from cch_his_auto.app.global_db import create_connection
+    from cch_his_auto.tasks.auth import login_then_choose_dept
 
     listing = [int(ma_hs) for ma_hs in cf["ds_ma_hs"].strip().splitlines()]
 
     driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
+    con = create_connection()
 
     # set up HIS
     login_then_choose_dept(driver, cf["username"], cf["password"], cf["department"])
 
-    con = create_connection()
 
     ma_hs = listing.pop()
     first_patient(driver, ma_hs)

@@ -97,7 +97,11 @@ class App(tk.Frame):
 
 def run(cf: config.Config):
     from cch_his_auto.app import PROFILE_PATH
-    from cch_his_auto.tasks.auth import login_then_choose_dept, logout_then_login
+    from cch_his_auto.tasks.auth import (
+        login_then_choose_dept,
+        logout_then_login,
+        logout,
+    )
 
     if config.is_patient_list_valid(cf):
         bs, dd = config.is_bs_valid(cf), config.is_dd_valid(cf)
@@ -118,6 +122,7 @@ def run(cf: config.Config):
                 )
                 run_dd(driver, cf)
                 run_bn(driver, cf)
+                logout(driver)
                 driver.close()
             case (True, False):
                 driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
@@ -129,6 +134,7 @@ def run(cf: config.Config):
                 )
                 run_bs(driver, cf)
                 run_bn(driver, cf)
+                logout(driver)
                 driver.close()
                 messagebox.showerror(message="chưa nhập điều dưỡng")
             case (False, True):
@@ -141,6 +147,7 @@ def run(cf: config.Config):
                 )
                 run_dd(driver, cf)
                 run_bn(driver, cf)
+                logout(driver)
                 driver.close()
                 messagebox.showerror(message="chưa nhập bác sĩ")
             case _:
@@ -181,7 +188,7 @@ def run_dd(driver: Driver, cf: config.Config):
             igt.phieuthuchienylenh_dd(driver, p["ky_3tra"]["dieuduong"])
 
 def run_bn(driver: Driver, cf: config.Config):
-    from cch_his_auto.app.ma_hs_db import create_connection
+    from cch_his_auto.app.global_db import create_connection
     from cch_his_auto.app.common_tasks.signature import goto_dsnbnt_get_signature
 
     con = create_connection()

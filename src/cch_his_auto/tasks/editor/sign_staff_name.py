@@ -30,7 +30,6 @@ def sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
     driver.clicking(btn_css)
     driver.waiting(img_css)
     _logger.info(f"finish sign page return image: {name}")
-    time.sleep(2)
 
 def tobiabenhannhikhoa(driver: Driver):
     "*Tờ bìa bệnh án nhi khoa*"
