@@ -80,27 +80,21 @@ def run(cf: config.Config):
     from cch_his_auto.app import PROFILE_PATH
     from cch_his_auto.app.common_tasks.navigation import first_patient, next_patient
     from cch_his_auto.app.global_db import create_connection
-    from cch_his_auto.tasks.auth import login_then_choose_dept
+    from cch_his_auto.tasks.auth import context
 
     listing = [int(ma_hs) for ma_hs in cf["ds_ma_hs"].strip().splitlines()]
-
     driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-    con = create_connection()
+    with create_connection() as con:
+        with context(driver, cf["username"], cf["password"], cf["department"]):
+            ma_hs = listing.pop()
+            first_patient(driver, ma_hs)
+            process(driver, con, ma_hs)
 
-    # set up HIS
-    login_then_choose_dept(driver, cf["username"], cf["password"], cf["department"])
+            while len(listing) > 0:
+                ma_hs = listing.pop()
+                next_patient(driver, ma_hs)
+                process(driver, con, ma_hs)
 
-
-    ma_hs = listing.pop()
-    first_patient(driver, ma_hs)
-    process(driver, con, ma_hs)
-
-    while len(listing) > 0:
-        ma_hs = listing.pop()
-        next_patient(driver, ma_hs)
-        process(driver, con, ma_hs)
-
-    con.close()
     driver.quit()
     messagebox.showinfo(message="finish")
 

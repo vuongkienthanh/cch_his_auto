@@ -98,61 +98,57 @@ class App(tk.Frame):
 def run(cf: config.Config):
     from cch_his_auto.app import PROFILE_PATH
     from cch_his_auto.tasks.auth import (
-        login_then_choose_dept,
-        logout_then_login,
-        logout,
+        # login_then_choose_dept,
+        # logout_then_login,
+        # logout,
+        context,
     )
 
     if config.is_patient_list_valid(cf):
         bs, dd = config.is_bs_valid(cf), config.is_dd_valid(cf)
+        driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
         match (bs, dd):
             case (True, True):
-                driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-                login_then_choose_dept(
+                with context(
                     driver,
                     cf["bacsi"]["username"],
                     cf["bacsi"]["password"],
                     cf["department"],
-                )
-                run_bs(driver, cf)
-                logout_then_login(
+                ):
+                    run_bs(driver, cf)
+
+                with context(
                     driver,
                     cf["dieuduong"]["username"],
                     cf["dieuduong"]["password"],
-                )
-                run_dd(driver, cf)
-                run_bn(driver, cf)
-                logout(driver)
-                driver.close()
+                    cf["department"],
+                ):
+                    run_dd(driver, cf)
+                    run_bn(driver, cf)
             case (True, False):
-                driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-                login_then_choose_dept(
+                with context(
                     driver,
                     cf["bacsi"]["username"],
                     cf["bacsi"]["password"],
                     cf["department"],
-                )
-                run_bs(driver, cf)
-                run_bn(driver, cf)
-                logout(driver)
-                driver.close()
+                ):
+                    run_bs(driver, cf)
+                    run_bn(driver, cf)
                 messagebox.showerror(message="chưa nhập điều dưỡng")
             case (False, True):
-                driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-                login_then_choose_dept(
+                with context(
                     driver,
                     cf["dieuduong"]["username"],
                     cf["dieuduong"]["password"],
                     cf["department"],
-                )
-                run_dd(driver, cf)
-                run_bn(driver, cf)
-                logout(driver)
-                driver.close()
+                ):
+                    run_dd(driver, cf)
+                    run_bn(driver, cf)
                 messagebox.showerror(message="chưa nhập bác sĩ")
             case _:
                 messagebox.showerror(message="chưa nhập bác sĩ, điều dưỡng")
 
+        driver.quit()
         messagebox.showinfo(message="finish")
     else:
         messagebox.showerror(message="không có bệnh nhân")
@@ -191,16 +187,15 @@ def run_bn(driver: Driver, cf: config.Config):
     from cch_his_auto.app.global_db import create_connection
     from cch_his_auto.app.common_tasks.signature import goto_dsnbnt_get_signature
 
-    con = create_connection()
-    for p in cf["patients"]:
-        driver.goto(p["url"])
-        ma_hs = int(
-            driver.waiting(
-                ".patient-information .additional-item:nth-child(2) .info",
-                "ma ho so",
-            ).text
-        )
-        signature = goto_dsnbnt_get_signature(driver, con, ma_hs)
-        if any(p["ky_3tra"]["benhnhan"]):
-            igt.phieuthuchienylenh_bn(driver, p["ky_3tra"]["benhnhan"], signature)
-    con.close()
+    with create_connection() as con:
+        for p in cf["patients"]:
+            driver.goto(p["url"])
+            ma_hs = int(
+                driver.waiting(
+                    ".patient-information .additional-item:nth-child(2) .info",
+                    "ma ho so",
+                ).text
+            )
+            signature = goto_dsnbnt_get_signature(driver, con, ma_hs)
+            if any(p["ky_3tra"]["benhnhan"]):
+                igt.phieuthuchienylenh_bn(driver, p["ky_3tra"]["benhnhan"], signature)

@@ -4,6 +4,7 @@
 
 import logging
 import time
+from contextlib import contextmanager
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -79,12 +80,23 @@ def choose_dept(driver: Driver, dept: str):
             except NoSuchElementException:
                 ...
 
-def login_then_choose_dept(driver: Driver, username: str, password: str, dept: str):
-    "`login` and goto `danhsachnguoibenhnoitru.URL` then `choose_dept`"
+@contextmanager
+def context(driver:Driver, username: str, password:str, dept:str):
     login(driver, username, password)
     driver.goto(danhsachnguoibenhnoitru.URL)
     choose_dept(driver, dept)
+    try:
+        yield driver
+    finally:
+        logout(driver)
 
-def logout_then_login(driver: Driver, username: str, password: str):
-    logout(driver)
-    login(driver, username, password)
+
+# def login_then_choose_dept(driver: Driver, username: str, password: str, dept: str):
+#     "`login` and goto `danhsachnguoibenhnoitru.URL` then `choose_dept`"
+#     login(driver, username, password)
+#     driver.goto(danhsachnguoibenhnoitru.URL)
+#     choose_dept(driver, dept)
+#
+# def logout_then_login(driver: Driver, username: str, password: str):
+#     logout(driver)
+#     login(driver, username, password)

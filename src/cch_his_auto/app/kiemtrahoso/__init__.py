@@ -89,33 +89,29 @@ class App(tk.Frame):
         btns.grid(row=0, column=1, rowspan=2, padx=20, sticky="S", pady=(0, 20))
 
 def run(cf: config.Config):
-    from cch_his_auto.tasks.auth import login_then_choose_dept
+    from cch_his_auto.tasks.auth import context
     from cch_his_auto.app import PROFILE_PATH
     from cch_his_auto.app.common_tasks.signature import get_signature_in_ctnbnt
     from cch_his_auto.app.global_db import create_connection
 
-    driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-    con = create_connection()
-
-    # set up HIS
-    login_then_choose_dept(driver, cf["username"], cf["password"], cf["department"])
-    if cf["discharged"]:
-        danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
-
     listing = [int(ma_hs) for ma_hs in cf["listing"].strip().splitlines()]
+    driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
+    with create_connection() as con:
+        with context(driver, cf["username"], cf["password"], cf["department"]):
+            if cf["discharged"]:
+                danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
 
-    ma_hs = listing.pop()
-    first_patient(driver, ma_hs)
-    signature = get_signature_in_ctnbnt(driver, con, ma_hs)
-    process(driver, signature)
+            ma_hs = listing.pop()
+            first_patient(driver, ma_hs)
+            signature = get_signature_in_ctnbnt(driver, con, ma_hs)
+            process(driver, signature)
 
-    while len(listing) > 0:
-        ma_hs = listing.pop()
-        next_patient(driver, ma_hs)
-        signature = get_signature_in_ctnbnt(driver, con, ma_hs)
-        process(driver, signature)
+            while len(listing) > 0:
+                ma_hs = listing.pop()
+                next_patient(driver, ma_hs)
+                signature = get_signature_in_ctnbnt(driver, con, ma_hs)
+                process(driver, signature)
 
-    con.close()
     driver.quit()
     messagebox.showinfo(message="finish")
 
