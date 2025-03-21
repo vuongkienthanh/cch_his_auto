@@ -23,17 +23,14 @@ def save_db(con: sqlite3.Connection, ma_hs: int, url: str, signature: str):
     )
     con.commit()
 
-def exists_in_db(con: sqlite3.Connection, ma_hs: int) -> bool:
-    return bool(
-        con.execute(
-            f"SELECT EXISTS( SELECT * FROM {DB_NAME} WHERE ma_hs =?)", (ma_hs,)
-        ).fetchone()[0]
-    )
+def get_url_from_db(con: sqlite3.Connection, ma_hs: int) -> str | None:
+    if ret := con.execute(
+        f"SELECT url FROM {DB_NAME} WHERE ma_hs=?", (ma_hs,)
+    ).fetchone():
+        return ret[0]
 
-def get_url_from_db(con: sqlite3.Connection, ma_hs: int) -> str:
-    return con.execute(f"SELECT url FROM {DB_NAME} WHERE ma_hs=?", (ma_hs,)).fetchone()[0]
-
-def get_signature_from_db(con: sqlite3.Connection, ma_hs: int) -> str:
-    return con.execute(
+def get_signature_from_db(con: sqlite3.Connection, ma_hs: int) -> str | None:
+    if ret := con.execute(
         f"SELECT signature FROM {DB_NAME} WHERE ma_hs=?", (ma_hs,)
-    ).fetchone()[0]
+    ).fetchone():
+        return ret[0]

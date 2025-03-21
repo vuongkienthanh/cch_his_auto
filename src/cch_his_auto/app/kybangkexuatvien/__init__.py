@@ -7,7 +7,7 @@ TITLE = "Ký bảng kê xuất viện"
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
 
 from . import config
-from cch_his_auto.app.common_tasks.signature import get_signature_in_ctnbnt
+from cch_his_auto.app.common_tasks.signature import get_signature_from_ctnbnt
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.chitietnguoibenhnoitru.indieuduong import bangkechiphiBHYT
 
@@ -87,22 +87,22 @@ def run(cf: config.Config):
     with create_connection() as con:
         with context(driver, cf["username"], cf["password"], cf["department"]):
             ma_hs = listing.pop()
-            first_patient(driver, ma_hs)
+            first_patient(driver, con, ma_hs)
             process(driver, con, ma_hs)
 
             while len(listing) > 0:
                 ma_hs = listing.pop()
-                next_patient(driver, ma_hs)
+                next_patient(driver, con, ma_hs)
                 process(driver, con, ma_hs)
 
     driver.quit()
     messagebox.showinfo(message="finish")
 
 def process(driver: Driver, con: sqlite3.Connection, ma_hs: int):
-    signature = get_signature_in_ctnbnt(driver, con, ma_hs)
+    signature = get_signature_from_ctnbnt(driver, con, ma_hs)
     bangkechiphiBHYT.open(driver)
-    bangkechiphiBHYT.goto_iframe(driver)
+    bangkechiphiBHYT.get_in_iframe(driver)
     bangkechiphiBHYT.sign_staff(driver)
     bangkechiphiBHYT.sign_patient(driver, signature)
-    bangkechiphiBHYT.goout_iframe(driver)
+    bangkechiphiBHYT.get_out_iframe(driver)
     bangkechiphiBHYT.close(driver)

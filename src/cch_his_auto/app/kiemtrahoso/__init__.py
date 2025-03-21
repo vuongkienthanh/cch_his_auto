@@ -91,7 +91,7 @@ class App(tk.Frame):
 def run(cf: config.Config):
     from cch_his_auto.tasks.auth import context
     from cch_his_auto.app import PROFILE_PATH
-    from cch_his_auto.app.common_tasks.signature import get_signature_in_ctnbnt
+    from cch_his_auto.app.common_tasks.signature import get_signature_from_ctnbnt
     from cch_his_auto.app.global_db import create_connection
 
     listing = [int(ma_hs) for ma_hs in cf["listing"].strip().splitlines()]
@@ -102,14 +102,14 @@ def run(cf: config.Config):
                 danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
 
             ma_hs = listing.pop()
-            first_patient(driver, ma_hs)
-            signature = get_signature_in_ctnbnt(driver, con, ma_hs)
+            first_patient(driver, con, ma_hs)
+            signature = get_signature_from_ctnbnt(driver, con, ma_hs)
             process(driver, signature)
 
             while len(listing) > 0:
                 ma_hs = listing.pop()
-                next_patient(driver, ma_hs)
-                signature = get_signature_in_ctnbnt(driver, con, ma_hs)
+                next_patient(driver, con, ma_hs)
+                signature = get_signature_from_ctnbnt(driver, con, ma_hs)
                 process(driver, signature)
 
     driver.quit()
