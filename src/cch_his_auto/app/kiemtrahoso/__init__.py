@@ -89,7 +89,7 @@ class App(tk.Frame):
         btns.grid(row=0, column=1, rowspan=2, padx=20, sticky="S", pady=(0, 20))
 
 def run(cf: config.Config):
-    from cch_his_auto.tasks.auth import context
+    from cch_his_auto.tasks.auth import session
     from cch_his_auto.app import PROFILE_PATH
     from cch_his_auto.app.common_tasks.signature import get_signature_from_ctnbnt
     from cch_his_auto.app.global_db import create_connection
@@ -97,7 +97,7 @@ def run(cf: config.Config):
     listing = [int(ma_hs) for ma_hs in cf["listing"].strip().splitlines()]
     driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
     with create_connection() as con:
-        with context(driver, cf["username"], cf["password"], cf["department"]):
+        with session(driver, cf["username"], cf["password"], cf["department"]):
             if cf["discharged"]:
                 danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
 
@@ -115,7 +115,7 @@ def run(cf: config.Config):
     driver.quit()
     messagebox.showinfo(message="finish")
 
-def process(driver: Driver, signature: str):
+def process(driver: Driver, signature: str | None):
     """
     Chức năng hiện tại:
         + Tờ bìa, mục A, mục B

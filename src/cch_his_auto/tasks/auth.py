@@ -81,7 +81,7 @@ def choose_dept(driver: Driver, dept: str):
                 ...
 
 @contextmanager
-def context(driver:Driver, username: str, password:str, dept:str):
+def session(driver:Driver, username: str, password:str, dept:str):
     login(driver, username, password)
     driver.goto(danhsachnguoibenhnoitru.URL)
     choose_dept(driver, dept)

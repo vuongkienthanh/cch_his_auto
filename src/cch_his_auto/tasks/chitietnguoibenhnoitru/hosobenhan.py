@@ -231,7 +231,7 @@ def phieuCT(driver: Driver):
         status_list=[Status.CHUAKY],
     )
 
-def phieuMRI(driver: Driver, signature: str):
+def phieuMRI(driver: Driver, signature: str | None):
     "Filter and sign name: *Phiếu chỉ định chụp MRI*"
     filter_check_expand_sign_new_tab(
         driver,

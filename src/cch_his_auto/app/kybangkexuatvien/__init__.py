@@ -80,12 +80,12 @@ def run(cf: config.Config):
     from cch_his_auto.app import PROFILE_PATH
     from cch_his_auto.app.common_tasks.navigation import first_patient, next_patient
     from cch_his_auto.app.global_db import create_connection
-    from cch_his_auto.tasks.auth import context
+    from cch_his_auto.tasks.auth import session
 
     listing = [int(ma_hs) for ma_hs in cf["ds_ma_hs"].strip().splitlines()]
     driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
     with create_connection() as con:
-        with context(driver, cf["username"], cf["password"], cf["department"]):
+        with session(driver, cf["username"], cf["password"], cf["department"]):
             ma_hs = listing.pop()
             first_patient(driver, con, ma_hs)
             process(driver, con, ma_hs)
@@ -103,6 +103,7 @@ def process(driver: Driver, con: sqlite3.Connection, ma_hs: int):
     bangkechiphiBHYT.open(driver)
     bangkechiphiBHYT.get_in_iframe(driver)
     bangkechiphiBHYT.sign_staff(driver)
-    bangkechiphiBHYT.sign_patient(driver, signature)
+    if signature:
+        bangkechiphiBHYT.sign_patient(driver, signature)
     bangkechiphiBHYT.get_out_iframe(driver)
     bangkechiphiBHYT.close(driver)

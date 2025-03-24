@@ -101,7 +101,7 @@ def run(cf: config.Config):
         # login_then_choose_dept,
         # logout_then_login,
         # logout,
-        context,
+        session,
     )
 
     if config.is_patient_list_valid(cf):
@@ -109,7 +109,7 @@ def run(cf: config.Config):
         driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
         match (bs, dd):
             case (True, True):
-                with context(
+                with session(
                     driver,
                     cf["bacsi"]["username"],
                     cf["bacsi"]["password"],
@@ -117,7 +117,7 @@ def run(cf: config.Config):
                 ):
                     run_bs(driver, cf)
 
-                with context(
+                with session(
                     driver,
                     cf["dieuduong"]["username"],
                     cf["dieuduong"]["password"],
@@ -126,7 +126,7 @@ def run(cf: config.Config):
                     run_dd(driver, cf)
                     run_bn(driver, cf)
             case (True, False):
-                with context(
+                with session(
                     driver,
                     cf["bacsi"]["username"],
                     cf["bacsi"]["password"],
@@ -136,7 +136,7 @@ def run(cf: config.Config):
                     run_bn(driver, cf)
                 messagebox.showerror(message="chưa nhập điều dưỡng")
             case (False, True):
-                with context(
+                with session(
                     driver,
                     cf["dieuduong"]["username"],
                     cf["dieuduong"]["password"],
@@ -196,6 +196,6 @@ def run_bn(driver: Driver, cf: config.Config):
                     "ma ho so",
                 ).text
             )
-            signature = get_signature_from_elsewhere(driver, con, ma_hs)
-            if any(p["ky_3tra"]["benhnhan"]):
-                igt.phieuthuchienylenh_bn(driver, p["ky_3tra"]["benhnhan"], signature)
+            if signature := get_signature_from_elsewhere(driver, con, ma_hs):
+                if any(p["ky_3tra"]["benhnhan"]):
+                    igt.phieuthuchienylenh_bn(driver, p["ky_3tra"]["benhnhan"], signature)
