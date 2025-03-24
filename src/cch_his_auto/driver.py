@@ -15,8 +15,7 @@ from selenium.webdriver import Keys
 # set up logging
 _logger = logging.getLogger()
 _logger.setLevel(logging.INFO)
-stdout = logging.StreamHandler(sys.stdout)
-_logger.addHandler(stdout)
+_logger.addHandler(logging.StreamHandler(sys.stdout))
 
 class DriverFn(Protocol):
     "A function typing hint that accepts Driver as first argument"
@@ -42,7 +41,8 @@ class Driver(webdriver.Chrome):
         options.add_argument("--remote-debugging-port=9222")
         options.add_argument("--window-size=1920,1080")
 
-        # not work in patient sign name
+        # intent to reduce page load
+        # but not working in sign_canvas
         # options.add_experimental_option(
         #     "prefs", {"profile.managed_default_content_settings.images": 2}
         # )
@@ -102,10 +102,14 @@ class Driver(webdriver.Chrome):
         """
         _logger.info(f"---clicking {name or css}")
         _logger.setLevel(logging.CRITICAL)
-        ele = self.waiting(css, name)
-        ActionChains(self).scroll_to_element(ele).pause(1).click(ele).perform()
-        _logger.setLevel(logging.INFO)
-        _logger.info(f"---done clicking {name or css}")
+        try:
+            ele = self.waiting(css, name)
+            ActionChains(self).scroll_to_element(ele).pause(1).click(ele).perform()
+            _logger.setLevel(logging.INFO)
+            _logger.info(f"---done clicking {name or css}")
+        except Exception as e:
+            _logger.error(f"---can't click {name or css}")
+            raise e
         time.sleep(2)
 
     def goto(self, url: str) -> None:

@@ -101,9 +101,8 @@ def run(cf: config.Config):
 def process(driver: Driver, con: sqlite3.Connection, ma_hs: int):
     signature = get_signature_from_ctnbnt(driver, con, ma_hs)
     bangkechiphiBHYT.open(driver)
-    bangkechiphiBHYT.get_in_iframe(driver)
-    bangkechiphiBHYT.sign_staff(driver)
-    if signature:
-        bangkechiphiBHYT.sign_patient(driver, signature)
-    bangkechiphiBHYT.get_out_iframe(driver)
+    with bangkechiphiBHYT.iframe(driver):
+        bangkechiphiBHYT.sign_staff(driver)
+        if signature:
+            bangkechiphiBHYT.sign_patient(driver, signature)
     bangkechiphiBHYT.close(driver)

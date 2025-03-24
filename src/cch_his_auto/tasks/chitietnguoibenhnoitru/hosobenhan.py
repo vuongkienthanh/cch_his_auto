@@ -64,27 +64,6 @@ def is_row(driver: Driver, idx: int, status: Status) -> bool:
     _logger.info(f"checking {name}: {status}")
     return ele.text.strip() == status
 
-# def is_row_hoanthanh(driver: Driver, idx: int) -> bool:
-#     "Check if row at `idx` is *Hoàn thành*, first row is id=2"
-#     ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
-#     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
-#     _logger.info(f"checking {name}: Hoan thanh")
-#     return ele.text.strip() == "Hoàn thành"
-#
-# def is_row_dangky(driver: Driver, idx: int) -> bool:
-#     "Check if row at `idx` is *Đang ký*, first row is id=2"
-#     ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
-#     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
-#     _logger.info(f"checking {name}: Dang ky")
-#     return ele.text.strip() == "Đang ký"
-#
-# def is_row_chuaky(driver: Driver, idx: int) -> bool:
-#     "Check if row at `idx` is *Chưa ký*, first row is id=2"
-#     ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
-#     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
-#     _logger.info(f"checking {name}: Chua ky")
-#     return ele.text.strip() == "Chưa ký"
-
 def is_row_expandable(driver: Driver, idx: int) -> bool:
     "Check if row at `idx` is expandable, first row is id=2"
     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
@@ -142,19 +121,19 @@ def filter_check_expand_sign_curent(
             expand_row(driver, 2)
             for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
                 if any([is_row(driver, i, status) for status in status_list]):
-                    _logger.info("hoan thanh: no")
+                    _logger.info("row condition: not met")
                     driver.clicking(f"tbody tr:nth-child({i})")
                     time.sleep(1)
                     sign_current(driver)
                 else:
-                    _logger.info("hoan thanh: yes")
+                    _logger.info("row condition: OK")
         else:
             if any([is_row(driver, 2, status) for status in status_list]):
-                _logger.info("hoan thanh: no")
+                _logger.info("row condition: not met")
                 driver.clicking("tbody tr:nth-child(2)")
                 sign_current(driver)
             else:
-                _logger.info("hoan thanh: yes")
+                _logger.info("row condition: OK")
     time.sleep(3)
 
 def filter_check_expand_sign_new_tab(
@@ -166,18 +145,18 @@ def filter_check_expand_sign_new_tab(
             expand_row(driver, 2)
             for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
                 if any([is_row(driver, i, status) for status in status_list]):
-                    _logger.info("hoan thanh or dang ky: no")
+                    _logger.info("row condition: not met")
                     driver.clicking(f"tbody tr:nth-child({i})")
                     time.sleep(1)
                     sign_new_tab(driver, i, sign_fn)
                 else:
-                    _logger.info("hoan thanh: yes")
+                    _logger.info("row condition: OK")
         else:
             if any([is_row(driver, 2, status) for status in status_list]):
-                _logger.info("hoan thanh or dang ky: no")
+                _logger.info("row condition: not met")
                 sign_new_tab(driver, 2, sign_fn)
             else:
-                _logger.info("hoan thanh: yes")
+                _logger.info("row condition: OK")
     time.sleep(3)
 
 def tobiabenhannhikhoa(driver: Driver):

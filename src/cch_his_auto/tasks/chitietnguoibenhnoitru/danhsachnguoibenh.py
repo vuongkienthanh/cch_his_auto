@@ -25,7 +25,7 @@ def close(driver: Driver):
     time.sleep(5)
 
 def filter_patient(driver: Driver, ma_hs: int) -> bool:
-    "Filter patient based on `ma_hs`"
+    "After `open`, filter patient based on `ma_hs`"
     ele = driver.clear_input(".ant-drawer .searching input")
     _logger.info(f"+++++ typing {ma_hs} to search entry")
     ele.send_keys(str(ma_hs))
@@ -38,7 +38,7 @@ def filter_patient(driver: Driver, ma_hs: int) -> bool:
         return False
 
 def goto_patient(driver: Driver, ma_hs: int):
-    "Filter patient based on `ma_hs`, then open that patient"
+    "After `open`, filter patient based on `ma_hs`, then open that patient"
     if filter_patient(driver, ma_hs):
         driver.clicking("tbody tr:nth-child(2)", "first row")
         driver.waiting_to_be(

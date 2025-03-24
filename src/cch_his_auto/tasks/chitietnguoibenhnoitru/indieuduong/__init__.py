@@ -23,7 +23,7 @@ def close(driver: Driver):
     time.sleep(2)
 
 def goto(driver: Driver, name: str):
-    "Filter document based on `name`"
+    "After `open`, filter selection based on `name`"
     ele = driver.clear_input(".ant-popover .ant-select input")
     time.sleep(2)
     _logger.info(f"typing {name}")
