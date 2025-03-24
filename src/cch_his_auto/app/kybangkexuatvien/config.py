@@ -12,7 +12,7 @@ class Config(TypedDict):
     username: str
     password: str
     department: str
-    ds_ma_hs: str
+    listing: str
 
 def save(config: Config):
     os.makedirs(APP_PATH, exist_ok=True)
@@ -29,5 +29,5 @@ def load() -> Config:
             "username": "",
             "password": "",
             "department": "",
-            "ds_ma_hs": "",
+            "listing": "",
         }

@@ -23,10 +23,9 @@ class App(tk.Frame):
         staff = UsernamePasswordDeptFrame(info, text="Nhân viên")
         staff.grid(row=0, column=0)
         headless_var = tk.BooleanVar()
-        headless_btn = tk.Checkbutton(
-            info, variable=headless_var, text="Headless Chrome"
+        tk.Checkbutton(info, variable=headless_var, text="Headless Chrome").grid(
+            row=1, column=0, pady=5
         )
-        headless_btn.grid(row=1, column=0, pady=5)
         info.grid(row=0, column=0, sticky="N", pady=20)
 
         mainframe = tk.Frame(self)
@@ -44,7 +43,7 @@ class App(tk.Frame):
             staff.set_password(cf["password"])
             staff.set_department(cf["department"])
             dsmahs.delete("1.0", "end")
-            dsmahs.insert("1.0", cf["ds_ma_hs"])
+            dsmahs.insert("1.0", cf["listing"])
 
         def get_config() -> config.Config:
             return {
@@ -52,7 +51,7 @@ class App(tk.Frame):
                 "username": staff.get_username(),
                 "password": staff.get_password(),
                 "department": staff.get_department(),
-                "ds_ma_hs": dsmahs.get("1.0", "end"),
+                "listing": dsmahs.get("1.0", "end"),
             }
 
         def save():
@@ -82,20 +81,21 @@ def run(cf: config.Config):
     from cch_his_auto.app.global_db import create_connection
     from cch_his_auto.tasks.auth import session
 
-    listing = [int(ma_hs) for ma_hs in cf["ds_ma_hs"].strip().splitlines()]
+    listing = [int(ma_hs) for ma_hs in cf["listing"].strip().splitlines()]
     driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-    with create_connection() as con:
-        with session(driver, cf["username"], cf["password"], cf["department"]):
-            ma_hs = listing.pop()
-            first_patient(driver, con, ma_hs)
-            process(driver, con, ma_hs)
-
-            while len(listing) > 0:
+    try:
+        with create_connection() as con:
+            with session(driver, cf["username"], cf["password"], cf["department"]):
                 ma_hs = listing.pop()
-                next_patient(driver, con, ma_hs)
+                first_patient(driver, con, ma_hs)
                 process(driver, con, ma_hs)
 
-    driver.quit()
+                while len(listing) > 0:
+                    ma_hs = listing.pop()
+                    next_patient(driver, con, ma_hs)
+                    process(driver, con, ma_hs)
+    finally:
+        driver.quit()
     messagebox.showinfo(message="finish")
 
 def process(driver: Driver, con: sqlite3.Connection, ma_hs: int):

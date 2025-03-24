@@ -14,6 +14,7 @@ class Config(TypedDict):
     department: str
     listing: str
     discharged: bool
+    is_final_day: bool
 
 def save(config: Config):
     os.makedirs(APP_PATH, exist_ok=True)
@@ -32,4 +33,5 @@ def load() -> Config:
             "department": "",
             "listing": "",
             "discharged": False,
+            "is_final_day": False,
         }

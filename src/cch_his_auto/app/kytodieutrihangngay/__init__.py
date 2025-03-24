@@ -23,22 +23,21 @@ class App(tk.Frame):
         info = tk.LabelFrame(self, text="Thông tin đăng nhập")
         bacsi = UsernamePasswordFrame(info, text="Bác sĩ")
         dieuduong = UsernamePasswordFrame(info, text="Điều dưỡng")
+        bacsi.grid(row=0, column=0)
+        dieuduong.grid(row=0, column=1)
         dept_var = tk.StringVar()
+        headless_var = tk.BooleanVar()
         tk.Label(info, text="Khoa lâm sàng:", justify="right").grid(
             row=1, column=0, sticky="E"
         )
         tk.Entry(info, textvariable=dept_var).grid(row=1, column=1, sticky="W")
-        headless_var = tk.BooleanVar()
-        headless_btn = tk.Checkbutton(
+        tk.Checkbutton(
             info,
             text="Headless Chrome",
             variable=headless_var,
-        )
+        ).grid(row=2, column=0, columnspan=2, pady=5)
 
         info.grid(row=0, column=0, sticky="N", pady=20)
-        bacsi.grid(row=0, column=0)
-        dieuduong.grid(row=0, column=1)
-        headless_btn.grid(row=2, column=0, columnspan=2, pady=5)
 
         mainframe = PatientFrame(self)
         mainframe.grid(row=1, column=0, sticky="NSEW")
@@ -97,58 +96,55 @@ class App(tk.Frame):
 
 def run(cf: config.Config):
     from cch_his_auto.app import PROFILE_PATH
-    from cch_his_auto.tasks.auth import (
-        # login_then_choose_dept,
-        # logout_then_login,
-        # logout,
-        session,
-    )
+    from cch_his_auto.tasks.auth import session
 
     if config.is_patient_list_valid(cf):
         bs, dd = config.is_bs_valid(cf), config.is_dd_valid(cf)
         driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-        match (bs, dd):
-            case (True, True):
-                with session(
-                    driver,
-                    cf["bacsi"]["username"],
-                    cf["bacsi"]["password"],
-                    cf["department"],
-                ):
-                    run_bs(driver, cf)
+        try:
+            match (bs, dd):
+                case (True, True):
+                    with session(
+                        driver,
+                        cf["bacsi"]["username"],
+                        cf["bacsi"]["password"],
+                        cf["department"],
+                    ):
+                        run_bs(driver, cf)
 
-                with session(
-                    driver,
-                    cf["dieuduong"]["username"],
-                    cf["dieuduong"]["password"],
-                    cf["department"],
-                ):
-                    run_dd(driver, cf)
-                    run_bn(driver, cf)
-            case (True, False):
-                with session(
-                    driver,
-                    cf["bacsi"]["username"],
-                    cf["bacsi"]["password"],
-                    cf["department"],
-                ):
-                    run_bs(driver, cf)
-                    run_bn(driver, cf)
-                messagebox.showerror(message="chưa nhập điều dưỡng")
-            case (False, True):
-                with session(
-                    driver,
-                    cf["dieuduong"]["username"],
-                    cf["dieuduong"]["password"],
-                    cf["department"],
-                ):
-                    run_dd(driver, cf)
-                    run_bn(driver, cf)
-                messagebox.showerror(message="chưa nhập bác sĩ")
-            case _:
-                messagebox.showerror(message="chưa nhập bác sĩ, điều dưỡng")
+                    with session(
+                        driver,
+                        cf["dieuduong"]["username"],
+                        cf["dieuduong"]["password"],
+                        cf["department"],
+                    ):
+                        run_dd(driver, cf)
+                        run_bn(driver, cf)
+                case (True, False):
+                    with session(
+                        driver,
+                        cf["bacsi"]["username"],
+                        cf["bacsi"]["password"],
+                        cf["department"],
+                    ):
+                        run_bs(driver, cf)
+                        run_bn(driver, cf)
+                    messagebox.showerror(message="chưa nhập điều dưỡng")
+                case (False, True):
+                    with session(
+                        driver,
+                        cf["dieuduong"]["username"],
+                        cf["dieuduong"]["password"],
+                        cf["department"],
+                    ):
+                        run_dd(driver, cf)
+                        run_bn(driver, cf)
+                    messagebox.showerror(message="chưa nhập bác sĩ")
+                case _:
+                    messagebox.showerror(message="chưa nhập bác sĩ, điều dưỡng")
 
-        driver.quit()
+        finally:
+            driver.quit()
         messagebox.showinfo(message="finish")
     else:
         messagebox.showerror(message="không có bệnh nhân")
@@ -198,4 +194,6 @@ def run_bn(driver: Driver, cf: config.Config):
             )
             if signature := get_signature_from_elsewhere(driver, con, ma_hs):
                 if any(p["ky_3tra"]["benhnhan"]):
-                    igt.phieuthuchienylenh_bn(driver, p["ky_3tra"]["benhnhan"], signature)
+                    igt.phieuthuchienylenh_bn(
+                        driver, p["ky_3tra"]["benhnhan"], signature
+                    )

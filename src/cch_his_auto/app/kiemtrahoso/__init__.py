@@ -4,6 +4,13 @@ import os.path
 
 TITLE = "Kiểm tra hồ sơ"
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
+APP_INTRO = """
+    Chức năng hiện tại:
+        + Tờ bìa, mục A, mục B
+        + phiếu chỉ định, tờ điều trị
+        + Phiếu CT, MRI
+        + Phiếu giải phẫu bệnh
+    """
 
 from . import config
 from cch_his_auto.app.common_tasks.navigation import first_patient, next_patient
@@ -23,29 +30,32 @@ class App(tk.Frame):
         bacsi = UsernamePasswordDeptFrame(info, text="Bác sĩ ký tên")
         bacsi.grid(row=0, column=0)
         headless_var = tk.BooleanVar()
-        headless_btn = tk.Checkbutton(
-            info, variable=headless_var, text="Headless Chrome"
+        tk.Checkbutton(info, variable=headless_var, text="Headless Chrome").grid(
+            row=1, column=0, pady=5
         )
-        headless_btn.grid(row=1, column=0, pady=5)
         info.grid(row=0, column=0, sticky="N", pady=20)
 
         mainframe = tk.Frame(self)
         mainframe.grid(row=1, column=0, sticky="NSEW")
         discharged_var = tk.BooleanVar()
+        is_finalday_var = tk.BooleanVar()
         tk.Checkbutton(mainframe, text="đã xuất viện", variable=discharged_var).grid(
             row=0, column=0, padx=20, pady=20, sticky="W"
         )
+        tk.Checkbutton(mainframe, text="ngày cuối cùng", variable=is_finalday_var).grid(
+            row=0, column=1, padx=20, pady=20, sticky="W"
+        )
         tk.Label(mainframe, text="Danh sách mã hồ sơ:", anchor="w").grid(
-            row=1, column=0, padx=20, sticky="NEW"
+            row=1, column=0, padx=20, sticky="NEW", columnspan=2
         )
         listing_entry = scrolledtext.ScrolledText(mainframe)
-        listing_entry.grid(row=2, column=0, padx=20, sticky="NSEW")
+        listing_entry.grid(row=2, column=0, padx=20, sticky="NSEW", columnspan=2)
         tk.Label(
             mainframe,
-            text=process.__doc__ or "",
+            text=APP_INTRO,
             justify="left",
             anchor="w",
-        ).grid(row=2, column=0, sticky="SEW", padx=20)
+        ).grid(row=2, column=0, sticky="SEW", padx=20, columnspan=2)
 
         def load():
             cf = config.load()
@@ -56,6 +66,7 @@ class App(tk.Frame):
             listing_entry.delete("1.0", "end")
             listing_entry.insert("1.0", cf["listing"])
             discharged_var.set(cf["discharged"])
+            is_finalday_var.set(cf["is_final_day"])
 
         def get_config() -> config.Config:
             return {
@@ -65,6 +76,7 @@ class App(tk.Frame):
                 "department": bacsi.get_department(),
                 "listing": listing_entry.get("1.0", "end"),
                 "discharged": discharged_var.get(),
+                "is_final_day": is_finalday_var.get(),
             }
 
         def save():
@@ -96,33 +108,40 @@ def run(cf: config.Config):
 
     listing = [int(ma_hs) for ma_hs in cf["listing"].strip().splitlines()]
     driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-    with create_connection() as con:
-        with session(driver, cf["username"], cf["password"], cf["department"]):
-            if cf["discharged"]:
-                danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
+    if cf["is_final_day"]:
+        process = process_final_day
+    else:
+        process = process_normal_day
+    try:
+        with create_connection() as con:
+            with session(driver, cf["username"], cf["password"], cf["department"]):
+                if cf["discharged"]:
+                    danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
 
-            ma_hs = listing.pop()
-            first_patient(driver, con, ma_hs)
-            signature = get_signature_from_ctnbnt(driver, con, ma_hs)
-            process(driver, signature)
-
-            while len(listing) > 0:
                 ma_hs = listing.pop()
-                next_patient(driver, con, ma_hs)
+                first_patient(driver, con, ma_hs)
                 signature = get_signature_from_ctnbnt(driver, con, ma_hs)
                 process(driver, signature)
 
-    driver.quit()
+                while len(listing) > 0:
+                    ma_hs = listing.pop()
+                    next_patient(driver, con, ma_hs)
+                    signature = get_signature_from_ctnbnt(driver, con, ma_hs)
+                    process(driver, signature)
+    finally:
+        driver.quit()
     messagebox.showinfo(message="finish")
 
-def process(driver: Driver, signature: str | None):
-    """
-    Chức năng hiện tại:
-        + Tờ bìa, mục A, mục B
-        + phiếu chỉ định, tờ điều trị
-        + Phiếu CT, MRI
-        + Phiếu giải phẫu bệnh
-    """
+def process_normal_day(driver: Driver, signature: str | None):
+    hosobenhan.open(driver)
+    hosobenhan.phieuchidinhxetnghiem(driver)
+    hosobenhan.todieutri(driver)
+    hosobenhan.phieuCT(driver)
+    hosobenhan.phieuMRI(driver, signature)
+    hosobenhan.giaiphaubenh(driver)
+    hosobenhan.close(driver)
+
+def process_final_day(driver: Driver, signature: str | None):
     hosobenhan.open(driver)
     hosobenhan.tobiabenhannhikhoa(driver)
     hosobenhan.mucAbenhannhikhoa(driver)
