@@ -13,39 +13,46 @@ _logger = logging.getLogger()
 
 def open(driver: Driver):
     "Click *Đăng ký PHCN* or *Thêm mới đợt PHCN* button"
-    try:
-        ele = driver.waiting(
-            ".footer-btn .left button:nth-child(3)", "Nút đăng ký PHCN"
-        )
-        if (
-            ele.text.strip() == "Đăng ký PHCN"
-            or ele.text.strip() == "Thêm mới đợt PHCN"
-        ):
-            ele.click()
-            _logger.info("finish open PHCN")
-            driver.waiting(".ant-form", "Bảng đăng ký PHCN")
-        else:
-            cancel(driver)
-            open(driver)
-    except StaleElementReferenceException:
-        open(driver)
-
-def cancel(driver: Driver):
-    "Click *Hủy đăng ký PHCN* button"
-    try:
-        ele = driver.waiting(".footer-btn .left button:nth-child(3)", "Nút huỷ PHCN")
-        if ele.text.strip() == "Hủy đăng ký PHCN":
-            ele.click()
-            ele = driver.waiting(".footer-btn .left button:nth-child(3)")
+    for _ in range(20):
+        try:
+            ele = driver.waiting(
+                ".footer-btn .left button:nth-child(3)", "Nút đăng ký PHCN"
+            )
             if (
                 ele.text.strip() == "Đăng ký PHCN"
                 or ele.text.strip() == "Thêm mới đợt PHCN"
             ):
-                _logger.info("finish cancel PHCN")
+                ele.click()
+                driver.waiting(".ant-form", "finish open PHCN")
             else:
-                _logger.error("can't cancel PHCN")
-    except StaleElementReferenceException:
-        cancel(driver)
+                _logger.info("PHCN is already registered -> canceling")
+                cancel(driver)
+        except StaleElementReferenceException:
+            ...
+    else:
+        _logger.error("can't open PHCN")
+
+def cancel(driver: Driver):
+    "Click *Hủy đăng ký PHCN* button"
+    for _ in range(20):
+        try:
+            ele = driver.waiting(
+                ".footer-btn .left button:nth-child(3)", "Nút huỷ PHCN"
+            )
+            if ele.text.strip() == "Hủy đăng ký PHCN":
+                ele.click()
+                ele = driver.waiting(
+                    ".footer-btn .left button:nth-child(3)", "refreshing PHCN button"
+                )
+                if (
+                    ele.text.strip() == "Đăng ký PHCN"
+                    or ele.text.strip() == "Thêm mới đợt PHCN"
+                ):
+                    _logger.info("finish cancel PHCN")
+        except StaleElementReferenceException:
+            ...
+    else:
+        _logger.error("can't cancel PHCN")
 
 def clear(driver: Driver):
     "After `open`, clear all selections"

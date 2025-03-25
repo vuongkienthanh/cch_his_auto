@@ -112,24 +112,22 @@ def run(cf: config.Config):
         process = process_final_day
     else:
         process = process_normal_day
-    try:
-        with create_connection() as con:
-            with session(driver, cf["username"], cf["password"], cf["department"]):
-                if cf["discharged"]:
-                    danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
+    with create_connection() as con:
+        with session(driver, cf["username"], cf["password"], cf["department"]):
+            if cf["discharged"]:
+                danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
 
+            ma_hs = listing.pop()
+            first_patient(driver, con, ma_hs)
+            signature = get_signature_from_ctnbnt(driver, con, ma_hs)
+            process(driver, signature)
+
+            while len(listing) > 0:
                 ma_hs = listing.pop()
-                first_patient(driver, con, ma_hs)
+                next_patient(driver, con, ma_hs)
                 signature = get_signature_from_ctnbnt(driver, con, ma_hs)
                 process(driver, signature)
-
-                while len(listing) > 0:
-                    ma_hs = listing.pop()
-                    next_patient(driver, con, ma_hs)
-                    signature = get_signature_from_ctnbnt(driver, con, ma_hs)
-                    process(driver, signature)
-    finally:
-        driver.quit()
+    driver.quit()
     messagebox.showinfo(message="finish")
 
 def process_normal_day(driver: Driver, signature: str | None):

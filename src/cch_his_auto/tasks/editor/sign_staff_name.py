@@ -5,8 +5,6 @@
 import logging
 import time
 
-from selenium.common import NoSuchElementException
-
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.editor import sign_patient_name
 
@@ -16,7 +14,7 @@ def sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
     "@private"
     try:
         driver.waiting(btn_css)
-    except NoSuchElementException:
+    except:
         return
     for _ in range(20):
         time.sleep(1)
@@ -29,7 +27,7 @@ def sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
         return
     driver.clicking(btn_css)
     driver.waiting(img_css)
-    _logger.info(f"finish sign page return image: {name}")
+    _logger.info(f"finish signing page: {name}")
 
 def tobiabenhannhikhoa(driver: Driver):
     "*Tờ bìa bệnh án nhi khoa*"

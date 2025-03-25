@@ -25,7 +25,7 @@ def open(driver: Driver):
     driver.clicking(
         ".thong-tin-benh-nhan .bunch-icon div:nth-child(3)", "xem ho so benh an"
     )
-    driver.waiting(".right-content tbody tr:nth-child(2) ", "Danh sách phiếu")
+    driver.waiting(".right-content tbody tr:nth-child(2)", "Danh sách phiếu")
     time.sleep(2)
 
 def close(driver: Driver):
@@ -52,7 +52,7 @@ def filter(driver: Driver, name: str) -> bool:
                 _logger.info(f"found {name}")
                 return True
         except NoSuchElementException:
-            pass
+            ...
     else:
         _logger.error("filtered with no result")
         return False
@@ -116,7 +116,12 @@ def filter_check_expand_sign_curent(
     driver: Driver, name: str, status_list: list[Status]
 ):
     "@private"
-    if filter(driver, name):
+    if filter(driver, name) and (
+        not driver.waiting(
+            ".right-content tbody tr:nth-child(2) td:nth-child(3)"
+        ).text.strip()
+        == Status.HOANTHANH
+    ):
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
             for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
@@ -134,13 +139,18 @@ def filter_check_expand_sign_curent(
                 sign_current(driver)
             else:
                 _logger.info("row condition: OK")
-    time.sleep(3)
+    time.sleep(2)
 
 def filter_check_expand_sign_new_tab(
     driver: Driver, name: str, sign_fn: DriverFn, status_list: list[Status]
 ):
     "@private"
-    if filter(driver, name):
+    if filter(driver, name) and (
+        not driver.waiting(
+            ".right-content tbody tr:nth-child(2) td:nth-child(3)"
+        ).text.strip()
+        == Status.HOANTHANH
+    ):
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
             for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):

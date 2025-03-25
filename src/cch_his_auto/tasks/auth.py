@@ -89,14 +89,3 @@ def session(driver:Driver, username: str, password:str, dept:str):
         yield driver
     finally:
         logout(driver)
-
-
-# def login_then_choose_dept(driver: Driver, username: str, password: str, dept: str):
-#     "`login` and goto `danhsachnguoibenhnoitru.URL` then `choose_dept`"
-#     login(driver, username, password)
-#     driver.goto(danhsachnguoibenhnoitru.URL)
-#     choose_dept(driver, dept)
-#
-# def logout_then_login(driver: Driver, username: str, password: str):
-#     logout(driver)
-#     login(driver, username, password)
