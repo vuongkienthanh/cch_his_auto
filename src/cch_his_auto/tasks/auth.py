@@ -37,7 +37,8 @@ def login(driver: Driver, username: str, password: str):
         except:
             try:
                 driver.find(".card")
-                _logger.info("found main screen")
+                _logger.info("found main screen -> log out")
+                logout(driver)
                 break
             except:
                 ...
