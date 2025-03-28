@@ -67,33 +67,40 @@ class Driver(webdriver.Chrome):
         Waiting element by `css`.
         You can also provide a `name` for logging
         """
-        _logger.info(f"-----waiting {name or css}")
-        WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
-        _logger.info(f"---->>done waiting {name or css}")
-        time.sleep(2)
-        return self.find(css)
+        try:
+            _logger.info(f"---waiting {name or css}")
+            WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
+            _logger.info(f"-->>done waiting {name or css}")
+            time.sleep(2)
+            return self.find(css)
+        except Exception as e:
+            _logger.error(f"-->>cant find {name or css}")
+            raise e
 
     def waiting_to_be(self, css: str, to_be: str, /, name: str = "") -> WebElement:
         """
         Waiting element by `css` with textContent equals `to_be`.
         You can also provide a `name` for logging
         """
-        _logger.info(f"-----waiting {name or css} to be {to_be}")
-        WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
-        if to_be:
-            for _ in range(120):
-                time.sleep(1)
-                if self.find(css).text.strip().startswith(to_be.strip()):
-                    _logger.info(f"---->> found {to_be}")
-                    break
-            else:
-                txt = self.find(css).text.strip()
-                ctx = f"{name or css} with to_be {to_be} != textContent {txt}"
-                _logger.error(f"---->>no such element: {ctx}")
-                raise NoSuchElementException(ctx)
-        _logger.info(f"---->>done waiting {name or css} to be {to_be}")
-        time.sleep(2)
-        return self.find(css)
+        _logger.info(f"---waiting {name or css} to be {to_be}")
+
+        try:
+            WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
+        except Exception as e:
+            _logger.error(f"-->>cant find {name or css}")
+            raise e
+
+        for _ in range(120):
+            time.sleep(1)
+            if self.find(css).text.strip().startswith(to_be.strip()):
+                _logger.info(f"-->>done waiting {name or css} to be {to_be}")
+                time.sleep(2)
+                return self.find(css)
+        else:
+            txt = self.find(css).text.strip()
+            ctx = f'{name or css} with to_be="{to_be}" is not equal to {txt}'
+            _logger.error(f"-->>no such element: {ctx}")
+            raise NoSuchElementException(ctx)
 
     def clicking(self, css: str, /, name: str = "") -> None:
         """
@@ -102,13 +109,19 @@ class Driver(webdriver.Chrome):
         """
         _logger.info(f"---clicking {name or css}")
         try:
-            ele = self.waiting(css, name)
+            WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
+        except Exception as e:
+            _logger.error(f"-->>cant find {name or css}")
+            raise e
+
+        try:
+            ele = self.find(css)
             ActionChains(self).scroll_to_element(ele).pause(1).click(ele).perform()
             _logger.info(f"-->>done clicking {name or css}")
+            time.sleep(2)
         except Exception as e:
             _logger.error(f"-->>can't click {name or css}")
             raise e
-        time.sleep(2)
 
     def goto(self, url: str) -> None:
         "Go to `url`"
