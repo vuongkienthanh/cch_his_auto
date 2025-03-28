@@ -1,4 +1,5 @@
 import os.path
+import logging
 
 TITLE = "Ký tờ điều trị hằng ngày"
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -10,6 +11,8 @@ from . import config
 
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.todieutri import ingiayto as igt
+
+_logger = logging.getLogger()
 
 class App(tk.Frame):
     def __init__(self):
@@ -152,6 +155,7 @@ def run_bs(driver: Driver, cf: config.Config):
 
     for p in cf["patients"]:
         driver.goto(p["url"])
+        _logger.info(f"patient: {driver.waiting('.name span').text}")
 
         if p["ky_xetnghiem"]:
             igt.phieuchidinh(driver)
@@ -174,6 +178,7 @@ def run_bs(driver: Driver, cf: config.Config):
 def run_dd(driver: Driver, cf: config.Config):
     for p in cf["patients"]:
         driver.goto(p["url"])
+        _logger.info(f"patient: {driver.waiting('.name span').text}")
         if any(p["ky_3tra"]["dieuduong"]):
             igt.phieuthuchienylenh_dd(driver, p["ky_3tra"]["dieuduong"])
 
@@ -184,6 +189,7 @@ def run_bn(driver: Driver, cf: config.Config):
     with create_connection() as con:
         for p in cf["patients"]:
             driver.goto(p["url"])
+            _logger.info(f"patient: {driver.waiting('.name span').text}")
             ma_hs = int(
                 driver.waiting(
                     ".patient-information .additional-item:nth-child(2) .info",

@@ -67,9 +67,9 @@ class Driver(webdriver.Chrome):
         Waiting element by `css`.
         You can also provide a `name` for logging
         """
-        _logger.info(f"---waiting {name or css}")
+        _logger.info(f"-----waiting {name or css}")
         WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
-        _logger.info(f"---done waiting {name or css}")
+        _logger.info(f"---->>done waiting {name or css}")
         time.sleep(2)
         return self.find(css)
 
@@ -78,20 +78,20 @@ class Driver(webdriver.Chrome):
         Waiting element by `css` with textContent equals `to_be`.
         You can also provide a `name` for logging
         """
-        _logger.info(f"---waiting {name or css} to be {to_be}")
+        _logger.info(f"-----waiting {name or css} to be {to_be}")
         WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         if to_be:
             for _ in range(120):
                 time.sleep(1)
                 if self.find(css).text.strip().startswith(to_be.strip()):
-                    _logger.info(f"-->> found {to_be}")
+                    _logger.info(f"---->> found {to_be}")
                     break
             else:
                 txt = self.find(css).text.strip()
                 ctx = f"{name or css} with to_be {to_be} != textContent {txt}"
-                _logger.error(f"---no such element: {ctx}")
+                _logger.error(f"---->>no such element: {ctx}")
                 raise NoSuchElementException(ctx)
-        _logger.info(f"---done waiting {name or css} to be {to_be}")
+        _logger.info(f"---->>done waiting {name or css} to be {to_be}")
         time.sleep(2)
         return self.find(css)
 
@@ -102,16 +102,12 @@ class Driver(webdriver.Chrome):
         """
         _logger.info(f"---clicking {name or css}")
         try:
-            _logger.setLevel(logging.WARNING)
             ele = self.waiting(css, name)
-            _logger.setLevel(logging.INFO)
             ActionChains(self).scroll_to_element(ele).pause(1).click(ele).perform()
-            _logger.info(f"---done clicking {name or css}")
+            _logger.info(f"-->>done clicking {name or css}")
         except Exception as e:
-            _logger.error(f"---can't click {name or css}")
+            _logger.error(f"-->>can't click {name or css}")
             raise e
-        finally:
-            _logger.setLevel(logging.INFO)
         time.sleep(2)
 
     def goto(self, url: str) -> None:
@@ -132,7 +128,7 @@ class Driver(webdriver.Chrome):
                 time.sleep(2)
                 break
         else:
-            raise Exception("cant go to new tab")
+            raise Exception("-->>cant go to new tab")
 
     def goto_newtab_do_smth_then_goback(self, main_tab: str, fn: DriverFn) -> None:
         """
@@ -148,10 +144,8 @@ class Driver(webdriver.Chrome):
 
     def clear_input(self, css: str) -> WebElement:
         "Find element by `css` then clear it"
-        _logger.info("clearing input")
-        _logger.setLevel(logging.WARNING)
+        _logger.info("---clearing input")
         ele = self.waiting(css)
-        _logger.setLevel(logging.INFO)
         ele.send_keys(Keys.CONTROL, "a")
         ele.send_keys(Keys.DELETE)
         time.sleep(2)

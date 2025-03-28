@@ -25,9 +25,12 @@ def sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
             ...
     else:
         return
-    driver.clicking(btn_css)
-    driver.waiting(img_css)
-    _logger.info(f"finish signing page: {name}")
+    try:
+        driver.clicking(btn_css)
+        driver.waiting(img_css)
+        _logger.info(f"-->>done signing page: {name}")
+    except:
+        _logger.info(f"-->>can't sign page: {name}")
 
 def tobiabenhannhikhoa(driver: Driver):
     "*Tờ bìa bệnh án nhi khoa*"
@@ -79,16 +82,16 @@ def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
                 try:
                     driver.clicking(
                         f"table tbody tr:nth-last-child({row}) td:nth-child({col}) button",
-                        f"row {row} col {col}",
+                        f"row {5 - row} col {col}",
                     )
                     driver.waiting(
                         f"table tbody tr:nth-last-child({row}) td:nth-child({col}) img",
-                        f"row {row} col {col}",
+                        f"-->>done row {5 - row} col {col} ",
                     )
                 except Exception as e:
                     _logger.warning(e)
                     continue
-    _logger.info("finish sign page: phieu thuc hien y lenh bs")
+    _logger.info("-->>finish sign page: phieu thuc hien y lenh bs")
     time.sleep(2)
 
 def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, bool]):
@@ -100,16 +103,16 @@ def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
             try:
                 driver.clicking(
                     f"table tbody tr:nth-last-child(2) td:nth-child({col}) button",
-                    f"row 2 col {col}",
+                    f"row 3 col {col}",
                 )
                 driver.waiting(
                     f"table tbody tr:nth-last-child(2) td:nth-child({col}) img",
-                    f"row 2 col {col}",
+                    f"-->>done row 3 col {col}",
                 )
             except Exception as e:
                 _logger.warning(e)
                 continue
-    _logger.info("finish sign page: phieu thuc hien y lenh dd")
+    _logger.info("-->>finish sign page: phieu thuc hien y lenh dd")
     time.sleep(2)
 
 def phieuCT(driver: Driver):

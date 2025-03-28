@@ -65,17 +65,17 @@ def phieuthuchienylenh(
             try:
                 driver.clicking(
                     f"table tbody tr:nth-last-child(1) td:nth-child({col}) button",
-                    f"row 1 col {col}",
+                    f"row 4 col {col}",
                 )
                 sign_canvas(driver, signature)
                 driver.waiting(
                     f"table tbody tr:nth-last-child(1) td:nth-child({col}) img",
-                    f"row 1 col {col}",
+                    f"-->>done row 4 col {col}",
                 )
             except Exception as e:
                 _logger.warning(e)
                 continue
-    _logger.info("finish sign patient: phieu thuc hien y lenh")
+    _logger.info("-->>finish sign patient: phieu thuc hien y lenh")
     time.sleep(2)
 
 def phieuMRI(driver: Driver, signature: str):
