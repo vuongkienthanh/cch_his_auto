@@ -17,7 +17,7 @@ def open(driver: Driver, name: str) -> bool:
     _logger.info(f"======= finding link {name} ======")
     for _ in range(30):
         time.sleep(1)
-        for ele in driver.find_all(".ant-dropdown-menu li"):
+        for ele in driver.find_all(".ant-dropdown li div div , .ant-dropdown li a"):
             if ele.text == name:
                 ele.click()
                 time.sleep(3)
