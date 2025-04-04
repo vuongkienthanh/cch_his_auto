@@ -66,12 +66,14 @@ def choose_dept(driver: Driver, dept: str):
                     ".ant-modal-body .bottom-action .bottom-action-right button"
                 )
             ).perform()
-            driver.waiting(".khoaLamViec div span")
+            driver.waiting(".khoaLamViec div span", "dept is set")
             break
         except:
             try:
                 khoa = driver.find(".khoaLamViec div span")
-                if khoa.text.strip().lower() == dept.lower():
+                if not dept.strip().lower().startswith("khoa"):
+                    dept = "khoa " + dept.strip().lower()
+                if dept in khoa.text.strip().lower():
                     _logger.info("dept already set")
                     break
                 else:
@@ -81,7 +83,7 @@ def choose_dept(driver: Driver, dept: str):
                 ...
 
 @contextmanager
-def session(driver:Driver, username: str, password:str, dept:str):
+def session(driver: Driver, username: str, password: str, dept: str):
     login(driver, username, password)
     driver.goto(danhsachnguoibenhnoitru.URL)
     choose_dept(driver, dept)
