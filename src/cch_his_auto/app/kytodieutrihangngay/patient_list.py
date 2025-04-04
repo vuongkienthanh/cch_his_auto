@@ -1,7 +1,7 @@
 import tkinter as tk
 from typing import cast
 
-from .config import PHCN_ORDER, Patient
+from .config import Patient
 from ..common_ui.scrollable_frame import ScrollFrame
 
 class PatientFrame(tk.Frame):
@@ -13,8 +13,7 @@ class PatientFrame(tk.Frame):
         header.columnconfigure(1, minsize=120)
         header.columnconfigure(2, minsize=120)
         header.columnconfigure(3, minsize=180)
-        header.columnconfigure(4, minsize=180)
-        header.columnconfigure(5, minsize=80)
+        header.columnconfigure(4, minsize=80)
 
         url = tk.Label(header, text="url", relief="raised", anchor="center")
         ky_xetnghiem = tk.Label(
@@ -26,15 +25,13 @@ class PatientFrame(tk.Frame):
         ky_3tra = tk.Label(
             header, text="Vị trí ký 3tra", relief="raised", anchor="center"
         )
-        phcn = tk.Label(header, text="Đăng ký PHCN", relief="raised", anchor="center")
         delete_btn = tk.Label(header, text="Xóa", relief="raised", anchor="center")
 
         url.grid(row=0, column=0, sticky="NSEW")
         ky_xetnghiem.grid(row=0, column=1, sticky="NSEW")
         ky_todieutri.grid(row=0, column=2, sticky="NSEW")
         ky_3tra.grid(row=0, column=3, sticky="NSEW")
-        phcn.grid(row=0, column=4, sticky="NSEW")
-        delete_btn.grid(row=0, column=5, sticky="NSWE", padx=(0, 15))
+        delete_btn.grid(row=0, column=4, sticky="NSWE", padx=(0, 15))
 
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
@@ -133,20 +130,13 @@ class Line(tk.Frame):
         k3t_bn_3 = tk.Checkbutton(k3t_bn, variable=self.bn_3_var)
         k3t_bn_4 = tk.Checkbutton(k3t_bn, variable=self.bn_4_var)
 
-        phcn = tk.Frame(self)
-        bunuot = tk.Checkbutton(phcn, variable=self.bunuot_var, text=PHCN_ORDER[0])
-        giaotiep = tk.Checkbutton(phcn, variable=self.giaotiep_var, text=PHCN_ORDER[1])
-        hohap = tk.Checkbutton(phcn, variable=self.hohap_var, text=PHCN_ORDER[2])
-        vandong = tk.Checkbutton(phcn, variable=self.vandong_var, text=PHCN_ORDER[3])
-
         delete_button = tk.Button(self, text="Xóa", command=self.destroy)
 
         self.columnconfigure(0, weight=1, minsize=200)
         self.columnconfigure(1, minsize=120)
         self.columnconfigure(2, minsize=120)
         self.columnconfigure(3, minsize=180)
-        self.columnconfigure(4, minsize=180)
-        self.columnconfigure(5, minsize=80)
+        self.columnconfigure(4, minsize=80)
 
         info_frame.columnconfigure(1, weight=1)
         info_frame.grid(row=0, column=0, sticky="WE")
@@ -179,16 +169,8 @@ class Line(tk.Frame):
         k3t_bn_2.grid(row=0, column=2)
         k3t_bn_3.grid(row=0, column=3)
         k3t_bn_4.grid(row=0, column=4)
-        phcn.grid(
-            row=0,
-            column=4,
-        )
-        bunuot.grid(row=0, column=0, sticky="w")
-        giaotiep.grid(row=1, column=0, sticky="w")
-        hohap.grid(row=2, column=0, sticky="w")
-        vandong.grid(row=3, column=0, sticky="w")
 
-        delete_button.grid(row=0, column=5)
+        delete_button.grid(row=0, column=4)
 
     def set_patient(self, patient: Patient):
         self.url_var.set(patient["url"])
@@ -210,10 +192,6 @@ class Line(tk.Frame):
         self.bn_2_var.set(patient["ky_3tra"]["benhnhan"][2])
         self.bn_3_var.set(patient["ky_3tra"]["benhnhan"][3])
         self.bn_4_var.set(patient["ky_3tra"]["benhnhan"][4])
-        self.bunuot_var.set(patient["phcn"][0])
-        self.giaotiep_var.set(patient["phcn"][1])
-        self.hohap_var.set(patient["phcn"][2])
-        self.vandong_var.set(patient["phcn"][3])
 
     def get_patient(self) -> Patient:
         return {
@@ -244,10 +222,4 @@ class Line(tk.Frame):
                     self.bn_4_var.get(),
                 ),
             },
-            "phcn": (
-                self.bunuot_var.get(),
-                self.giaotiep_var.get(),
-                self.hohap_var.get(),
-                self.vandong_var.get(),
-            ),
         }

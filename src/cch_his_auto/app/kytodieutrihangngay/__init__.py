@@ -151,8 +151,6 @@ def run(cf: config.Config):
         messagebox.showerror(message="không có bệnh nhân")
 
 def run_bs(driver: Driver, cf: config.Config):
-    from cch_his_auto.tasks.todieutri import dangkyPHCN as dkphcn
-
     for p in cf["patients"]:
         driver.goto(p["url"])
         _logger.info(f"patient: {driver.waiting('.name span').text}")
@@ -163,17 +161,6 @@ def run_bs(driver: Driver, cf: config.Config):
             igt.todieutri(driver)
         if any(p["ky_3tra"]["bacsi"]):
             igt.phieuthuchienylenh_bs(driver, p["ky_3tra"]["bacsi"])
-        if any(p["phcn"]):
-            dkphcn.open(driver)
-            dkphcn.clear(driver)
-            for ph, fn in zip(
-                p["phcn"],
-                [dkphcn.bunuot, dkphcn.giaotiep, dkphcn.hohap, dkphcn.vandong],
-            ):
-                if ph:
-                    fn(driver)
-            dkphcn.closemenu(driver)
-            dkphcn.save(driver)
 
 def run_dd(driver: Driver, cf: config.Config):
     for p in cf["patients"]:

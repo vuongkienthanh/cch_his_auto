@@ -34,13 +34,14 @@ def add_file_handler_to_logger(filename: str, mode="w"):
 
 - Pick the tasks you want
 ```python
-from cch_his_auto.tasks.auth import login
-login(driver, username, password)
+from cch_his_auto.tasks.auth import session:
+with session(driver, username, password, dept):
+    do_smth(driver)
 ```
 
 - Close the driver when finished
 ```python
-driver.close()
+driver.quit()
 ```
 
 ## Or use GUI which is built for my daily tasks

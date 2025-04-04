@@ -25,7 +25,6 @@ class Patient(TypedDict):
     ky_xetnghiem: bool
     ky_todieutri: bool
     ky_3tra: Ky_3tra
-    phcn: tuple[bool, bool, bool, bool]
 
 class Config(TypedDict):
     headless: bool
