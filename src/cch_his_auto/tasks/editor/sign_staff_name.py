@@ -5,6 +5,9 @@
 import logging
 import time
 
+from selenium.common import NoSuchElementException
+from selenium.webdriver import ActionChains
+
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.editor import sign_patient_name
 
@@ -80,14 +83,35 @@ def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
         if isok:
             for row in [4, 3]:
                 try:
-                    driver.clicking(
-                        f"table tbody tr:nth-last-child({row}) td:nth-child({col}) button",
-                        f"row {5 - row} col {col}",
-                    )
-                    driver.waiting(
-                        f"table tbody tr:nth-last-child({row}) td:nth-child({col}) img",
-                        f"-->>done row {5 - row} col {col} ",
-                    )
+                    for _ in range(120):
+                        try:
+                            ele = driver.find(
+                                f"table tbody tr:nth-last-child({row}) td:nth-child({col}) button",
+                            )
+                        except NoSuchElementException:
+                            try:
+                                driver.find(
+                                    f"table tbody tr:nth-last-child({row}) td:nth-child({col}) img",
+                                )
+                                break
+                            except:
+                                continue
+                        ActionChains(driver).scroll_to_element(ele).pause(1).click(
+                            ele
+                        ).perform()
+                        driver.waiting(
+                            f"table tbody tr:nth-last-child({row}) td:nth-child({col}) img",
+                            f"-->>done clicking row {5 - row} col {col - 2} ",
+                        )
+                        break
+                    # driver.clicking(
+                    #     f"table tbody tr:nth-last-child({row}) td:nth-child({col}) button",
+                    #     f"row {5 - row} col {col}",
+                    # )
+                    # driver.waiting(
+                    #     f"table tbody tr:nth-last-child({row}) td:nth-child({col}) img",
+                    #     f"-->>done row {5 - row} col {col} ",
+                    # )
                 except Exception as e:
                     _logger.warning(e)
                     continue
@@ -101,14 +125,35 @@ def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
     for col, isok in zip([3, 4, 5, 6, 7], arr):
         if isok:
             try:
-                driver.clicking(
-                    f"table tbody tr:nth-last-child(2) td:nth-child({col}) button",
-                    f"row 3 col {col}",
-                )
-                driver.waiting(
-                    f"table tbody tr:nth-last-child(2) td:nth-child({col}) img",
-                    f"-->>done row 3 col {col}",
-                )
+                for _ in range(120):
+                    try:
+                        ele = driver.find(
+                            f"table tbody tr:nth-last-child(2) td:nth-child({col}) button",
+                        )
+                    except NoSuchElementException:
+                        try:
+                            driver.find(
+                                f"table tbody tr:nth-last-child(2) td:nth-child({col}) img",
+                            )
+                            break
+                        except:
+                            continue
+                    ActionChains(driver).scroll_to_element(ele).pause(1).click(
+                        ele
+                    ).perform()
+                    driver.waiting(
+                        f"table tbody tr:nth-last-child(2) td:nth-child({col}) img",
+                        f"-->>done clicking row 3 col {col - 2} ",
+                    )
+                    break
+                # driver.clicking(
+                #     f"table tbody tr:nth-last-child(2) td:nth-child({col}) button",
+                #     f"row 3 col {col}",
+                # )
+                # driver.waiting(
+                #     f"table tbody tr:nth-last-child(2) td:nth-child({col}) img",
+                #     f"-->>done row 3 col {col}",
+                # )
             except Exception as e:
                 _logger.warning(e)
                 continue

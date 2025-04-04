@@ -6,6 +6,7 @@ import logging
 import time
 
 from selenium.common import NoSuchElementException
+from selenium.webdriver import ActionChains
 
 from cch_his_auto.driver import Driver
 
@@ -63,19 +64,41 @@ def phieuthuchienylenh(
     for col, isok in zip([3, 4, 5, 6, 7], arr):
         if isok:
             try:
-                driver.clicking(
-                    f"table tbody tr:nth-last-child(1) td:nth-child({col}) button",
-                    f"row 4 col {col}",
-                )
-                sign_canvas(driver, signature)
-                driver.waiting(
-                    f"table tbody tr:nth-last-child(1) td:nth-child({col}) img",
-                    f"-->>done row 4 col {col}",
-                )
+                for _ in range(120):
+                    try:
+                        ele = driver.find(
+                            f"table tbody tr:nth-last-child(1) td:nth-child({col}) button",
+                        )
+                    except NoSuchElementException:
+                        try:
+                            driver.find(
+                                f"table tbody tr:nth-last-child(1) td:nth-child({col}) img",
+                            )
+                            break
+                        except:
+                            continue
+                    ActionChains(driver).scroll_to_element(ele).pause(1).click(
+                        ele
+                    ).perform()
+                    sign_canvas(driver, signature)
+                    driver.waiting(
+                        f"table tbody tr:nth-last-child(1) td:nth-child({col}) img",
+                        f"-->>done clicking row 4 col {col - 2} ",
+                    )
+                    break
+                # driver.clicking(
+                #     f"table tbody tr:nth-last-child(1) td:nth-child({col}) button",
+                #     f"row 4 col {col}",
+                # )
+                # sign_canvas(driver, signature)
+                # driver.waiting(
+                #     f"table tbody tr:nth-last-child(1) td:nth-child({col}) img",
+                #     f"-->>done row 4 col {col}",
+                # )
             except Exception as e:
                 _logger.warning(e)
                 continue
-    _logger.info("-->>finish sign patient: phieu thuc hien y lenh")
+    _logger.info("-->>finish sign patient: phieu thuc hien y lenh bn")
     time.sleep(2)
 
 def phieuMRI(driver: Driver, signature: str):
