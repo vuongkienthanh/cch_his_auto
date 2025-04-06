@@ -20,6 +20,7 @@ def open(driver: Driver, name: str) -> bool:
         for ele in driver.find_all(".ant-dropdown li div div , .ant-dropdown li a"):
             if ele.text == name:
                 ele.click()
+                _logger.info(f"======= found link {name} ======")
                 time.sleep(3)
                 return True
     else:

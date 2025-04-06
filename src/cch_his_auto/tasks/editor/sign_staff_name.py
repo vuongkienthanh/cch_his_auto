@@ -83,6 +83,7 @@ def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
         if isok:
             for row in [4, 3]:
                 try:
+                    _logger.info(f"clicking row {5 - row} col {col - 2}")
                     for _ in range(120):
                         try:
                             ele = driver.find(
@@ -101,17 +102,9 @@ def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
                         ).perform()
                         driver.waiting(
                             f"table tbody tr:nth-last-child({row}) td:nth-child({col}) img",
-                            f"-->>done clicking row {5 - row} col {col - 2} ",
+                            f"row {5 - row} col {col - 2} signature",
                         )
                         break
-                    # driver.clicking(
-                    #     f"table tbody tr:nth-last-child({row}) td:nth-child({col}) button",
-                    #     f"row {5 - row} col {col}",
-                    # )
-                    # driver.waiting(
-                    #     f"table tbody tr:nth-last-child({row}) td:nth-child({col}) img",
-                    #     f"-->>done row {5 - row} col {col} ",
-                    # )
                 except Exception as e:
                     _logger.warning(e)
                     continue
@@ -125,6 +118,7 @@ def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
     for col, isok in zip([3, 4, 5, 6, 7], arr):
         if isok:
             try:
+                _logger.info(f"clicking row 3 col {col - 2}")
                 for _ in range(120):
                     try:
                         ele = driver.find(
@@ -143,17 +137,9 @@ def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
                     ).perform()
                     driver.waiting(
                         f"table tbody tr:nth-last-child(2) td:nth-child({col}) img",
-                        f"-->>done clicking row 3 col {col - 2} ",
+                        f"row 3 col {col - 2} signature",
                     )
                     break
-                # driver.clicking(
-                #     f"table tbody tr:nth-last-child(2) td:nth-child({col}) button",
-                #     f"row 3 col {col}",
-                # )
-                # driver.waiting(
-                #     f"table tbody tr:nth-last-child(2) td:nth-child({col}) img",
-                #     f"-->>done row 3 col {col}",
-                # )
             except Exception as e:
                 _logger.warning(e)
                 continue

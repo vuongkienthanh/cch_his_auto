@@ -64,6 +64,7 @@ def phieuthuchienylenh(
     for col, isok in zip([3, 4, 5, 6, 7], arr):
         if isok:
             try:
+                _logger.info(f"clicking row 4 col {col - 2}")
                 for _ in range(120):
                     try:
                         ele = driver.find(
@@ -83,18 +84,9 @@ def phieuthuchienylenh(
                     sign_canvas(driver, signature)
                     driver.waiting(
                         f"table tbody tr:nth-last-child(1) td:nth-child({col}) img",
-                        f"-->>done clicking row 4 col {col - 2} ",
+                        f"row 4 col {col - 2} signature",
                     )
                     break
-                # driver.clicking(
-                #     f"table tbody tr:nth-last-child(1) td:nth-child({col}) button",
-                #     f"row 4 col {col}",
-                # )
-                # sign_canvas(driver, signature)
-                # driver.waiting(
-                #     f"table tbody tr:nth-last-child(1) td:nth-child({col}) img",
-                #     f"-->>done row 4 col {col}",
-                # )
             except Exception as e:
                 _logger.warning(e)
                 continue
