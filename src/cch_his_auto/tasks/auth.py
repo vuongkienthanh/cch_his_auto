@@ -25,6 +25,15 @@ def login(driver: Driver, username: str, password: str):
         time.sleep(1)
         try:
             driver.find(".login-body")
+        except NoSuchElementException:
+            try:
+                driver.find(".card")
+            except NoSuchElementException:
+                continue
+            else:
+                _logger.info("found main screen -> log out")
+                logout(driver)
+        else:
             _logger.info("found login screen")
             _logger.info("+++++ typing username and password")
             inputs = driver.find_elements(By.TAG_NAME, "input")
@@ -33,14 +42,8 @@ def login(driver: Driver, username: str, password: str):
             time.sleep(2)
             driver.clicking(".action>button", "submit button")
             driver.waiting(".card", "main screen")
-            break
-        except:
-            try:
-                driver.find(".card")
-                _logger.info("found main screen -> log out")
-                logout(driver)
-            except:
-                ...
+    else:
+        raise Exception("can't login")
 
 def logout(driver: Driver):
     "logout `http://emr.bvndtp.org`, back to login page"
@@ -56,6 +59,21 @@ def choose_dept(driver: Driver, dept: str):
         time.sleep(1)
         try:
             ele = driver.find(".ant-modal-body input")
+        except NoSuchElementException:
+            try:
+                khoa = driver.find(".khoaLamViec div span")
+            except NoSuchElementException:
+                continue
+            else:
+                if not dept.strip().lower().startswith("khoa"):
+                    dept = "khoa " + dept.strip().lower()
+                if dept in khoa.text.strip().lower():
+                    _logger.info("dept already set")
+                    break
+                else:
+                    _logger.info(f"dept not set to {dept}")
+                    driver.clicking(".khoaLamViec div span")
+        else:
             _logger.info("found dept picker")
             ActionChains(driver).send_keys_to_element(
                 ele, Keys.ARROW_DOWN
@@ -66,21 +84,10 @@ def choose_dept(driver: Driver, dept: str):
                     ".ant-modal-body .bottom-action .bottom-action-right button"
                 )
             ).perform()
-            driver.waiting(".khoaLamViec div span", "dept is set")
+            driver.waiting(".khoaLamViec div span", "dept being set")
             break
-        except:
-            try:
-                khoa = driver.find(".khoaLamViec div span")
-                if not dept.strip().lower().startswith("khoa"):
-                    dept = "khoa " + dept.strip().lower()
-                if dept in khoa.text.strip().lower():
-                    _logger.info("dept already set")
-                    break
-                else:
-                    _logger.info(f"dept not set to {dept}")
-                    driver.clicking(".khoaLamViec div span")
-            except NoSuchElementException:
-                ...
+    else:
+        raise Exception("can't set dept")
 
 @contextmanager
 def session(driver: Driver, username: str, password: str, dept: str):

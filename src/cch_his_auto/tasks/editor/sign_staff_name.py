@@ -5,7 +5,7 @@
 import logging
 import time
 
-from selenium.common import NoSuchElementException
+from selenium.common import NoSuchElementException, TimeoutException
 from selenium.webdriver import ActionChains
 
 from cch_his_auto.driver import Driver
@@ -95,16 +95,21 @@ def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
                                     f"table tbody tr:nth-last-child({row}) td:nth-child({col}) img",
                                 )
                                 break
-                            except:
+                            except NoSuchElementException:
                                 continue
-                        ActionChains(driver).scroll_to_element(ele).pause(1).click(
-                            ele
-                        ).perform()
-                        driver.waiting(
-                            f"table tbody tr:nth-last-child({row}) td:nth-child({col}) img",
-                            f"row {5 - row} col {col - 2} signature",
-                        )
-                        break
+                        else:
+                            ActionChains(driver).scroll_to_element(ele).pause(1).click(
+                                ele
+                            ).perform()
+                            try:
+                                driver.waiting(
+                                    f"table tbody tr:nth-last-child({row}) td:nth-child({col}) img",
+                                    f"row {5 - row} col {col - 2} signature",
+                                )
+                            except TimeoutException:
+                                ...
+                            finally:
+                                break
                 except Exception as e:
                     _logger.warning(e)
                     continue
@@ -130,16 +135,21 @@ def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
                                 f"table tbody tr:nth-last-child(2) td:nth-child({col}) img",
                             )
                             break
-                        except:
+                        except NoSuchElementException:
                             continue
-                    ActionChains(driver).scroll_to_element(ele).pause(1).click(
-                        ele
-                    ).perform()
-                    driver.waiting(
-                        f"table tbody tr:nth-last-child(2) td:nth-child({col}) img",
-                        f"row 3 col {col - 2} signature",
-                    )
-                    break
+                    else:
+                        ActionChains(driver).scroll_to_element(ele).pause(1).click(
+                            ele
+                        ).perform()
+                        try:
+                            driver.waiting(
+                                f"table tbody tr:nth-last-child(2) td:nth-child({col}) img",
+                                f"row 3 col {col - 2} signature",
+                            )
+                        except TimeoutException:
+                            ...
+                        finally:
+                            break
             except Exception as e:
                 _logger.warning(e)
                 continue
