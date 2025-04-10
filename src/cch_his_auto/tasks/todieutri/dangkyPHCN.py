@@ -11,7 +11,7 @@ from cch_his_auto.driver import Driver
 
 _logger = logging.getLogger()
 
-def open(driver: Driver):
+def open_dialog(driver: Driver):
     "Click *Đăng ký PHCN* or *Thêm mới đợt PHCN* button"
     for _ in range(20):
         try:
@@ -31,6 +31,7 @@ def open(driver: Driver):
             ...
     else:
         _logger.error("can't open PHCN")
+        raise Exception("can't open PHCN")
 
 def cancel(driver: Driver):
     "Click *Hủy đăng ký PHCN* button"
@@ -53,6 +54,7 @@ def cancel(driver: Driver):
             ...
     else:
         _logger.error("can't cancel PHCN")
+        raise Exception("can't cancel PHCN")
 
 def clear(driver: Driver):
     "After `open`, clear all selections"
@@ -61,7 +63,7 @@ def clear(driver: Driver):
         ele.click()
 
 def dropmenu(driver: Driver):
-    "After `open`, drop down the menu"
+    "After `open_dialog`, drop down the menu"
     _logger.info("dropmenu PHCN")
     driver.waiting(".ant-form .ant-select").send_keys(Keys.DOWN)
 

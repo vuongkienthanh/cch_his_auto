@@ -13,8 +13,7 @@ from cch_his_auto.tasks.editor import sign_patient_name
 
 _logger = logging.getLogger()
 
-def sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
-    "@private"
+def _sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
     try:
         driver.waiting(btn_css)
     except:
@@ -37,7 +36,7 @@ def sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
 
 def tobiabenhannhikhoa(driver: Driver):
     "*Tờ bìa bệnh án nhi khoa*"
-    sign(
+    _sign(
         driver,
         name="to bia benh an nhi khoa",
         btn_css=".layout-line-item div:nth-child(2) .sign-image button",
@@ -47,7 +46,7 @@ def tobiabenhannhikhoa(driver: Driver):
 
 def mucAbenhannhikhoa(driver: Driver):
     "*Mục A bệnh án nhi khoa*"
-    sign(
+    _sign(
         driver,
         name="muc A",
         btn_css=".sign-image button",
@@ -57,7 +56,7 @@ def mucAbenhannhikhoa(driver: Driver):
 
 def mucBtongketbenhan(driver: Driver):
     "*Mục B tổng kết bệnh án*"
-    sign(
+    _sign(
         driver,
         name="muc B",
         btn_css="td:nth-child(3) .sign-image button",
@@ -67,7 +66,7 @@ def mucBtongketbenhan(driver: Driver):
 
 def todieutri(driver: Driver):
     "*Tờ điều trị*"
-    sign(
+    _sign(
         driver,
         name="to dieu tri",
         btn_css=".sign-image button",
@@ -158,7 +157,7 @@ def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
 
 def phieuCT(driver: Driver):
     "*Phiếu chỉ định CT*"
-    sign(
+    _sign(
         driver,
         name="phieu CT",
         btn_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(13) .sign-image button",
@@ -168,7 +167,7 @@ def phieuCT(driver: Driver):
 
 def phieuMRI_bschidinh(driver: Driver):
     "*Phiếu chỉ định MRI, bs chỉ định*"
-    sign(
+    _sign(
         driver,
         name="phieu MRI bs chi dinh",
         btn_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(22) .sign-image button",
@@ -178,7 +177,7 @@ def phieuMRI_bschidinh(driver: Driver):
 
 def phieuMRI_bsthuchien(driver: Driver):
     "*Phiếu chỉ định MRI, bs thực hiện*"
-    sign(
+    _sign(
         driver,
         name="phieu MRI bs thuc hien",
         btn_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25)>div[data-type=block]:nth-child(1) .sign-image button",
@@ -195,7 +194,7 @@ def phieuMRI_all(driver: Driver, signature: str | None):
 
 def giaiphaubenh(driver: Driver):
     "*Phiếu xét nghiệm giải phẫu bệnh sinh thiết*"
-    sign(
+    _sign(
         driver,
         name="phieu giai phau benh",
         btn_css=".sign-image button",

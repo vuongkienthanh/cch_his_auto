@@ -59,7 +59,7 @@ def choose_dept(driver: Driver, dept: str):
     for _ in range(120):
         time.sleep(1)
         try:
-            ele = driver.find(".ant-modal-body input")
+            ele = driver.find(".ant-modal-body input[type=search]")
         except NoSuchElementException:
             try:
                 khoa = driver.find(".khoaLamViec div span")

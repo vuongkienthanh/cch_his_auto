@@ -21,14 +21,14 @@ class Status(StrEnum):
     DANGKY = "Đang ký"
     HOANTHANH = "Hoàn thành"
 
-def open(driver: Driver):
+def open_dialog(driver: Driver):
     driver.clicking(
         ".thong-tin-benh-nhan .bunch-icon div:nth-child(3)", "xem ho so benh an"
     )
     driver.waiting(".right-content tbody tr:nth-child(2)", "Danh sách phiếu")
     time.sleep(2)
 
-def close(driver: Driver):
+def close_dialog(driver: Driver):
     driver.clicking(".ant-modal button[aria-label='Close']", "close button")
     driver.waiting(
         ".thong-tin-benh-nhan .bunch-icon div:nth-child(3)", "close ho so benh an"

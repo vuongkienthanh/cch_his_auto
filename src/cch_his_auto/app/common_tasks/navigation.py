@@ -20,5 +20,5 @@ def next_patient(driver: Driver, con: Connection, ma_hs: int):
         _logger.info(f"found {ma_hs} in db")
         driver.goto(url)
     else:
-        danhsachnguoibenh.open(driver)
+        danhsachnguoibenh.open_dialog(driver)
         danhsachnguoibenh.goto_patient(driver, ma_hs)

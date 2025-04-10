@@ -9,7 +9,7 @@ APP_PATH = os.path.dirname(os.path.abspath(__file__))
 from . import config
 from cch_his_auto.app.common_tasks.signature import get_signature_from_ctnbnt
 from cch_his_auto.driver import Driver
-from cch_his_auto.tasks.chitietnguoibenhnoitru.indieuduong import bangkechiphiBHYT
+from cch_his_auto.tasks.chitietnguoibenhnoitru.indieuduong import sign_bangkechiphiBHYT
 
 class App(tk.Frame):
     def __init__(self):
@@ -99,10 +99,5 @@ def run(cf: config.Config):
         messagebox.showinfo(message="finish")
 
 def process(driver: Driver, con: sqlite3.Connection, ma_hs: int):
-    signature = get_signature_from_ctnbnt(driver, con, ma_hs)
-    bangkechiphiBHYT.open(driver)
-    with bangkechiphiBHYT.iframe(driver):
-        bangkechiphiBHYT.sign_staff(driver)
-        if signature:
-            bangkechiphiBHYT.sign_patient(driver, signature)
-    bangkechiphiBHYT.close(driver)
+    if signature := get_signature_from_ctnbnt(driver, con, ma_hs):
+        sign_bangkechiphiBHYT(driver, signature)

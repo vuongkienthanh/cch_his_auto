@@ -12,7 +12,7 @@ from cch_his_auto.driver import Driver
 
 _logger = logging.getLogger()
 
-def open(driver: Driver):
+def open_dialog(driver: Driver):
     driver.clicking(
         ".thong-tin-benh-nhan .bunch-icon div:last-child",
         "xem danh sach nguoi benh",
@@ -20,9 +20,9 @@ def open(driver: Driver):
     driver.waiting(".ant-drawer .searching input", "Danh sách người bệnh")
     time.sleep(2)
 
-def close(driver: Driver):
+def close_dialog(driver: Driver):
     driver.clicking(".ant-drawer-mask", "close danh sach nguoi benh")
-    time.sleep(5)
+    time.sleep(2)
 
 def filter_patient(driver: Driver, ma_hs: int) -> bool:
     "After `open`, filter patient based on `ma_hs`"

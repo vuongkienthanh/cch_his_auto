@@ -33,10 +33,9 @@ def sign_canvas(driver: Driver, signature: str):
         "save after finish drawing",
     )
 
-def sign(
+def _sign(
     driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str, signature: str
 ):
-    "@private"
     try:
         driver.waiting(btn_css)
     except NoSuchElementException:
@@ -55,7 +54,7 @@ def sign(
     driver.waiting(img_css)
     _logger.info(f"finish sign page return image: {name}")
 
-def phieuthuchienylenh(
+def phieuthuchienylenh_bn(
     driver: Driver, arr: tuple[bool, bool, bool, bool, bool], signature: str
 ):
     "*Phiếu thực hiện y lệnh (bệnh nhân)*"
@@ -100,7 +99,7 @@ def phieuthuchienylenh(
 
 def phieuMRI(driver: Driver, signature: str):
     "*Phiếu chỉ định MRI (bệnh nhân)*"
-    sign(
+    _sign(
         driver,
         name="phieu mri benh nhan",
         btn_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25)>div[data-type=block]:nth-child(2) .sign-image button",

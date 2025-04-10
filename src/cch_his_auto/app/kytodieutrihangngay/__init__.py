@@ -160,18 +160,18 @@ def run_bs(driver: Driver, cf: config.Config):
         _logger.info(f"patient: {driver.waiting('.name span').text}")
 
         if p["ky_xetnghiem"]:
-            igt.phieuchidinh(driver)
+            igt.sign_phieuchidinh(driver)
         if p["ky_todieutri"]:
             igt.todieutri(driver)
         if any(p["ky_3tra"]["bacsi"]):
-            igt.phieuthuchienylenh_bs(driver, p["ky_3tra"]["bacsi"])
+            igt.sign_phieuthuchienylenh_bs(driver, p["ky_3tra"]["bacsi"])
 
 def run_dd(driver: Driver, cf: config.Config):
     for p in cf["patients"]:
         driver.goto(p["url"])
         _logger.info(f"patient: {driver.waiting('.name span').text}")
         if any(p["ky_3tra"]["dieuduong"]):
-            igt.phieuthuchienylenh_dd(driver, p["ky_3tra"]["dieuduong"])
+            igt.sign_phieuthuchienylenh_dd(driver, p["ky_3tra"]["dieuduong"])
 
 def run_bn(driver: Driver, cf: config.Config):
     from cch_his_auto.app.global_db import create_connection
@@ -189,6 +189,6 @@ def run_bn(driver: Driver, cf: config.Config):
             )
             if signature := get_signature_from_elsewhere(driver, con, ma_hs):
                 if any(p["ky_3tra"]["benhnhan"]):
-                    igt.phieuthuchienylenh_bn(
+                    igt.sign_phieuthuchienylenh_bn(
                         driver, p["ky_3tra"]["benhnhan"], signature
                     )
