@@ -42,6 +42,7 @@ def login(driver: Driver, username: str, password: str):
             time.sleep(2)
             driver.clicking(".action>button", "submit button")
             driver.waiting(".card", "main screen")
+            return
     else:
         raise Exception("can't login")
 
