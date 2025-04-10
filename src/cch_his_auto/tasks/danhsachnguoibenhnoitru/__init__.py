@@ -39,25 +39,21 @@ def filter_trangthainguoibenh(driver: Driver, indexes: list[int]):
             f".ant-popover label:nth-child({i}) .ant-checkbox",
             driver.find(f".ant-popover label:nth-child({i})").text,
         )
-    time.sleep(2)
     driver.clicking(
         ".base-search_component .ant-col:nth-child(7) button",
         "trang thai nguoi benh lan 2",
     )
-    time.sleep(2)
 
 def open_filter_boloc(driver: Driver):
     "Open filter *Bộ lọc* for subsequent tasks"
     _logger.info("opening bo loc")
     driver.clicking(".base-search_component .ant-col:nth-child(1) button", "Bộ lọc")
     driver.waiting(".ant-popover .content-popover +div button", "Tìm button")
-    time.sleep(2)
 
 def close_filter_boloc(driver: Driver):
     "Close filter *Bộ lọc* after `open_filter_boloc` and finish all tasks inside"
     _logger.info("closing bo loc")
     driver.clicking(".ant-popover .content-popover +div button", "Tìm button")
-    time.sleep(2)
 
 def filter_boloc_thoigiannhapvien(driver: Driver, start: dt.date, end: dt.date):
     "After `open_filter_boloc`, input admission `start` date and `end` date info"
@@ -79,7 +75,9 @@ def filter_patient(driver: Driver, ma_hs: int) -> bool:
     time.sleep(2)
     try:
         driver.waiting_to_be(
-            ".ant-table-body tbody tr:nth-child(2) td:nth-child(8)", str(ma_hs)
+            ".ant-table-body tbody tr:nth-child(2) td:nth-child(8)",
+            str(ma_hs),
+            "patient id",
         )
         return True
     except:
@@ -93,6 +91,7 @@ def goto_patient(driver: Driver, ma_hs: int):
             "first row",
         )
         driver.waiting_to_be(
-            ".patient-information .ant-row span:nth-child(2) b", str(ma_hs)
+            ".patient-information .ant-row span:nth-child(2) b",
+            str(ma_hs),
+            "patient id",
         )
-        time.sleep(2)

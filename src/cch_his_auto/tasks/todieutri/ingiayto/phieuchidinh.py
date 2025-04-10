@@ -33,4 +33,4 @@ def sign_phieuchidinh(driver: Driver):
         logging.info("clicking close button")
         driver.find(".ant-modal-close:has(~.ant-modal-body .__list)").click()
         logging.info("finish phieu chi dinh")
-        time.sleep(3)
+        time.sleep(2)

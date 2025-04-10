@@ -3,8 +3,6 @@
 ###### inside "*Chi tiết người bệnh nội trú*
 """
 
-import time
-
 from cch_his_auto.driver import Driver
 
 def open_dialog(driver: Driver):
@@ -13,14 +11,12 @@ def open_dialog(driver: Driver):
         "xem chi tiet thong tin",
     )
     driver.waiting(".avatar__image")
-    time.sleep(2)
 
 def close_dialog(driver: Driver):
     driver.clicking(
         ".ant-modal-close:has(~.ant-modal-body .avatar__image)",
         "close chi tiet thong tin",
     )
-    time.sleep(2)
 
 def get_chieucao(driver: Driver) -> str | None:
     for _ in range(10):

@@ -77,7 +77,7 @@ def todieutri(driver: Driver):
 def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, bool]):
     "*Phiếu thực hiện y lệnh (bác sĩ)*"
     driver.waiting(".table-tbody")
-    time.sleep(5)
+    time.sleep(3)
     for col, isok in zip([3, 4, 5, 6, 7], arr):
         if isok:
             for row in [4, 3]:
@@ -118,7 +118,7 @@ def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
 def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, bool]):
     "*Phiếu thực hiện y lệnh (điều dưỡng)*"
     driver.waiting(".table-tbody")
-    time.sleep(5)
+    time.sleep(3)
     for col, isok in zip([3, 4, 5, 6, 7], arr):
         if isok:
             try:

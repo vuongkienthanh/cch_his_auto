@@ -59,7 +59,7 @@ def phieuthuchienylenh_bn(
 ):
     "*Phiếu thực hiện y lệnh (bệnh nhân)*"
     driver.waiting(".table-tbody")
-    time.sleep(5)
+    time.sleep(3)
     for col, isok in zip([3, 4, 5, 6, 7], arr):
         if isok:
             try:

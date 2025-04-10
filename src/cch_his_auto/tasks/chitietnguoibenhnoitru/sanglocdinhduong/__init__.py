@@ -3,7 +3,9 @@
 ###### inside "*Chi tiết người bệnh nội trú*
 """
 
-import time
+URL = "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
+"All tasks in this submodule work under this url."
+
 import datetime as dt
 
 from cch_his_auto.driver import Driver
@@ -16,14 +18,12 @@ def open_dialog(driver: Driver):
         ".footer-btn .right button:nth-child(1)", "open Sàng lọc dinh dưỡng"
     )
     driver.waiting(".ant-modal-body .ant-table", "Sàng lọc dinh dưỡng dialog")
-    time.sleep(2)
 
 def close_dialog(driver: Driver):
     driver.clicking(
         ".ant-modal-close:has(~.ant-modal-body .ant-table)",
         "close Sàng lọc dinh dưỡng dialog",
     )
-    time.sleep(2)
 
 def get_last_date(driver: Driver) -> dt.date | None:
     try:
@@ -38,6 +38,7 @@ def add_new(driver: Driver):
     driver.clicking(".ant-modal:has(table) .ant-modal-title button")
 
 def complete_sanglocdinhduong(driver: Driver):
+    "complete all phieusangloc from admission_date up til today"
     admission_date = get_admission_date(driver)
     cttt.open_dialog(driver)
     cannang = cttt.get_cannang(driver)
@@ -51,11 +52,13 @@ def complete_sanglocdinhduong(driver: Driver):
     else:
         next_date = admission_date
 
+    today = dt.date.today()
+
     while True:
         add_new(driver)
         save_new_phieusangloc(driver, next_date, cannang, chieucao)
         next_date = next_date + dt.timedelta(days=7)
-        if next_date <= dt.date.today():
+        if next_date <= today:
             open_dialog(driver)
         else:
             break

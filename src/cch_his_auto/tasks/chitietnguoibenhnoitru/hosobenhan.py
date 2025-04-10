@@ -26,19 +26,16 @@ def open_dialog(driver: Driver):
         ".thong-tin-benh-nhan .bunch-icon div:nth-child(3)", "xem ho so benh an"
     )
     driver.waiting(".right-content tbody tr:nth-child(2)", "Danh sách phiếu")
-    time.sleep(2)
 
 def close_dialog(driver: Driver):
     driver.clicking(".ant-modal button[aria-label='Close']", "close button")
     driver.waiting(
         ".thong-tin-benh-nhan .bunch-icon div:nth-child(3)", "close ho so benh an"
     )
-    time.sleep(5)
 
 def filter(driver: Driver, name: str) -> bool:
     "Filter document based on `name`"
     ele = driver.clear_input(".right-content .header input")
-    time.sleep(2)
     _logger.info(f"typing {name}")
     ele.send_keys(name)
     ele.send_keys(Keys.ENTER)
@@ -68,7 +65,6 @@ def is_row_expandable(driver: Driver, idx: int) -> bool:
     "Check if row at `idx` is expandable, first row is id=2"
     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
     _logger.info(f"checking {name}: expandable")
-    time.sleep(1)
     try:
         ele = driver.find(
             f".right-content tbody tr:nth-child({idx}) td:nth-child(1) button"

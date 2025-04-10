@@ -10,12 +10,13 @@ APP_INTRO = """
         + phiếu chỉ định, tờ điều trị
         + Phiếu CT, MRI
         + Phiếu giải phẫu bệnh
+        + Phiếu sàng lọc dinh dưỡng
     """
 
 from . import config
 from cch_his_auto.app.common_tasks.navigation import first_patient, next_patient
 from cch_his_auto.driver import Driver
-from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan
+from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan, sanglocdinhduong
 from cch_his_auto.tasks import danhsachnguoibenhnoitru
 
 class App(tk.Frame):
@@ -141,6 +142,8 @@ def process_normal_day(driver: Driver, signature: str | None):
     hosobenhan.giaiphaubenh(driver)
     hosobenhan.close_dialog(driver)
 
+    sanglocdinhduong.complete_sanglocdinhduong(driver)
+
 def process_final_day(driver: Driver, signature: str | None):
     hosobenhan.open_dialog(driver)
     hosobenhan.tobiabenhannhikhoa(driver)
@@ -152,3 +155,5 @@ def process_final_day(driver: Driver, signature: str | None):
     hosobenhan.phieuMRI(driver, signature)
     hosobenhan.giaiphaubenh(driver)
     hosobenhan.close_dialog(driver)
+
+    sanglocdinhduong.complete_sanglocdinhduong(driver)

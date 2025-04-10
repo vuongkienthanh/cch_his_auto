@@ -49,7 +49,6 @@ def login(driver: Driver, username: str, password: str):
 def logout(driver: Driver):
     "logout `http://emr.bvndtp.org`, back to login page"
     driver.clicking(".header .header-icon:has(+.username)", "log info drop down")
-    time.sleep(1)
     driver.clicking(".ant-popover .item-action:last-child", "logout")
     _logger.info("finish logout")
     driver.waiting(".login-body")

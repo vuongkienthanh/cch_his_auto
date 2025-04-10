@@ -1,4 +1,6 @@
 import datetime as dt
+import time
+
 from cch_his_auto.driver import Driver
 
 def set_date(driver: Driver, date: dt.date):
@@ -15,6 +17,8 @@ def save(driver: Driver):
 
 def back(driver: Driver):
     driver.clicking(".footer-btn .left button")
+    driver.waiting(".thong-tin-benh-nhan", "chi tiết bệnh nhân")
+    time.sleep(5)
 
 def save_new_phieusangloc(driver: Driver, date: dt.date, cannang: str, chieucao: str):
     set_date(driver, date)
