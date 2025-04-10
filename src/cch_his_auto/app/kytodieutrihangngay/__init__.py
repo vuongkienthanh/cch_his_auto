@@ -101,54 +101,58 @@ def run(cf: config.Config):
     from cch_his_auto.app import PROFILE_PATH
     from cch_his_auto.tasks.auth import session
 
-    if config.is_patient_list_valid(cf):
-        bs, dd = config.is_bs_valid(cf), config.is_dd_valid(cf)
-        driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-        match (bs, dd):
-            case (True, True):
-                with session(
-                    driver,
-                    cf["bacsi"]["username"],
-                    cf["bacsi"]["password"],
-                    cf["department"],
-                ):
-                    run_bs(driver, cf)
+    driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
 
-                with session(
-                    driver,
-                    cf["dieuduong"]["username"],
-                    cf["dieuduong"]["password"],
-                    cf["department"],
-                ):
-                    run_dd(driver, cf)
-                    run_bn(driver, cf)
-            case (True, False):
-                with session(
-                    driver,
-                    cf["bacsi"]["username"],
-                    cf["bacsi"]["password"],
-                    cf["department"],
-                ):
-                    run_bs(driver, cf)
-                    run_bn(driver, cf)
-                messagebox.showerror(message="chưa nhập điều dưỡng")
-            case (False, True):
-                with session(
-                    driver,
-                    cf["dieuduong"]["username"],
-                    cf["dieuduong"]["password"],
-                    cf["department"],
-                ):
-                    run_dd(driver, cf)
-                    run_bn(driver, cf)
-                messagebox.showerror(message="chưa nhập bác sĩ")
-            case _:
-                messagebox.showerror(message="chưa nhập bác sĩ, điều dưỡng")
+    try:
+        if config.is_patient_list_valid(cf):
+            bs, dd = config.is_bs_valid(cf), config.is_dd_valid(cf)
+            driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
+            match (bs, dd):
+                case (True, True):
+                    with session(
+                        driver,
+                        cf["bacsi"]["username"],
+                        cf["bacsi"]["password"],
+                        cf["department"],
+                    ):
+                        run_bs(driver, cf)
 
+                    with session(
+                        driver,
+                        cf["dieuduong"]["username"],
+                        cf["dieuduong"]["password"],
+                        cf["department"],
+                    ):
+                        run_dd(driver, cf)
+                        run_bn(driver, cf)
+                case (True, False):
+                    with session(
+                        driver,
+                        cf["bacsi"]["username"],
+                        cf["bacsi"]["password"],
+                        cf["department"],
+                    ):
+                        run_bs(driver, cf)
+                        run_bn(driver, cf)
+                    messagebox.showerror(message="chưa nhập điều dưỡng")
+                case (False, True):
+                    with session(
+                        driver,
+                        cf["dieuduong"]["username"],
+                        cf["dieuduong"]["password"],
+                        cf["department"],
+                    ):
+                        run_dd(driver, cf)
+                        run_bn(driver, cf)
+                    messagebox.showerror(message="chưa nhập bác sĩ")
+                case _:
+                    messagebox.showerror(message="chưa nhập bác sĩ, điều dưỡng")
+
+        else:
+            messagebox.showerror(message="không có bệnh nhân")
+    finally:
         driver.quit()
         messagebox.showinfo(message="finish")
-    else:
-        messagebox.showerror(message="không có bệnh nhân")
 
 def run_bs(driver: Driver, cf: config.Config):
     for p in cf["patients"]:

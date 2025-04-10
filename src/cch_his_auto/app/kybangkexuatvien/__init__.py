@@ -83,18 +83,20 @@ def run(cf: config.Config):
 
     listing = [int(ma_hs) for ma_hs in cf["listing"].strip().splitlines()]
     driver = Driver(headless=cf["headless"], profile_path=PROFILE_PATH)
-    with create_connection() as con:
-        with session(driver, cf["username"], cf["password"], cf["department"]):
-            ma_hs = listing.pop()
-            first_patient(driver, con, ma_hs)
-            process(driver, con, ma_hs)
-
-            while len(listing) > 0:
+    try:
+        with create_connection() as con:
+            with session(driver, cf["username"], cf["password"], cf["department"]):
                 ma_hs = listing.pop()
-                next_patient(driver, con, ma_hs)
+                first_patient(driver, con, ma_hs)
                 process(driver, con, ma_hs)
-    driver.quit()
-    messagebox.showinfo(message="finish")
+
+                while len(listing) > 0:
+                    ma_hs = listing.pop()
+                    next_patient(driver, con, ma_hs)
+                    process(driver, con, ma_hs)
+    finally:
+        driver.quit()
+        messagebox.showinfo(message="finish")
 
 def process(driver: Driver, con: sqlite3.Connection, ma_hs: int):
     signature = get_signature_from_ctnbnt(driver, con, ma_hs)
