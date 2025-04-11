@@ -162,7 +162,7 @@ def run_bs(driver: Driver, cf: config.Config):
         if p["ky_xetnghiem"]:
             igt.sign_phieuchidinh(driver)
         if p["ky_todieutri"]:
-            igt.todieutri(driver)
+            igt.sign_todieutri(driver)
         if any(p["ky_3tra"]["bacsi"]):
             igt.sign_phieuthuchienylenh_bs(driver, p["ky_3tra"]["bacsi"])
 

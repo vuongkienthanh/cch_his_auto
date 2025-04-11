@@ -9,7 +9,6 @@ import logging
 from selenium.webdriver import Keys
 
 from cch_his_auto.driver import Driver
-from .bangkechiphiBHYT import sign_bangkechiphiBHYT
 
 _logger = logging.getLogger()
 
@@ -25,6 +24,8 @@ def goto(driver: Driver, name: str):
     ele.send_keys(name)
     time.sleep(2)
     ele.send_keys(Keys.ENTER)
+
+from .bangkechiphiBHYT import sign_bangkechiphiBHYT
 
 __all__ = [
     "open_menu",

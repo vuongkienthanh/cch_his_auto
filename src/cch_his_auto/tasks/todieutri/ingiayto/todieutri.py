@@ -2,7 +2,7 @@ from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.editor import sign_staff_name
 from . import open_menu, goto
 
-def todieutri(driver: Driver):
+def sign_todieutri(driver: Driver):
     main_tab = driver.current_window_handle
     try:
         open_menu(driver)

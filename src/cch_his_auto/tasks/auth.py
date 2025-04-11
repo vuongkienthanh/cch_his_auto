@@ -37,9 +37,9 @@ def login(driver: Driver, username: str, password: str):
             _logger.info("found login screen")
             _logger.info("+++++ typing username and password")
             inputs = driver.find_elements(By.TAG_NAME, "input")
+            time.sleep(5)
             inputs[0].send_keys(username)
             inputs[1].send_keys(password)
-            time.sleep(2)
             driver.clicking(".action>button", "submit button")
             driver.waiting(".card", "main screen")
             return
@@ -48,7 +48,9 @@ def login(driver: Driver, username: str, password: str):
 
 def logout(driver: Driver):
     "logout `http://emr.bvndtp.org`, back to login page"
+    time.sleep(5) # wait for it to be dropdown-able
     driver.clicking(".header .header-icon:has(+.username)", "log info drop down")
+    time.sleep(2)
     driver.clicking(".ant-popover .item-action:last-child", "logout")
     _logger.info("finish logout")
     driver.waiting(".login-body")

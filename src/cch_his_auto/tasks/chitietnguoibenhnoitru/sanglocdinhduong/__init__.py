@@ -7,11 +7,16 @@ URL = "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
 "All tasks in this submodule work under this url."
 
 import datetime as dt
+import logging
+import time
+
 
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.chitietnguoibenhnoitru import get_admission_date
 from cch_his_auto.tasks.chitietnguoibenhnoitru import chitietthongtin as cttt
 from .phieusangloc import save_new_phieusangloc
+
+_logger = logging.getLogger()
 
 def open_dialog(driver: Driver):
     driver.clicking(
@@ -24,18 +29,24 @@ def close_dialog(driver: Driver):
         ".ant-modal-close:has(~.ant-modal-body .ant-table)",
         "close Sàng lọc dinh dưỡng dialog",
     )
+    time.sleep(5)
 
 def get_last_date(driver: Driver) -> dt.date | None:
     try:
-        return dt.datetime.strptime(
+        last_date = dt.datetime.strptime(
             driver.find("tbody tr:nth-child(2) td:nth-child(2)").text,
             "%d/%m/%Y %H:%M:%S",
         ).date()
+        _logger.info(f"found last_date = {last_date}")
+        return last_date
     except:
+        _logger.warning("last_date not found")
         return None
 
 def add_new(driver: Driver):
-    driver.clicking(".ant-modal:has(table) .ant-modal-title button")
+    driver.clicking(
+        ".ant-modal:has(table) .ant-modal-title button", "add new phiếu sàng lọc"
+    )
 
 def complete_sanglocdinhduong(driver: Driver):
     "complete all phieusangloc from admission_date up til today"
@@ -45,6 +56,7 @@ def complete_sanglocdinhduong(driver: Driver):
     chieucao = cttt.get_chieucao(driver)
     cttt.close_dialog(driver)
     if (cannang == "") or (chieucao == "") or (cannang is None) or (chieucao is None):
+        _logger.warning("cannang or chieucao is empty")
         return
     open_dialog(driver)
     if last_date := get_last_date(driver):
@@ -54,11 +66,10 @@ def complete_sanglocdinhduong(driver: Driver):
 
     today = dt.date.today()
 
-    while True:
+    while next_date <= today:
         add_new(driver)
         save_new_phieusangloc(driver, next_date, cannang, chieucao)
         next_date = next_date + dt.timedelta(days=7)
-        if next_date <= today:
-            open_dialog(driver)
-        else:
-            break
+        open_dialog(driver)
+
+    close_dialog(driver)

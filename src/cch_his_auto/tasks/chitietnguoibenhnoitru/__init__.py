@@ -31,8 +31,9 @@ def scrape_signature(driver: Driver) -> str | None:
 
 def get_admission_date(driver: Driver) -> dt.date:
     return dt.datetime.strptime(
-        driver.find(
-            ".tab-box .content-tab .ant-row .ant-col:nth-child(2) .item-sub b"
+        driver.waiting(
+            ".tab-box .content-tab .ant-row .ant-col:nth-child(2) .item-sub b",
+            "admission date",
         ).text,
         "%d/%m/%Y %H:%M:%S",
     ).date()

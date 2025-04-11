@@ -15,7 +15,9 @@ from selenium.webdriver import Keys
 # set up logging
 _logger = logging.getLogger()
 _logger.setLevel(logging.INFO)
-_logger.addHandler(logging.StreamHandler(sys.stdout))
+_out = logging.StreamHandler(sys.stdout)
+_out.setFormatter(logging.Formatter(fmt="{levelname}: {message}", style="{"))
+_logger.addHandler(_out)
 
 class DriverFn(Protocol):
     "A function typing hint that accepts Driver as first argument"
@@ -121,6 +123,30 @@ class Driver(webdriver.Chrome):
             time.sleep(2)
         except Exception as e:
             _logger.error(f"-->>can't click {name or css}")
+            raise e
+
+    def clicking_svg(self, css: str, /, name: str = "") -> None:
+        """
+        Clicking svg element by `css`.
+        You can also provide a `name` for logging
+        """
+        _logger.info(f"---clicking svg {name or css}")
+        try:
+            WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
+        except Exception as e:
+            _logger.error(f"-->>cant find {name or css}")
+            raise e
+
+        try:
+            self.execute_script(f"""
+                let evt = document.createEvent("MouseEvents");
+                evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                document.querySelector('{css}').dispatchEvent(evt);
+            """)
+            _logger.info(f"-->>done clicking svg {name or css}")
+            time.sleep(2)
+        except Exception as e:
+            _logger.error(f"-->>can't click svg {name or css}")
             raise e
 
     def goto(self, url: str) -> None:

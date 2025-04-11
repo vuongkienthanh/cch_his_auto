@@ -29,9 +29,7 @@ def open_dialog(driver: Driver):
 
 def close_dialog(driver: Driver):
     driver.clicking(".ant-modal button[aria-label='Close']", "close button")
-    driver.waiting(
-        ".thong-tin-benh-nhan .bunch-icon div:nth-child(3)", "close ho so benh an"
-    )
+    time.sleep(5)
 
 def filter(driver: Driver, name: str) -> bool:
     "Filter document based on `name`"
@@ -231,5 +229,13 @@ def giaiphaubenh(driver: Driver):
         driver,
         name="Phiếu xét nghiệm giải phẫu bệnh sinh thiết",
         sign_fn=sign_staff_name.giaiphaubenh,
+        status_list=[Status.CHUAKY],
+    )
+
+def phieusanglocdinhduong(driver: Driver):
+    "Filter and sign name: *Phiếu sàng lọc dinh dưỡng - Bệnh nhi nội trú*"
+    filter_check_expand_sign_curent(
+        driver,
+        name="Phiếu sàng lọc dinh dưỡng - Bệnh nhi nội trú",
         status_list=[Status.CHUAKY],
     )

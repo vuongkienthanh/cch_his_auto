@@ -8,14 +8,6 @@ import time
 
 from cch_his_auto.driver import Driver
 
-from .phieuchidinh import sign_phieuchidinh
-from .todieutri import todieutri
-from .phieuthuchienylenh import (
-    sign_phieuthuchienylenh_bn,
-    sign_phieuthuchienylenh_bs,
-    sign_phieuthuchienylenh_dd,
-)
-
 _logger = logging.getLogger()
 
 def open_menu(driver: Driver):
@@ -38,11 +30,19 @@ def goto(driver: Driver, name: str):
         driver.clicking(".footer-btn .right button:nth-child(1)")
         raise Exception(f"cant find {name}")
 
+from .phieuchidinh import sign_phieuchidinh
+from .todieutri import sign_todieutri
+from .phieuthuchienylenh import (
+    sign_phieuthuchienylenh_bn,
+    sign_phieuthuchienylenh_bs,
+    sign_phieuthuchienylenh_dd,
+)
+
 __all__ = [
     "open_menu",
     "goto",
     "sign_phieuchidinh",
-    "todieutri",
+    "sign_todieutri",
     "sign_phieuthuchienylenh_bs",
     "sign_phieuthuchienylenh_dd",
     "sign_phieuthuchienylenh_bn",
