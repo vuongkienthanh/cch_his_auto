@@ -145,9 +145,9 @@ def process_normal_day(driver: Driver, signature: str | None):
     hosobenhan.phieusanglocdinhduong(driver)
     hosobenhan.close_dialog(driver)
 
-
 def process_final_day(driver: Driver, signature: str | None):
     sanglocdinhduong.complete_sanglocdinhduong(driver)
+
     hosobenhan.open_dialog(driver)
     hosobenhan.tobiabenhannhikhoa(driver)
     hosobenhan.mucAbenhannhikhoa(driver)
@@ -159,5 +159,3 @@ def process_final_day(driver: Driver, signature: str | None):
     hosobenhan.giaiphaubenh(driver)
     hosobenhan.phieusanglocdinhduong(driver)
     hosobenhan.close_dialog(driver)
-    hosobenhan.close_dialog(driver)
-

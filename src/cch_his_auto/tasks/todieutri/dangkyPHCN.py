@@ -57,7 +57,7 @@ def cancel(driver: Driver):
         raise Exception("can't cancel PHCN")
 
 def clear(driver: Driver):
-    "After `open`, clear all selections"
+    "After `open_dialog`, clear all selections"
     _logger.info("clear all selections PHCN")
     for ele in driver.find_all(".ant-form .ant-select-selection-item-remove"):
         ele.click()

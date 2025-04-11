@@ -32,12 +32,13 @@ def login(driver: Driver, username: str, password: str):
                 continue
             else:
                 _logger.info("found main screen -> log out")
+                time.sleep(2)
                 logout(driver)
         else:
             _logger.info("found login screen")
             _logger.info("+++++ typing username and password")
             inputs = driver.find_elements(By.TAG_NAME, "input")
-            time.sleep(5)
+            time.sleep(5)  # wait for js to load
             inputs[0].send_keys(username)
             inputs[1].send_keys(password)
             driver.clicking(".action>button", "submit button")
@@ -48,12 +49,19 @@ def login(driver: Driver, username: str, password: str):
 
 def logout(driver: Driver):
     "logout `http://emr.bvndtp.org`, back to login page"
-    time.sleep(5) # wait for it to be dropdown-able
-    driver.clicking(".header .header-icon:has(+.username)", "log info drop down")
-    time.sleep(2)
-    driver.clicking(".ant-popover .item-action:last-child", "logout")
-    _logger.info("finish logout")
-    driver.waiting(".login-body")
+    time.sleep(5)  # wait for it to be dropdown-able
+    for _ in range(5):
+        driver.clicking(".header .header-icon:has(+.username)", "log info drop down")
+        time.sleep(1)
+        try:
+            driver.clicking(".ant-popover .item-action:last-child", "logout")
+        except:
+            continue
+        else:
+            driver.waiting(".login-body")
+            return
+    else:
+        raise Exception("can't logout")
 
 def choose_dept(driver: Driver, dept: str):
     "Choose department with exact `dept`"
