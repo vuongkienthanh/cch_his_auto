@@ -56,6 +56,10 @@ class Driver(webdriver.Chrome):
 
         super().__init__(options=options)
 
+    def quit(self):
+        _logger.info("driver quiting...")
+        super().quit()
+
     def find(self, css: str) -> WebElement:
         "Find element by `css`"
         return self.find_element(By.CSS_SELECTOR, css)
