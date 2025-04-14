@@ -37,7 +37,7 @@ def filter(driver: Driver, name: str) -> bool:
     _logger.info(f"typing {name}")
     ele.send_keys(name)
     ele.send_keys(Keys.ENTER)
-    for _ in range(20):
+    for _ in range(120):
         time.sleep(1)
         try:
             ele = driver.find(

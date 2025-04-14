@@ -16,13 +16,13 @@ def open_menu(driver: Driver):
 
 def goto(driver: Driver, name: str):
     "After `open_menu`, click `name`"
-    _logger.info(f"======= finding link {name} ======")
-    for _ in range(20):
+    _logger.debug(f"======= finding link {name} ======")
+    for _ in range(120):
         time.sleep(1)
         for ele in driver.find_all(".ant-dropdown li div div , .ant-dropdown li a"):
             if ele.text == name:
                 ele.click()
-                _logger.info(f"======= found link {name} ======")
+                _logger.debug(f"======= found link {name} ======")
                 time.sleep(2)
                 return
     else:

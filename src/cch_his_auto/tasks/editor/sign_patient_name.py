@@ -50,21 +50,35 @@ def phieuthuchienylenh_bn(
     for col, isok in zip([3, 4, 5, 6, 7], arr):
         if isok:
             try:
-                _logger.info(f"clicking row 4 col {col - 2}")
-                for _ in range(120):
+                _logger.debug(f"cheking row 4 col {col - 2}")
+                for i in range(120):
                     try:
+                        _logger.debug(f"finding row 4 col {col - 2} button {i}...")
                         ele = driver.find(
                             f"table tbody tr:nth-last-child(1) td:nth-child({col}) button",
                         )
                     except NoSuchElementException:
+                        _logger.debug(f"-> can't find row 4 col {col - 2} button")
                         try:
+                            _logger.debug(
+                                f"finding row 4 col {col - 2} signature image {i}..."
+                            )
                             driver.find(
                                 f"table tbody tr:nth-last-child(1) td:nth-child({col}) img",
                             )
+                            _logger.debug(
+                                f"-> found row 4 col {col - 2} signature image"
+                            )
                             break
                         except NoSuchElementException:
+                            _logger.debug(
+                                f"-> can't find row 4 col {col - 2} signature image"
+                            )
                             continue
                     else:
+                        _logger.debug(
+                            f"-> found row 4 col {col - 2} button -> proceed to click"
+                        )
                         ActionChains(driver).scroll_to_element(ele).pause(1).click(
                             ele
                         ).perform()
@@ -74,14 +88,20 @@ def phieuthuchienylenh_bn(
                                 f"table tbody tr:nth-last-child(1) td:nth-child({col}) img",
                                 f"row 4 col {col - 2} signature",
                             )
+                            _logger.debug(f"-> finish row 4 col {col - 2}")
                         except TimeoutException:
-                            ...
+                            _logger.warning(
+                                "get TimeoutException -> maybe clicked but didn't load"
+                            )
                         finally:
                             break
+                else:
+                    raise Exception("end of loop")
             except Exception as e:
-                _logger.warning(e)
-                continue
-    _logger.info("-->>finish sign patient: phieu thuc hien y lenh bn")
+                _logger.warning(
+                    f"get {e} -> can't sign name on this cell -> proceed to next in queue"
+                )
+    _logger.debug("-> finish sign editor: phiếu thực hiện y lệnh bn")
     time.sleep(2)
 
 def phieuMRI(driver: Driver, signature: str):
@@ -94,3 +114,4 @@ def phieuMRI(driver: Driver, signature: str):
         img_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25)>div[data-type=block]:nth-child(2) .sign-image img",
         signature=signature,
     )
+    _logger.debug("-> finish sign editor: phiếu MRI bn")

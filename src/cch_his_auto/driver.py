@@ -1,5 +1,4 @@
 import logging
-import sys
 import time
 from typing import Protocol
 from pathlib import PurePath
@@ -12,16 +11,7 @@ from selenium.webdriver import ActionChains
 from selenium.common import NoSuchElementException
 from selenium.webdriver import Keys
 
-# set up logging
-_root_logger = logging.getLogger()
-_root_logger.setLevel(logging.INFO)
-_out = logging.StreamHandler(sys.stdout)
-_out.setFormatter(
-    logging.Formatter(fmt="{asctime} {name} {levelname}: {message}", style="{")
-)
-_root_logger.addHandler(_out)
-
-_logger = _root_logger.getChild("driver")
+_logger = logging.getLogger().getChild("driver")
 
 class DriverFn(Protocol):
     "A function typing hint that accepts Driver as first argument"
@@ -81,10 +71,10 @@ class Driver(webdriver.Chrome):
             _logger.debug(f"waiting {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         except Exception as e:
-            _logger.error(f"->cant find {name or css}")
+            _logger.error(f"-> can't find {name or css}")
             raise e
         else:
-            _logger.debug(f"->done waiting {name or css}")
+            _logger.debug(f"-> done waiting {name or css}")
             time.sleep(2)
             return self.find(css)
 
@@ -97,19 +87,19 @@ class Driver(webdriver.Chrome):
             _logger.debug(f"waiting {name or css} to be {to_be}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         except Exception as e:
-            _logger.error(f"->cant find {name or css}")
+            _logger.error(f"-> can't find {name or css}")
             raise e
         else:
             for _ in range(120):
                 time.sleep(1)
                 if (ele := self.find(css)).text.strip().startswith(to_be.strip()):
-                    _logger.debug(f"->done waiting {name or css} to be {to_be}")
+                    _logger.debug(f"-> done waiting {name or css} to be {to_be}")
                     time.sleep(2)
                     return ele
             else:
                 txt = self.find(css).text.strip()
                 ctx = f'{name or css} with to_be="{to_be}" is not equal to {txt}'
-                _logger.error(f"->no such element: {ctx}")
+                _logger.error(f"-> no such element: {ctx}")
                 raise NoSuchElementException(ctx)
 
     def clicking(self, css: str, /, name: str = "") -> None:
@@ -121,17 +111,17 @@ class Driver(webdriver.Chrome):
             _logger.debug(f"clicking {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         except Exception as e:
-            _logger.error(f"->cant find {name or css}")
+            _logger.error(f"-> can't find {name or css}")
             raise e
         else:
             try:
                 ele = self.find(css)
                 ActionChains(self).scroll_to_element(ele).pause(1).click(ele).perform()
             except Exception as e:
-                _logger.error(f"->can't click {name or css}")
+                _logger.error(f"-> can't click {name or css}")
                 raise e
             else:
-                _logger.debug(f"->done clicking {name or css}")
+                _logger.debug(f"-> done clicking {name or css}")
                 time.sleep(2)
 
     def clicking_svg(self, css: str, /, name: str = "") -> None:
@@ -143,7 +133,7 @@ class Driver(webdriver.Chrome):
             _logger.debug(f"clicking svg {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         except Exception as e:
-            _logger.error(f"->cant find {name or css}")
+            _logger.error(f"-> can't find {name or css}")
             raise e
         else:
             try:
@@ -153,10 +143,10 @@ class Driver(webdriver.Chrome):
                     document.querySelector('{css}').dispatchEvent(evt);
                 """)
             except Exception as e:
-                _logger.error(f"->can't click svg {name or css}")
+                _logger.error(f"-> can't click svg {name or css}")
                 raise e
             else:
-                _logger.debug(f"->done clicking svg {name or css}")
+                _logger.debug(f"-> done clicking svg {name or css}")
                 time.sleep(2)
 
     def goto(self, url: str) -> None:

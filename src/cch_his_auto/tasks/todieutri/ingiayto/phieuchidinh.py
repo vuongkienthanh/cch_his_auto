@@ -10,30 +10,30 @@ _logger = logging.getLogger().getChild("tasks")
 
 def sign_phieuchidinh(driver: Driver):
     "Inside *tờ điều trị*, try to sign *phiếu chỉ định* in sequence"
+
+    def _close_dialog():
+        driver.clicking(
+            ".ant-modal-close:has(~.ant-modal-body .__list)",
+            "close dialog button",
+        )
+        _logger.info("finish signing phieuchidinh")
+
     open_menu(driver)
     goto(driver, name="Phiếu chỉ định")
-    for _ in range(20):
+    for _ in range(120):
         time.sleep(1)
         _logger.debug("checking Hủy ký bác sĩ")
         for w in driver.find_all(".__button button"):
             try:
                 if w.text == "Hủy ký Bác sĩ":
                     _logger.debug("found Hủy ký bác sĩ")
-                    driver.clicking(
-                        ".ant-modal-close:has(~.ant-modal-body .__list)",
-                        "close dialog button",
-                    )
-                    _logger.info("finish signing phieuchidinh")
+                    _close_dialog()
                     return
                 elif w.text == "Ký Bác sĩ":
                     _logger.debug("found Ký bác sĩ -> click sign button")
                     w.click()
                     time.sleep(5)
-                    driver.clicking(
-                        ".ant-modal-close:has(~.ant-modal-body .__list)",
-                        "close dialog button",
-                    )
-                    _logger.info("finish signing phieuchidinh")
+                    _close_dialog()
                     return
             except StaleElementReferenceException:
                 _logger.warning("get StaleElementReferenceException")

@@ -11,10 +11,11 @@ from selenium.webdriver import ActionChains
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.editor import sign_patient_name
 
-_logger = logging.getLogger()
+_logger = logging.getLogger().getChild("editors")
 
 def _sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
     ele = driver.waiting_to_be(btn_css, btn_txt, name)
+    _logger.debug("click sign button")
     ele.click()
     driver.waiting(img_css, "signature image")
 
@@ -27,6 +28,7 @@ def tobiabenhannhikhoa(driver: Driver):
         btn_txt="Xác nhận ký Trưởng khoa",
         img_css=".layout-line-item div:nth-child(2) .sign-image img",
     )
+    _logger.debug("-> finish sign editor: tờ bìa bệnh án nhi khoa")
 
 def mucAbenhannhikhoa(driver: Driver):
     "*Mục A bệnh án nhi khoa*"
@@ -37,6 +39,7 @@ def mucAbenhannhikhoa(driver: Driver):
         btn_txt="Xác nhận ký Bác sĩ làm bệnh án",
         img_css=".sign-image img",
     )
+    _logger.debug("-> finish sign editor: mục A")
 
 def mucBtongketbenhan(driver: Driver):
     "*Mục B tổng kết bệnh án*"
@@ -47,6 +50,7 @@ def mucBtongketbenhan(driver: Driver):
         btn_txt="Xác nhận ký Bác sĩ điều trị",
         img_css="td:nth-child(3) .sign-image img",
     )
+    _logger.debug("-> finish sign editor: mục B")
 
 def todieutri(driver: Driver):
     "*Tờ điều trị*"
@@ -57,6 +61,7 @@ def todieutri(driver: Driver):
         btn_txt="Xác nhận ký Bác sĩ điều trị",
         img_css=".sign-image img",
     )
+    _logger.debug("-> finish sign editor: tờ điều trị")
 
 def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, bool]):
     "*Phiếu thực hiện y lệnh (bác sĩ)*"
@@ -66,21 +71,39 @@ def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
         if isok:
             for row in [4, 3]:
                 try:
-                    _logger.info(f"clicking row {5 - row} col {col - 2}")
-                    for _ in range(120):
+                    _logger.debug(f"checking row {5 - row} col {col - 2}")
+                    for i in range(120):
                         try:
+                            _logger.debug(
+                                f"finding row {5 - row} col {col - 2} button {i}..."
+                            )
                             ele = driver.find(
                                 f"table tbody tr:nth-last-child({row}) td:nth-child({col}) button",
                             )
                         except NoSuchElementException:
+                            _logger.debug(
+                                f"-> can't find row {5 - row} col {col - 2} button"
+                            )
                             try:
+                                _logger.debug(
+                                    f"finding row {5 - row} col {col - 2} signature image {i}..."
+                                )
                                 driver.find(
                                     f"table tbody tr:nth-last-child({row}) td:nth-child({col}) img",
                                 )
+                                _logger.debug(
+                                    f"found row {5 - row} col {col - 2} signature image"
+                                )
                                 break
                             except NoSuchElementException:
+                                _logger.debug(
+                                    f"can't row {5 - row} col {col - 2} signature image"
+                                )
                                 continue
                         else:
+                            _logger.debug(
+                                f"-> found row {5 - row} col {col - 2} button -> proceed to click"
+                            )
                             ActionChains(driver).scroll_to_element(ele).pause(1).click(
                                 ele
                             ).perform()
@@ -89,14 +112,20 @@ def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
                                     f"table tbody tr:nth-last-child({row}) td:nth-child({col}) img",
                                     f"row {5 - row} col {col - 2} signature",
                                 )
+                                _logger.debug(f"-> finish row {5 - row} col {col - 2}")
                             except TimeoutException:
-                                ...
+                                _logger.warning(
+                                    "get TimeoutException -> maybe clicked but didn't load"
+                                )
                             finally:
                                 break
+                    else:
+                        raise Exception("end of loop")
                 except Exception as e:
-                    _logger.warning(e)
-                    continue
-    _logger.info("-->>finish sign page: phieu thuc hien y lenh bs")
+                    _logger.warning(
+                        f"get {e} -> can't sign name on this cell -> proceed to next in queue"
+                    )
+    _logger.debug("-> finish sign editor: phiếu thực hiện y lệnh bs")
     time.sleep(2)
 
 def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, bool]):
@@ -106,21 +135,35 @@ def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
     for col, isok in zip([3, 4, 5, 6, 7], arr):
         if isok:
             try:
-                _logger.info(f"clicking row 3 col {col - 2}")
-                for _ in range(120):
+                _logger.debug(f"checking row 3 col {col - 2}")
+                for i in range(120):
                     try:
+                        _logger.debug(f"finding row 3 col {col - 2} button {i}...")
                         ele = driver.find(
                             f"table tbody tr:nth-last-child(2) td:nth-child({col}) button",
                         )
                     except NoSuchElementException:
+                        _logger.debug(f"-> can't find row 3 col {col - 2} button")
                         try:
+                            _logger.debug(
+                                f"finding row 3 col {col - 2} signature image {i}..."
+                            )
                             driver.find(
                                 f"table tbody tr:nth-last-child(2) td:nth-child({col}) img",
                             )
+                            _logger.debug(
+                                f"-> found row 3 col {col - 2} signature image"
+                            )
                             break
                         except NoSuchElementException:
+                            _logger.debug(
+                                f"-> can't find row 3 col {col - 2} signature image"
+                            )
                             continue
                     else:
+                        _logger.debug(
+                            f"-> found row 3 col {col - 2} button -> proceed to click"
+                        )
                         ActionChains(driver).scroll_to_element(ele).pause(1).click(
                             ele
                         ).perform()
@@ -129,14 +172,20 @@ def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
                                 f"table tbody tr:nth-last-child(2) td:nth-child({col}) img",
                                 f"row 3 col {col - 2} signature",
                             )
+                            _logger.debug(f"-> finish row 3 col {col - 2}")
                         except TimeoutException:
-                            ...
+                            _logger.warning(
+                                "get TimeoutException -> maybe clicked but didn't load"
+                            )
                         finally:
                             break
+                else:
+                    raise Exception("end of loop")
             except Exception as e:
-                _logger.warning(e)
-                continue
-    _logger.info("-->>finish sign page: phieu thuc hien y lenh dd")
+                _logger.warning(
+                    f"get {e} -> can't sign name on this cell -> proceed to next in queue"
+                )
+    _logger.debug("-> finish sign editor: phiếu thực hiện y lệnh dd")
     time.sleep(2)
 
 def phieuCT(driver: Driver):
@@ -148,6 +197,7 @@ def phieuCT(driver: Driver):
         btn_txt="Xác nhận ký Bác sĩ điều trị",
         img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(13) .sign-image img",
     )
+    _logger.debug("-> finish sign editor: phiếu CT")
 
 def phieuMRI_bschidinh(driver: Driver):
     "*Phiếu chỉ định MRI, bs chỉ định*"
@@ -158,6 +208,7 @@ def phieuMRI_bschidinh(driver: Driver):
         btn_txt="Xác nhận ký Bác sĩ chỉ định",
         img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(22) .sign-image img",
     )
+    _logger.debug("-> finish sign editor: phiếu MRI bs chỉ định")
 
 def phieuMRI_bsthuchien(driver: Driver):
     "*Phiếu chỉ định MRI, bs thực hiện*"
@@ -168,6 +219,7 @@ def phieuMRI_bsthuchien(driver: Driver):
         btn_txt="Xác nhận ký Bác sĩ thực hiện",
         img_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25)>div[data-type=block]:nth-child(1) .sign-image img",
     )
+    _logger.debug("-> finish sign editor: phiếu MRI bs thực hiện")
 
 def phieuMRI_all(driver: Driver, signature: str | None):
     "*Phiếu chỉ định MRI all*"
@@ -185,3 +237,4 @@ def giaiphaubenh(driver: Driver):
         btn_txt="Xác nhận ký BÁC SĨ ĐIỀU TRỊ",
         img_css=".sign-image img",
     )
+    _logger.debug("-> finish sign editor: phiếu giải phẫu bệnh")
