@@ -1,6 +1,6 @@
 """
 ### Tasks: In giấy tờ
-Mostly about clicking Sign buttons
+Mostly about signing name
 """
 
 import logging
@@ -11,13 +11,13 @@ from cch_his_auto.driver import Driver
 _logger = logging.getLogger()
 
 def open_menu(driver: Driver):
-    "Click *In giấy tờ* button"
-    driver.clicking(".footer-btn .right button:nth-child(1)", "open In giấy tờ")
+    "Open menu *In giấy tờ*"
+    driver.clicking(".footer-btn .right button:nth-child(1)", "open menu In giấy tờ")
 
 def goto(driver: Driver, name: str):
     "After `open_menu`, click `name`"
     _logger.info(f"======= finding link {name} ======")
-    for _ in range(30):
+    for _ in range(20):
         time.sleep(1)
         for ele in driver.find_all(".ant-dropdown li div div , .ant-dropdown li a"):
             if ele.text == name:
@@ -27,7 +27,9 @@ def goto(driver: Driver, name: str):
                 return
     else:
         _logger.warning(f"cant find {name}")
-        driver.clicking(".footer-btn .right button:nth-child(1)")
+        driver.clicking(
+            ".footer-btn .right button:nth-child(1)", "close menu In giấy tờ"
+        )
         raise Exception(f"cant find {name}")
 
 from .phieuchidinh import sign_phieuchidinh

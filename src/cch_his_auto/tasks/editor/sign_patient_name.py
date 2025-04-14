@@ -1,5 +1,5 @@
 """
-### Tasks: sign patient in editor pages
+### Tasks: sign patient name in editor pages
 """
 
 import logging
@@ -30,29 +30,16 @@ def sign_canvas(driver: Driver, signature: str):
     driver.clicking("canvas")
     driver.clicking(
         ".ant-modal .bottom-action-right button",
-        "save after finish drawing",
+        "save after finish drawing signature",
     )
 
 def _sign(
     driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str, signature: str
 ):
-    try:
-        driver.waiting(btn_css)
-    except NoSuchElementException:
-        return
-    for _ in range(20):
-        time.sleep(1)
-        try:
-            if driver.find(btn_css).text.strip() == btn_txt:
-                break
-        except:
-            ...
-    else:
-        return
-    driver.clicking(btn_css)
+    ele = driver.waiting_to_be(btn_css, btn_txt, name)
+    ele.click()
     sign_canvas(driver, signature)
-    driver.waiting(img_css)
-    _logger.info(f"finish sign page return image: {name}")
+    driver.waiting(img_css, "signature image")
 
 def phieuthuchienylenh_bn(
     driver: Driver, arr: tuple[bool, bool, bool, bool, bool], signature: str

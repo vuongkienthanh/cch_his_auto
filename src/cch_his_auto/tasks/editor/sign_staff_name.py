@@ -1,5 +1,5 @@
 """
-### Tasks: sign name in editor pages
+### Tasks: sign staff name in editor pages
 """
 
 import logging
@@ -14,25 +14,9 @@ from cch_his_auto.tasks.editor import sign_patient_name
 _logger = logging.getLogger()
 
 def _sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
-    try:
-        driver.waiting(btn_css)
-    except:
-        return
-    for _ in range(20):
-        time.sleep(1)
-        try:
-            if driver.find(btn_css).text.strip() == btn_txt:
-                break
-        except:
-            ...
-    else:
-        return
-    try:
-        driver.clicking(btn_css)
-        driver.waiting(img_css)
-        _logger.info(f"-->>done signing page: {name}")
-    except:
-        _logger.info(f"-->>can't sign page: {name}")
+    ele = driver.waiting_to_be(btn_css, btn_txt, name)
+    ele.click()
+    driver.waiting(img_css, "signature image")
 
 def tobiabenhannhikhoa(driver: Driver):
     "*Tờ bìa bệnh án nhi khoa*"

@@ -4,7 +4,7 @@
 
 import logging
 
-from selenium.common import StaleElementReferenceException
+from selenium.common import StaleElementReferenceException, NoSuchElementException
 from selenium.webdriver import ActionChains, Keys
 
 from cch_his_auto.driver import Driver
@@ -16,14 +16,14 @@ def open_dialog(driver: Driver):
     for _ in range(20):
         try:
             ele = driver.waiting(
-                ".footer-btn .left button:nth-child(3)", "Nút đăng ký PHCN"
+                ".footer-btn .left button:nth-child(3)", "Đăng ký PHCN"
             )
             if (
                 ele.text.strip() == "Đăng ký PHCN"
                 or ele.text.strip() == "Thêm mới đợt PHCN"
             ):
                 ele.click()
-                driver.waiting(".ant-form", "finish open PHCN")
+                driver.waiting(".ant-form", "PHCN dialog")
             else:
                 _logger.info("PHCN is already registered -> canceling")
                 cancel(driver)
@@ -38,12 +38,12 @@ def cancel(driver: Driver):
     for _ in range(20):
         try:
             ele = driver.waiting(
-                ".footer-btn .left button:nth-child(3)", "Nút huỷ PHCN"
+                ".footer-btn .left button:nth-child(3)", "Huỷ đăng ký PHCN"
             )
             if ele.text.strip() == "Hủy đăng ký PHCN":
                 ele.click()
                 ele = driver.waiting(
-                    ".footer-btn .left button:nth-child(3)", "refreshing PHCN button"
+                    ".footer-btn .left button:nth-child(3)", "reset PHCN button"
                 )
                 if (
                     ele.text.strip() == "Đăng ký PHCN"
@@ -58,50 +58,54 @@ def cancel(driver: Driver):
 
 def clear(driver: Driver):
     "After `open_dialog`, clear all selections"
-    _logger.info("clear all selections PHCN")
+    _logger.info("clear all selections in PHCN dialog")
     for ele in driver.find_all(".ant-form .ant-select-selection-item-remove"):
         ele.click()
 
-def dropmenu(driver: Driver):
+def drop_menu(driver: Driver):
     "After `open_dialog`, drop down the menu"
-    _logger.info("dropmenu PHCN")
-    driver.waiting(".ant-form .ant-select").send_keys(Keys.DOWN)
+    driver.waiting(".ant-form .ant-select", "drop menu PHCN").send_keys(Keys.DOWN)
 
-def closemenu(driver: Driver):
+def close_menu(driver: Driver):
     "After `dropmenu`, close the menu"
-    _logger.info("closemenu PHCN")
+    _logger.info("close menu PHCN")
     ActionChains(driver).send_keys(Keys.ESCAPE).perform()
 
 def bunuot(driver: Driver):
-    "After `dropmenu`, Add *bú nuốt*"
+    "After `drop_menu`, Add *bú nuốt*"
     _logger.info("add bu nuot")
-    driver.clicking(".rc-virtual-list div.ant-select-item-option:nth-child(2)")
+    driver.clicking(
+        ".rc-virtual-list div.ant-select-item-option:nth-child(2)", "add Bú nuốt"
+    )
 
 def giaotiep(driver: Driver):
-    "After `dropmenu`, Add *giao tiếp*"
-    _logger.info("add giao tiep")
-    driver.clicking(".rc-virtual-list div.ant-select-item-option:nth-child(3)")
+    "After `drop_menu`, Add *giao tiếp*"
+    driver.clicking(
+        ".rc-virtual-list div.ant-select-item-option:nth-child(3)", "add Giao tiếp"
+    )
 
 def hohap(driver: Driver):
-    "After `dropmenu`, Add *hô hấp*"
-    _logger.info("add ho hap")
-    driver.clicking(".rc-virtual-list div.ant-select-item-option:nth-child(4)")
+    "After `drop_menu`, Add *hô hấp*"
+    driver.clicking(
+        ".rc-virtual-list div.ant-select-item-option:nth-child(4)", "add Hô hấp"
+    )
 
 def vandong(driver: Driver):
-    "After `dropmenu`, Add *vận động*"
-    _logger.info("add van dong")
-    driver.clicking(".rc-virtual-list div.ant-select-item-option:nth-child(5)")
+    "After `drop_menu`, Add *vận động*"
+    driver.clicking(
+        ".rc-virtual-list div.ant-select-item-option:nth-child(5)", "add Vận động"
+    )
 
 def save(driver: Driver):
     "Finish and click save"
     driver.clicking(".ant-modal-body .bottom-action-right button", "save button")
     for _ in range(20):
         try:
-            ele = driver.waiting(".footer-btn .left button:nth-child(3)")
+            ele = driver.find(".footer-btn .left button:nth-child(3)")
             if ele.text.strip() == "Hủy đăng ký PHCN":
                 _logger.info("saved PHCN")
                 return
-        except StaleElementReferenceException:
+        except (StaleElementReferenceException, NoSuchElementException):
             ...
     else:
         _logger.error("can't save PHCN")
