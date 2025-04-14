@@ -1,7 +1,3 @@
-"""
-### Tasks that are related to authentications
-"""
-
 import logging
 import time
 from contextlib import contextmanager
@@ -13,9 +9,9 @@ from selenium.common import NoSuchElementException
 
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks import danhsachnguoibenhnoitru
-from cch_his_auto.helper import tracing
+from cch_his_auto.helper import tracing, EndOfLoop
 
-_logger = logging.getLogger().getChild("tasks.auth")
+_logger = logging.getLogger().getChild("auth")
 _trace = tracing(_logger)
 
 @_trace
@@ -51,7 +47,7 @@ def login(driver: Driver, username: str, password: str):
             driver.waiting(".card", "main screen")
             return
     else:
-        raise Exception("end of checking loop")
+        raise EndOfLoop("can't log in")
 
 @_trace
 def logout(driver: Driver):
@@ -69,12 +65,12 @@ def logout(driver: Driver):
             driver.waiting(".login-body")
             return
     else:
-        raise Exception("end of checking loop")
+        raise EndOfLoop("can't log out")
 
 @_trace
-def choose_dept(driver: Driver, dept: str):
-    "Choose department with exact `dept`"
-    _logger.info(f"dept ={dept}")
+def set_dept(driver: Driver, dept: str):
+    "Set department with exact `dept`"
+    _logger.info(f"dept={dept}")
 
     def _set_dept_in_dialog():
         ele = driver.waiting(".ant-modal-body input[type=search]", "dept picker")
@@ -111,17 +107,17 @@ def choose_dept(driver: Driver, dept: str):
                     _set_dept_in_dialog()
                     return
         else:
-            _logger.debug("found dept picker")
+            _logger.debug("-> found dept picker")
             _set_dept_in_dialog()
             return
     else:
-        raise Exception("end of checking loop")
+        raise EndOfLoop("can't set dept")
 
 @contextmanager
 def session(driver: Driver, username: str, password: str, dept: str):
     login(driver, username, password)
     driver.goto(danhsachnguoibenhnoitru.URL)
-    choose_dept(driver, dept)
+    set_dept(driver, dept)
     try:
         yield driver
     finally:

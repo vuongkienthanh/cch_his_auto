@@ -1,7 +1,3 @@
-"""
-### Tasks: đăng ký phục hồi chức năng
-"""
-
 import logging
 import time
 from enum import StrEnum
@@ -10,48 +6,56 @@ from selenium.common import StaleElementReferenceException, NoSuchElementExcepti
 from selenium.webdriver import ActionChains, Keys
 
 from cch_his_auto.driver import Driver
-from cch_his_auto.helper import tracing
+from cch_his_auto.helper import tracing, EndOfLoop
 
-_logger = logging.getLogger().getChild("tasks.dangkyPHCN")
+_logger = logging.getLogger().getChild("PHCN")
 _trace = tracing(_logger)
 
-class ButtonState(StrEnum):
+class _State(StrEnum):
     Register = "Đăng ký PHCN"
     AddNew = "Thêm mới đợt PHCN"
     Cancel = "Hủy đăng ký PHCN"
+
+def _open(driver: Driver):
+    driver.clicking(
+        ".footer-btn .left button:nth-child(3)", f"{_State.Register} button"
+    )
+    driver.waiting(".ant-form", "PHCN dialog")
+
+def _cancel(driver: Driver):
+    driver.clicking(".footer-btn .left button:nth-child(3)", f"{_State.Cancel} button")
+    driver.waiting_to_be(
+        ".footer-btn .left button:nth-child(3)",
+        _State.AddNew,
+        f"{_State.Cancel} becomes {_State.AddNew}",
+    )
 
 @_trace
 def open_dialog(driver: Driver):
     "Click *Đăng ký PHCN* or *Thêm mới đợt PHCN* button"
 
-    def _open():
-        driver.clicking(".footer-btn .left button:nth-child(3)", "Đăng ký PHCN")
-        driver.waiting(".ant-form", "PHCN dialog")
-
     for i in range(120):
         time.sleep(1)
         try:
             _logger.debug(f"checking PHCN button state {i}...")
-            ele = driver.waiting(
-                ".footer-btn .left button:nth-child(3)", "Đăng ký PHCN"
-            )
-            if ele.text.strip() == ButtonState.Register:
-                _logger.debug(f"PHCN button state is {ButtonState.Register}")
-                _open()
+            ele = driver.waiting(".footer-btn .left button:nth-child(3)", "PHCN button")
+            if ele.text.strip() == _State.Register:
+                _logger.debug(f"PHCN button state is {_State.Register}")
+                _open(driver)
                 return
-            elif ele.text.strip() == ButtonState.AddNew:
-                _logger.debug(f"PHCN button state is {ButtonState.AddNew}")
-                _open()
+            elif ele.text.strip() == _State.AddNew:
+                _logger.debug(f"PHCN button state is {_State.AddNew}")
+                _open(driver)
                 return
-            elif ele.text.strip() == ButtonState.Cancel:
-                _logger.debug(f"PHCN button state is {ButtonState.Cancel}")
-                cancel(driver)
-                _open()
+            elif ele.text.strip() == _State.Cancel:
+                _logger.debug(f"PHCN button state is {_State.Cancel}")
+                _cancel(driver)
+                _open(driver)
                 return
-        except StaleElementReferenceException:
-            _logger.warning("get StaleElementReferenceException")
+        except StaleElementReferenceException as e:
+            _logger.warning(f"get {e}")
     else:
-        raise Exception("end of checking loop")
+        raise EndOfLoop("can't open dialog")
 
 @_trace
 def cancel(driver: Driver):
@@ -61,18 +65,19 @@ def cancel(driver: Driver):
         time.sleep(1)
         try:
             _logger.debug(f"checking PHCN button state {i}...")
-            ele = driver.waiting(
-                ".footer-btn .left button:nth-child(3)", "Huỷ đăng ký PHCN"
-            )
-            if ele.text.strip() == ButtonState.Cancel:
-                _logger.debug(f"PHCN button state is {ButtonState.Cancel}")
-                ele.click()
-                time.sleep(5)
+            ele = driver.waiting(".footer-btn .left button:nth-child(3)", "PHCN button")
+            if ele.text.strip() == _State.Register:
+                raise Exception(f"Button state is {_State.Register}")
+            elif ele.text.strip() == _State.AddNew:
+                raise Exception(f"Button state is {_State.AddNew}")
+            elif ele.text.strip() == _State.Cancel:
+                _logger.debug(f"PHCN button state is {_State.Cancel}")
+                _cancel(driver)
                 return
-        except StaleElementReferenceException:
-            _logger.warning("get StaleElementReferenceException")
+        except StaleElementReferenceException as e:
+            _logger.warning(f"get {e}")
     else:
-        raise Exception("end of checking loop")
+        raise EndOfLoop("can't cancel PHCN")
 
 @_trace
 def clear(driver: Driver):
@@ -121,18 +126,17 @@ def add_vandong(driver: Driver):
 
 @_trace
 def save(driver: Driver):
-    "Finish and click save"
+    "Finish and click save dialog"
     driver.clicking(".ant-modal-body .bottom-action-right button", "save button")
     for i in range(120):
         time.sleep(1)
-        _logger.debug(f"checking PHCN button state {i}...")
         try:
+            _logger.debug(f"checking PHCN button state {i}...")
             ele = driver.find(".footer-btn .left button:nth-child(3)")
-            if ele.text.strip() == ButtonState.Cancel:
+            if ele.text.strip() == _State.Cancel:
+                _logger.debug(f"PHCN button state is {_State.Cancel}")
                 return
-        except (StaleElementReferenceException, NoSuchElementException):
-            _logger.warning(
-                "get StaleElementReferenceException or NoSuchElementException"
-            )
+        except (StaleElementReferenceException, NoSuchElementException) as e:
+            _logger.warning(f"get {e}")
     else:
-        raise Exception("end of checking loop")
+        raise EndOfLoop("can't save PHCN dialog")

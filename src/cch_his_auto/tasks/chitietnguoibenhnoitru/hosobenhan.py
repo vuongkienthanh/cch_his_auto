@@ -16,7 +16,7 @@ from cch_his_auto.tasks.editor import sign_staff_name as sign_staff_name
 
 _logger = logging.getLogger()
 
-class Status(StrEnum):
+class _Status(StrEnum):
     CHUAKY = "Chưa ký"
     DANGKY = "Đang ký"
     HOANTHANH = "Hoàn thành"
@@ -52,7 +52,7 @@ def filter(driver: Driver, name: str) -> bool:
         _logger.error("filtered with no result")
         return False
 
-def is_row(driver: Driver, idx: int, status: Status) -> bool:
+def is_row(driver: Driver, idx: int, status: _Status) -> bool:
     "Check if row at `idx` is _status_, first row is id=2"
     ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
@@ -107,14 +107,14 @@ def sign_current(driver: Driver):
     time.sleep(2)
 
 def filter_check_expand_sign_curent(
-    driver: Driver, name: str, status_list: list[Status]
+    driver: Driver, name: str, status_list: list[_Status]
 ):
     "@private"
     if filter(driver, name) and (
         not driver.waiting(
             ".right-content tbody tr:nth-child(2) td:nth-child(3)"
         ).text.strip()
-        == Status.HOANTHANH
+        == _Status.HOANTHANH
     ):
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
@@ -136,14 +136,14 @@ def filter_check_expand_sign_curent(
     time.sleep(2)
 
 def filter_check_expand_sign_new_tab(
-    driver: Driver, name: str, sign_fn: DriverFn, status_list: list[Status]
+    driver: Driver, name: str, sign_fn: DriverFn, status_list: list[_Status]
 ):
     "@private"
     if filter(driver, name) and (
         not driver.waiting(
             ".right-content tbody tr:nth-child(2) td:nth-child(3)"
         ).text.strip()
-        == Status.HOANTHANH
+        == _Status.HOANTHANH
     ):
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
@@ -169,7 +169,7 @@ def tobiabenhannhikhoa(driver: Driver):
         driver,
         name="Tờ bìa bệnh án Nhi khoa",
         sign_fn=sign_staff_name.tobiabenhannhikhoa,
-        status_list=[Status.CHUAKY],
+        status_list=[_Status.CHUAKY],
     )
 
 def mucAbenhannhikhoa(driver: Driver):
@@ -178,7 +178,7 @@ def mucAbenhannhikhoa(driver: Driver):
         driver,
         name="Mục A - Bệnh án Nhi khoa",
         sign_fn=sign_staff_name.mucAbenhannhikhoa,
-        status_list=[Status.CHUAKY],
+        status_list=[_Status.CHUAKY],
     )
 
 def mucBtongketbenhan(driver: Driver):
@@ -187,13 +187,13 @@ def mucBtongketbenhan(driver: Driver):
         driver,
         name="Mục B - Tổng kết Bệnh án (Nội khoa, Nhi Khoa, Truyền nhiễm, Sơ sinh, Da liễu, DD-PHCN, HHTM)",
         sign_fn=sign_staff_name.mucBtongketbenhan,
-        status_list=[Status.CHUAKY],
+        status_list=[_Status.CHUAKY],
     )
 
 def phieuchidinhxetnghiem(driver: Driver):
     "Filter and sign name: *Phiếu chỉ định xét nghiệm*"
     filter_check_expand_sign_curent(
-        driver, name="Phiếu chỉ định xét nghiệm", status_list=[Status.CHUAKY]
+        driver, name="Phiếu chỉ định xét nghiệm", status_list=[_Status.CHUAKY]
     )
 
 def todieutri(driver: Driver):
@@ -202,7 +202,7 @@ def todieutri(driver: Driver):
         driver,
         name="Tờ điều trị",
         sign_fn=sign_staff_name.todieutri,
-        status_list=[Status.CHUAKY],
+        status_list=[_Status.CHUAKY],
     )
 
 def phieuCT(driver: Driver):
@@ -211,7 +211,7 @@ def phieuCT(driver: Driver):
         driver,
         name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
         sign_fn=sign_staff_name.phieuCT,
-        status_list=[Status.CHUAKY],
+        status_list=[_Status.CHUAKY],
     )
 
 def phieuMRI(driver: Driver, signature: str | None):
@@ -220,7 +220,7 @@ def phieuMRI(driver: Driver, signature: str | None):
         driver,
         name="Phiếu chỉ định chụp cộng hưởng từ (MRI)",
         sign_fn=partial(sign_staff_name.phieuMRI_all, signature=signature),
-        status_list=[Status.CHUAKY, Status.DANGKY],
+        status_list=[_Status.CHUAKY, _Status.DANGKY],
     )
 
 def giaiphaubenh(driver: Driver):
@@ -229,7 +229,7 @@ def giaiphaubenh(driver: Driver):
         driver,
         name="Phiếu xét nghiệm giải phẫu bệnh sinh thiết",
         sign_fn=sign_staff_name.giaiphaubenh,
-        status_list=[Status.CHUAKY],
+        status_list=[_Status.CHUAKY],
     )
 
 def phieusanglocdinhduong(driver: Driver):
@@ -237,5 +237,5 @@ def phieusanglocdinhduong(driver: Driver):
     filter_check_expand_sign_curent(
         driver,
         name="Phiếu sàng lọc dinh dưỡng - Bệnh nhi nội trú",
-        status_list=[Status.CHUAKY],
+        status_list=[_Status.CHUAKY],
     )
