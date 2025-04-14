@@ -1,7 +1,11 @@
 from functools import partial
+import logging
+
 from cch_his_auto.driver import Driver, DriverFn
 from cch_his_auto.tasks.editor import sign_staff_name, sign_patient_name
 from . import open_menu, goto
+
+_logger = logging.getLogger().getChild("tasks")
 
 def _sign_phieuthuchienylenh(
     driver: Driver,
@@ -20,6 +24,7 @@ def sign_phieuthuchienylenh_bs(
     _sign_phieuthuchienylenh(
         driver, arr=arr, sign_fn=sign_staff_name.phieuthuchienylenh_bs
     )
+    _logger.info("finish signing phieuthuchienylenh_bs")
 
 def sign_phieuthuchienylenh_dd(
     driver: Driver, arr: tuple[bool, bool, bool, bool, bool]
@@ -28,6 +33,7 @@ def sign_phieuthuchienylenh_dd(
     _sign_phieuthuchienylenh(
         driver, arr=arr, sign_fn=sign_staff_name.phieuthuchienylenh_dd
     )
+    _logger.info("finish signing phieuthuchienylenh_dd")
 
 def sign_phieuthuchienylenh_bn(
     driver: Driver, arr: tuple[bool, bool, bool, bool, bool], signature: str
@@ -38,3 +44,4 @@ def sign_phieuthuchienylenh_bn(
         arr=arr,
         sign_fn=partial(sign_patient_name.phieuthuchienylenh_bn, signature=signature),
     )
+    _logger.info("finish signing phieuthuchienylenh_bn")

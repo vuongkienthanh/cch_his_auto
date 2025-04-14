@@ -13,11 +13,15 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver import Keys
 
 # set up logging
-_logger = logging.getLogger()
-_logger.setLevel(logging.INFO)
+_root_logger = logging.getLogger()
+_root_logger.setLevel(logging.INFO)
 _out = logging.StreamHandler(sys.stdout)
-_out.setFormatter(logging.Formatter(fmt="{levelname}: {message}", style="{"))
-_logger.addHandler(_out)
+_out.setFormatter(
+    logging.Formatter(fmt="{asctime} {name} {levelname}: {message}", style="{")
+)
+_root_logger.addHandler(_out)
+
+_logger = _root_logger.getChild("driver")
 
 class DriverFn(Protocol):
     "A function typing hint that accepts Driver as first argument"
@@ -36,7 +40,7 @@ class Driver(webdriver.Chrome):
         - `headless`: run driver in headless mode
         - `profile_path`: provide a profile path for more efficient subsequent use
         """
-        _logger.info("opening chrome ...")
+        _logger.info("---opening chrome")
         options = webdriver.ChromeOptions()
         options.add_argument("--disable-infobars")
         options.add_argument("--no-sandbox")
@@ -57,7 +61,7 @@ class Driver(webdriver.Chrome):
         super().__init__(options=options)
 
     def quit(self):
-        _logger.info("driver quiting...")
+        _logger.info("---driver quiting")
         super().quit()
 
     def find(self, css: str) -> WebElement:
@@ -74,84 +78,86 @@ class Driver(webdriver.Chrome):
         You can also provide a `name` for logging
         """
         try:
-            _logger.info(f"---waiting {name or css}")
+            _logger.debug(f"waiting {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
-            _logger.info(f"-->>done waiting {name or css}")
+        except Exception as e:
+            _logger.error(f"->cant find {name or css}")
+            raise e
+        else:
+            _logger.debug(f"->done waiting {name or css}")
             time.sleep(2)
             return self.find(css)
-        except Exception as e:
-            _logger.error(f"-->>cant find {name or css}")
-            raise e
 
     def waiting_to_be(self, css: str, to_be: str, /, name: str = "") -> WebElement:
         """
         Waiting element by `css` with textContent equals `to_be`.
         You can also provide a `name` for logging
         """
-        _logger.info(f"---waiting {name or css} to be {to_be}")
-
         try:
+            _logger.debug(f"waiting {name or css} to be {to_be}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         except Exception as e:
-            _logger.error(f"-->>cant find {name or css}")
+            _logger.error(f"->cant find {name or css}")
             raise e
-
-        for _ in range(120):
-            time.sleep(1)
-            if self.find(css).text.strip().startswith(to_be.strip()):
-                _logger.info(f"-->>done waiting {name or css} to be {to_be}")
-                time.sleep(2)
-                return self.find(css)
         else:
-            txt = self.find(css).text.strip()
-            ctx = f'{name or css} with to_be="{to_be}" is not equal to {txt}'
-            _logger.error(f"-->>no such element: {ctx}")
-            raise NoSuchElementException(ctx)
+            for _ in range(120):
+                time.sleep(1)
+                if (ele := self.find(css)).text.strip().startswith(to_be.strip()):
+                    _logger.debug(f"->done waiting {name or css} to be {to_be}")
+                    time.sleep(2)
+                    return ele
+            else:
+                txt = self.find(css).text.strip()
+                ctx = f'{name or css} with to_be="{to_be}" is not equal to {txt}'
+                _logger.error(f"->no such element: {ctx}")
+                raise NoSuchElementException(ctx)
 
     def clicking(self, css: str, /, name: str = "") -> None:
         """
         Clicking element by `css`.
         You can also provide a `name` for logging
         """
-        _logger.info(f"---clicking {name or css}")
         try:
+            _logger.debug(f"clicking {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         except Exception as e:
-            _logger.error(f"-->>cant find {name or css}")
+            _logger.error(f"->cant find {name or css}")
             raise e
-
-        try:
-            ele = self.find(css)
-            ActionChains(self).scroll_to_element(ele).pause(1).click(ele).perform()
-            _logger.info(f"-->>done clicking {name or css}")
-            time.sleep(2)
-        except Exception as e:
-            _logger.error(f"-->>can't click {name or css}")
-            raise e
+        else:
+            try:
+                ele = self.find(css)
+                ActionChains(self).scroll_to_element(ele).pause(1).click(ele).perform()
+            except Exception as e:
+                _logger.error(f"->can't click {name or css}")
+                raise e
+            else:
+                _logger.debug(f"->done clicking {name or css}")
+                time.sleep(2)
 
     def clicking_svg(self, css: str, /, name: str = "") -> None:
         """
         Clicking svg element by `css`.
         You can also provide a `name` for logging
         """
-        _logger.info(f"---clicking svg {name or css}")
         try:
+            _logger.debug(f"clicking svg {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         except Exception as e:
-            _logger.error(f"-->>cant find {name or css}")
+            _logger.error(f"->cant find {name or css}")
             raise e
-
-        try:
-            self.execute_script(f"""
-                let evt = document.createEvent("MouseEvents");
-                evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-                document.querySelector('{css}').dispatchEvent(evt);
-            """)
-            _logger.info(f"-->>done clicking svg {name or css}")
-            time.sleep(2)
-        except Exception as e:
-            _logger.error(f"-->>can't click svg {name or css}")
-            raise e
+        else:
+            try:
+                self.execute_script(f"""
+                    let evt = document.createEvent("MouseEvents");
+                    evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                    document.querySelector('{css}').dispatchEvent(evt);
+                """)
+            except Exception as e:
+                _logger.error(f"->can't click svg {name or css}")
+                raise e
+            else:
+                _logger.debug(f"->done clicking svg {name or css}")
+                time.sleep(2)
 
     def goto(self, url: str) -> None:
         "Go to `url`"
@@ -165,13 +171,15 @@ class Driver(webdriver.Chrome):
         - `main_tab`: you can can this using `driver.current_window_handle`
         """
         _logger.info("---go to new tab")
+        time.sleep(1)
         for window_handle in self.window_handles:
             if window_handle != main_tab:
                 self.switch_to.window(window_handle)
                 time.sleep(2)
                 break
         else:
-            raise Exception("-->>cant go to new tab")
+            _logger.error("-> can't go to new tab")
+            raise Exception("can't go to new tab")
 
     def goto_newtab_do_smth_then_goback(self, main_tab: str, fn: DriverFn) -> None:
         """
@@ -187,7 +195,7 @@ class Driver(webdriver.Chrome):
 
     def clear_input(self, css: str) -> WebElement:
         "Find element by `css` then clear it"
-        _logger.info("---clearing input")
+        _logger.debug("clearing input")
         ele = self.waiting(css)
         ele.send_keys(Keys.CONTROL, "a")
         ele.send_keys(Keys.DELETE)
