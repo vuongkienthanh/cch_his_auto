@@ -134,7 +134,10 @@ def run(cf: config.Config):
         messagebox.showinfo(message="finish")
 
 def process_normal_day(driver: Driver, signature: str | None):
-    sanglocdinhduong.complete_sanglocdinhduong(driver)
+    try:
+        sanglocdinhduong.complete_sanglocdinhduong(driver)
+    except:
+        ...
 
     hosobenhan.open_dialog(driver)
     hosobenhan.phieuchidinhxetnghiem(driver)
@@ -146,7 +149,10 @@ def process_normal_day(driver: Driver, signature: str | None):
     hosobenhan.close_dialog(driver)
 
 def process_final_day(driver: Driver, signature: str | None):
-    sanglocdinhduong.complete_sanglocdinhduong(driver)
+    try:
+        sanglocdinhduong.complete_sanglocdinhduong(driver)
+    except:
+        ...
 
     hosobenhan.open_dialog(driver)
     hosobenhan.tobiabenhannhikhoa(driver)

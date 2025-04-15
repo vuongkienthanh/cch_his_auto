@@ -1,12 +1,13 @@
 import logging
 import sys
 from functools import wraps
+from contextlib import contextmanager
 
 from . import driver
 
 # set up logging
 _logger = logging.getLogger()
-_logger.setLevel(logging.INFO)
+# _logger.setLevel(logging.INFO)
 _out = logging.StreamHandler(sys.stdout)
 _out.setFormatter(
     logging.Formatter(fmt="{asctime} {name} {levelname}: {message}", style="{")
@@ -14,6 +15,8 @@ _out.setFormatter(
 _logger.addHandler(_out)
 
 def tracing(logger: logging.Logger):
+    "Add logging capability to `DriverFn`"
+
     def inner(f: "driver.DriverFn"):
         @wraps(f)
         def inner2(*args, **kwargs):
@@ -34,3 +37,17 @@ def tracing(logger: logging.Logger):
 class EndOfLoop(Exception):
     def __init__(self, *args):
         super().__init__(*args)
+
+@contextmanager
+def iframe(driver: "driver.Driver", iframe_css: str, /, logger: logging.Logger | None):
+    "use as contextmanager for going in and out an iframe inside a modal"
+    if logger is None:
+        logger = logging.getLogger()
+    try:
+        logger.debug("go into iframe")
+        iframe = driver.waiting(iframe_css)
+        driver.switch_to.frame(iframe)
+        yield iframe
+    finally:
+        logger.debug("go back to parent frame")
+        driver.switch_to.parent_frame()

@@ -41,6 +41,7 @@ def login(driver: Driver, username: str, password: str):
             _logger.debug("found login screen")
             inputs = driver.find_elements(By.TAG_NAME, "input")
             time.sleep(3)  # wait for js to load
+            _logger.debug("+++++ typing username and password")
             inputs[0].send_keys(username)
             inputs[1].send_keys(password)
             driver.clicking(".action>button", "submit button")
@@ -74,6 +75,7 @@ def set_dept(driver: Driver, dept: str):
 
     def _set_dept_in_dialog():
         ele = driver.waiting(".ant-modal-body input[type=search]", "dept picker")
+        _logger.debug("+++++ typing dept")
         ActionChains(driver).send_keys_to_element(
             ele, Keys.ARROW_DOWN
         ).send_keys_to_element(ele, dept).send_keys_to_element(ele, Keys.ENTER).click(

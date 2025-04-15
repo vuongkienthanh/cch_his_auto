@@ -33,7 +33,6 @@ def _cancel(driver: Driver):
 @_trace
 def open_dialog(driver: Driver):
     "Click *Đăng ký PHCN* or *Thêm mới đợt PHCN* button"
-
     for i in range(120):
         time.sleep(1)
         try:

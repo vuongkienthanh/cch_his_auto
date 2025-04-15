@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import Protocol
+from typing import Protocol, Any
 from pathlib import PurePath
 
 from selenium import webdriver
@@ -16,7 +16,7 @@ _logger = logging.getLogger().getChild("driver")
 class DriverFn(Protocol):
     "A function typing hint that accepts Driver as first argument"
 
-    def __call__(self, driver: "Driver", /, *args, **kwargs) -> None: ...
+    def __call__(self, driver: "Driver", /, *args, **kwargs) -> Any: ...
 
 class Driver(webdriver.Chrome):
     """
