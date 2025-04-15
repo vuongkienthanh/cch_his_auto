@@ -2,6 +2,8 @@ import time
 import datetime as dt
 import logging
 
+from selenium.common import NoSuchElementException
+
 from cch_his_auto.driver import Driver
 from . import indieuduong as idd
 
@@ -9,8 +11,9 @@ URL = "http://emr.ndtp.org/quan-ly-noi-tru/chi-tiet-nguoi-benh-noi-tru/"
 
 _logger = logging.getLogger().getChild("chitietnguoibenhnoitru")
 
+
 def scrape_signature(driver: Driver) -> str | None:
-    "try getting signature src of current patient"
+    "try getting signature of the current patient"
     _logger.debug("+++ start scrape_signature")
     main_tab = driver.current_window_handle
     idd.open_menu(driver)
@@ -21,13 +24,14 @@ def scrape_signature(driver: Driver) -> str | None:
         ans = ele.get_dom_attribute("src").strip()
         _logger.info(">>> found patient signature")
         return ans
-    except:
+    except NoSuchElementException:
         _logger.warning("??? can't find patient signature")
         return None
     finally:
         driver.close()
         driver.switch_to.window(main_tab)
         time.sleep(5)
+
 
 def get_admission_date(driver: Driver) -> dt.date:
     "Get admission date"

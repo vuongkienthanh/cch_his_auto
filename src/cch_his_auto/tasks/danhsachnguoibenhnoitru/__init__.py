@@ -15,6 +15,7 @@ URL = "http://emr.ndtp.org/quan-ly-noi-tru/danh-sach-nguoi-benh-noi-tru"
 
 _FMT = "%Y-%m-%d"
 
+
 @_trace
 def filter_trangthainguoibenh(driver: Driver, indexes: list[int]):
     """
@@ -44,6 +45,7 @@ def filter_trangthainguoibenh(driver: Driver, indexes: list[int]):
         "close menu trạng thái người bệnh",
     )
 
+
 @_trace
 def open_filter_boloc(driver: Driver):
     "Open filter *Bộ lọc* for subsequent tasks"
@@ -52,10 +54,12 @@ def open_filter_boloc(driver: Driver):
     )
     driver.waiting(".ant-popover .content-popover +div button", "Tìm button")
 
+
 @_trace
 def close_filter_boloc(driver: Driver):
     "Close filter *Bộ lọc* after `open_filter_boloc` and finish all tasks inside"
     driver.clicking(".ant-popover .content-popover +div button", "Tìm button")
+
 
 @_trace
 def filter_boloc_thoigiannhapvien(driver: Driver, start: dt.date, end: dt.date):
@@ -71,6 +75,7 @@ def filter_boloc_thoigiannhapvien(driver: Driver, start: dt.date, end: dt.date):
         driver.find(".date-1 .ant-picker-input:nth-child(3) input"), end_d
     ).send_keys(Keys.ENTER).perform()
 
+
 @_trace
 def filter_patient(driver: Driver, ma_hs: int):
     "Filter patient based on `ma_hs`"
@@ -85,6 +90,7 @@ def filter_patient(driver: Driver, ma_hs: int):
         str(ma_hs),
         "first row patient id",
     )
+
 
 @_trace
 def goto_patient(driver: Driver, ma_hs: int):

@@ -14,6 +14,7 @@ from cch_his_auto.helper import EndOfLoop, tracing
 _logger = logging.getLogger().getChild("editor")
 _trace = tracing(_logger)
 
+
 @_trace
 def sign_canvas(driver: Driver, signature: str):
     "use when patient signature needed"
@@ -36,15 +37,15 @@ def sign_canvas(driver: Driver, signature: str):
         "save after finish drawing signature",
     )
 
+
 def _sign(
     driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str, signature: str
 ):
     ele = driver.waiting_to_be(btn_css, btn_txt, name)
-    _logger.debug("clicking sign button")
     ele.click()
-    _logger.debug("-> finish clicking sign button")
     sign_canvas(driver, signature)
     driver.waiting(img_css, "signature image")
+
 
 @_trace
 def phieuthuchienylenh_bn(
@@ -103,6 +104,7 @@ def phieuthuchienylenh_bn(
         except Exception as e:
             _logger.warning(f"get {e} -> proceed to next in queue")
     time.sleep(2)
+
 
 @_trace
 def phieuMRI_bn(driver: Driver, signature: str):

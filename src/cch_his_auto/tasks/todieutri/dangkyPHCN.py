@@ -11,16 +11,19 @@ from cch_his_auto.helper import tracing, EndOfLoop
 _logger = logging.getLogger().getChild("PHCN")
 _trace = tracing(_logger)
 
+
 class _State(StrEnum):
     Register = "Đăng ký PHCN"
     AddNew = "Thêm mới đợt PHCN"
     Cancel = "Hủy đăng ký PHCN"
+
 
 def _open(driver: Driver):
     driver.clicking(
         ".footer-btn .left button:nth-child(3)", f"{_State.Register} button"
     )
     driver.waiting(".ant-form", "PHCN dialog")
+
 
 def _cancel(driver: Driver):
     driver.clicking(".footer-btn .left button:nth-child(3)", f"{_State.Cancel} button")
@@ -29,6 +32,7 @@ def _cancel(driver: Driver):
         _State.AddNew,
         f"{_State.Cancel} becomes {_State.AddNew}",
     )
+
 
 @_trace
 def open_dialog(driver: Driver):
@@ -54,7 +58,8 @@ def open_dialog(driver: Driver):
         except StaleElementReferenceException as e:
             _logger.warning(f"get {e}")
     else:
-        raise EndOfLoop("can't open dialog")
+        raise EndOfLoop("can't open PHCN dialog")
+
 
 @_trace
 def cancel(driver: Driver):
@@ -78,6 +83,7 @@ def cancel(driver: Driver):
     else:
         raise EndOfLoop("can't cancel PHCN")
 
+
 @_trace
 def clear(driver: Driver):
     "After `open_dialog`, clear all selections"
@@ -85,15 +91,18 @@ def clear(driver: Driver):
         _logger.debug(f"removing {ele.text}")
         ele.click()
 
+
 @_trace
 def drop_menu(driver: Driver):
     "After `open_dialog`, drop down the menu"
     driver.waiting(".ant-form .ant-select", "drop menu PHCN").send_keys(Keys.DOWN)
 
+
 @_trace
 def close_menu(driver: Driver):
     "After `dropmenu`, close the menu"
     ActionChains(driver).send_keys(Keys.ESCAPE).perform()
+
 
 @_trace
 def add_bunuot(driver: Driver):
@@ -102,12 +111,14 @@ def add_bunuot(driver: Driver):
         ".rc-virtual-list div.ant-select-item-option:nth-child(2)", "add Bú nuốt"
     )
 
+
 @_trace
 def add_giaotiep(driver: Driver):
     "After `drop_menu`, Add *giao tiếp*"
     driver.clicking(
         ".rc-virtual-list div.ant-select-item-option:nth-child(3)", "add Giao tiếp"
     )
+
 
 @_trace
 def add_hohap(driver: Driver):
@@ -116,12 +127,14 @@ def add_hohap(driver: Driver):
         ".rc-virtual-list div.ant-select-item-option:nth-child(4)", "add Hô hấp"
     )
 
+
 @_trace
 def add_vandong(driver: Driver):
     "After `drop_menu`, Add *vận động*"
     driver.clicking(
         ".rc-virtual-list div.ant-select-item-option:nth-child(5)", "add Vận động"
     )
+
 
 @_trace
 def save(driver: Driver):

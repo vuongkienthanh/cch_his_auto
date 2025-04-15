@@ -6,14 +6,16 @@ from selenium.common import StaleElementReferenceException
 
 from cch_his_auto.driver import Driver
 from cch_his_auto.helper import tracing, EndOfLoop
-from . import open_menu, goto
+from .helper import open_menu, goto
 
-_logger = logging.getLogger().getChild("todieutri")
+_logger = logging.getLogger().getChild("ingiayto")
 _trace = tracing(_logger)
+
 
 class _State(StrEnum):
     Sign = "Ký Bác sĩ"
     Cancel = "Hủy ký Bác sĩ"
+
 
 @_trace
 def sign_phieuchidinh(driver: Driver):
@@ -30,17 +32,15 @@ def sign_phieuchidinh(driver: Driver):
     for i in range(120):
         time.sleep(1)
         _logger.debug(f"checking button state {i}...")
-        for w in driver.find_all(".__button button"):
+        for ele in driver.find_all(".__button button"):
             try:
-                if w.text == _State.Cancel:
+                if ele.text == _State.Cancel:
                     _logger.debug(f"button state is {_State.Cancel}")
                     _close_dialog()
                     return
-                elif w.text == "Ký Bác sĩ":
-                    _logger.debug(f"button state is {_State.Sign}")
-                    _logger.debug("click sign button")
-                    w.click()
-                    _logger.debug("-> finish click sign button")
+                elif ele.text == "Ký Bác sĩ":
+                    _logger.debug(f"button state is {_State.Sign} -> click")
+                    ele.click()
                     time.sleep(5)
                     _close_dialog()
                     return

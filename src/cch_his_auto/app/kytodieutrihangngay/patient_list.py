@@ -4,6 +4,7 @@ from typing import cast
 from .config import Patient
 from ..common_ui.scrollable_frame import ScrollFrame
 
+
 class PatientFrame(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -50,6 +51,7 @@ class PatientFrame(tk.Frame):
     def clear(self):
         self.listframe.clear()
 
+
 class PatientList(ScrollFrame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -70,6 +72,7 @@ class PatientList(ScrollFrame):
     def clear(self):
         for w in self.viewPort.grid_slaves():
             w.destroy()
+
 
 class Line(tk.Frame):
     def __init__(self, parent):

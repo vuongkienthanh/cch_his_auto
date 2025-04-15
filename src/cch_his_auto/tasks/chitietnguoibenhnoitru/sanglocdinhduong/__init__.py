@@ -1,17 +1,19 @@
-URL = "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
-
 import datetime as dt
 import logging
 import time
 
+from selenium.common import NoSuchElementException
+
 from cch_his_auto.driver import Driver
+from cch_his_auto.helper import tracing
 from cch_his_auto.tasks.chitietnguoibenhnoitru import get_admission_date
 from cch_his_auto.tasks.chitietnguoibenhnoitru import chitietthongtin as cttt
-from cch_his_auto.helper import tracing
 from .phieusangloc import save_new_phieusangloc
 
+URL = "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
 _logger = logging.getLogger().getChild("sanglocdinhduong")
 _trace = tracing(_logger)
+
 
 @_trace
 def open_dialog(driver: Driver):
@@ -22,6 +24,7 @@ def open_dialog(driver: Driver):
     driver.waiting(".ant-modal-body .ant-table", "Sàng lọc dinh dưỡng dialog")
     time.sleep(3)
 
+
 @_trace
 def close_dialog(driver: Driver):
     "Close *Sàng lọc dinh dưỡng* dialog"
@@ -30,6 +33,7 @@ def close_dialog(driver: Driver):
         "close Sàng lọc dinh dưỡng dialog",
     )
     time.sleep(3)
+
 
 def get_last_date(driver: Driver) -> dt.date | None:
     "Get last date in *Sàng lọc dinh dưỡng* dialog"
@@ -40,14 +44,17 @@ def get_last_date(driver: Driver) -> dt.date | None:
         ).date()
         _logger.debug(f"-> found last_date = {date}")
         return date
-    except:
+    except NoSuchElementException:
         _logger.warning("-> can't find last_date")
         return None
 
+
 def add_new(driver: Driver):
+    "Add new *Phiếu sàng lọc*, goto `phieusangloc` submodule for more tasks"
     driver.clicking(
         ".ant-modal:has(table) .ant-modal-title button", "add new phiếu sàng lọc"
     )
+
 
 @_trace
 def complete_sanglocdinhduong(driver: Driver):
@@ -58,7 +65,8 @@ def complete_sanglocdinhduong(driver: Driver):
     chieucao = cttt.get_chieucao(driver)
     cttt.close_dialog(driver)
     if (cannang == "") or (chieucao == "") or (cannang is None) or (chieucao is None):
-        raise Exception("cannang or chieucao is empty")
+        _logger.warning("cannang or chieucao is empty")
+        return
     open_dialog(driver)
     if last_date := get_last_date(driver):
         next_date = last_date + dt.timedelta(days=7)

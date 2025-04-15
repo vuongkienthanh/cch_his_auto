@@ -1,6 +1,7 @@
 import tkinter as tk
 import platform
 
+
 class ScrollFrame(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)  # create a frame (self)

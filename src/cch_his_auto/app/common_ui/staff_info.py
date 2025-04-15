@@ -1,5 +1,6 @@
 import tkinter as tk
 
+
 class UsernamePasswordFrame(tk.LabelFrame):
     def __init__(self, parent, text: str, *args, **kwargs):
         super().__init__(parent, text=text, *args, **kwargs)
@@ -23,6 +24,7 @@ class UsernamePasswordFrame(tk.LabelFrame):
 
     def set_password(self, value: str):
         return self.password_var.set(value)
+
 
 class UsernamePasswordDeptFrame(UsernamePasswordFrame):
     def __init__(self, parent, text: str, *args, **kwargs):

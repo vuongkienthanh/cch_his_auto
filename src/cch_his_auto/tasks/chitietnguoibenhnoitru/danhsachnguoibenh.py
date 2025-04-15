@@ -9,6 +9,7 @@ from cch_his_auto.helper import tracing
 _logger = logging.getLogger().getChild("danhsachnguoibenh")
 _trace = tracing(_logger)
 
+
 @_trace
 def open_dialog(driver: Driver):
     driver.clicking(
@@ -17,9 +18,11 @@ def open_dialog(driver: Driver):
     )
     driver.waiting(".ant-drawer .searching input", "Danh sách người bệnh panel")
 
+
 @_trace
 def close_dialog(driver: Driver):
     driver.clicking(".ant-drawer-mask", "close Danh sách người bệnh panel")
+
 
 @_trace
 def filter_patient(driver: Driver, ma_hs: int):
@@ -33,6 +36,7 @@ def filter_patient(driver: Driver, ma_hs: int):
     driver.waiting_to_be(
         "tbody tr:nth-child(2) td:nth-child(3)", str(ma_hs), "patient id"
     )
+
 
 @_trace
 def goto_patient(driver: Driver, ma_hs: int):

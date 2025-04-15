@@ -7,12 +7,12 @@ from . import driver
 
 # set up logging
 _logger = logging.getLogger()
-# _logger.setLevel(logging.INFO)
 _out = logging.StreamHandler(sys.stdout)
 _out.setFormatter(
     logging.Formatter(fmt="{asctime} {name} {levelname}: {message}", style="{")
 )
 _logger.addHandler(_out)
+
 
 def tracing(logger: logging.Logger):
     "Add logging capability to `DriverFn`"
@@ -34,9 +34,11 @@ def tracing(logger: logging.Logger):
 
     return inner
 
+
 class EndOfLoop(Exception):
     def __init__(self, *args):
         super().__init__(*args)
+
 
 @contextmanager
 def iframe(driver: "driver.Driver", iframe_css: str, /, logger: logging.Logger | None):

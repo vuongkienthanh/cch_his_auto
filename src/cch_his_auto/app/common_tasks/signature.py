@@ -1,12 +1,13 @@
 import sqlite3
 import logging
 
-_logger = logging.getLogger()
-
 from cch_his_auto.driver import Driver
 from cch_his_auto.app.global_db import save_db, get_signature_from_db
 from cch_his_auto.tasks.chitietnguoibenhnoitru import scrape_signature
 from cch_his_auto.tasks.danhsachnguoibenhnoitru import URL, goto_patient
+
+_logger = logging.getLogger().getChild("app")
+
 
 def get_signature_from_elsewhere(
     driver: Driver, con: sqlite3.Connection, ma_hs: int
@@ -30,6 +31,7 @@ def get_signature_from_elsewhere(
             return signature
         else:
             return None
+
 
 def get_signature_from_ctnbnt(
     driver: Driver, con: sqlite3.Connection, ma_hs: int

@@ -14,6 +14,7 @@ from cch_his_auto.helper import tracing, EndOfLoop
 _logger = logging.getLogger().getChild("auth")
 _trace = tracing(_logger)
 
+
 @_trace
 def login(driver: Driver, username: str, password: str):
     "login with provided `username` and `password`"
@@ -50,6 +51,7 @@ def login(driver: Driver, username: str, password: str):
     else:
         raise EndOfLoop("can't log in")
 
+
 @_trace
 def logout(driver: Driver):
     "logout, then back to login page"
@@ -60,13 +62,14 @@ def logout(driver: Driver):
         driver.clicking(".header .header-icon:has(+.username)", "log menu drop down")
         try:
             driver.clicking(".ant-popover .item-action:last-child", "logout")
-        except:
+        except NoSuchElementException:
             continue
         else:
             driver.waiting(".login-body")
             return
     else:
         raise EndOfLoop("can't log out")
+
 
 @_trace
 def set_dept(driver: Driver, dept: str):
@@ -114,6 +117,7 @@ def set_dept(driver: Driver, dept: str):
             return
     else:
         raise EndOfLoop("can't set dept")
+
 
 @contextmanager
 def session(driver: Driver, username: str, password: str, dept: str):

@@ -3,10 +3,11 @@ import logging
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.editor import sign_staff_name
 from cch_his_auto.helper import tracing
-from . import open_menu, goto
+from .helper import open_menu, goto
 
-_logger = logging.getLogger().getChild("todieutri")
+_logger = logging.getLogger().getChild("ingiayto")
 _trace = tracing(_logger)
+
 
 @_trace
 def sign_todieutri(driver: Driver):

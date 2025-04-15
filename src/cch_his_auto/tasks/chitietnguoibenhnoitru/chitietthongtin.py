@@ -1,10 +1,13 @@
 import logging
 
+from selenium.common import NoSuchElementException
+
 from cch_his_auto.driver import Driver
 from cch_his_auto.helper import tracing
 
 _logger = logging.getLogger().getChild("chitietthongtin")
 _trace = tracing(_logger)
+
 
 @_trace
 def open_dialog(driver: Driver):
@@ -14,12 +17,14 @@ def open_dialog(driver: Driver):
     )
     driver.waiting(".avatar__image", "Chi tiết thông tin dialog")
 
+
 @_trace
 def close_dialog(driver: Driver):
     driver.clicking(
         ".ant-modal-close:has(~.ant-modal-body .avatar__image)",
         "close Chi tiết thông tin dialog",
     )
+
 
 def get_chieucao(driver: Driver) -> str | None:
     for _ in range(120):
@@ -29,10 +34,11 @@ def get_chieucao(driver: Driver) -> str | None:
             ).get_attribute("value")
             _logger.debug(f"-> found chieucao={value}")
             return value
-        except:
+        except NoSuchElementException:
             _logger.debug("-> can't find chieucao")
     else:
         return None
+
 
 def get_cannang(driver: Driver) -> str | None:
     for _ in range(120):
@@ -42,7 +48,7 @@ def get_cannang(driver: Driver) -> str | None:
             ).get_attribute("value")
             _logger.debug(f"-> found cannang={value}")
             return value
-        except:
+        except NoSuchElementException:
             _logger.debug("-> can't find cannang")
     else:
         return None

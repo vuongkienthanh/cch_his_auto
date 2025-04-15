@@ -13,10 +13,12 @@ from cch_his_auto.helper import EndOfLoop, tracing
 _logger = logging.getLogger().getChild("hosobenhan")
 _trace = tracing(_logger)
 
+
 class _Status(StrEnum):
     CHUAKY = "Chưa ký"
     DANGKY = "Đang ký"
     HOANTHANH = "Hoàn thành"
+
 
 @_trace
 def open_dialog(driver: Driver):
@@ -25,10 +27,12 @@ def open_dialog(driver: Driver):
     )
     driver.waiting(".right-content tbody tr:nth-child(2)", "Danh sách phiếu")
 
+
 @_trace
 def close_dialog(driver: Driver):
     driver.clicking(".ant-modal button[aria-label='Close']", "close button")
     time.sleep(5)
+
 
 @_trace
 def filter(driver: Driver, name: str) -> bool:
@@ -53,12 +57,14 @@ def filter(driver: Driver, name: str) -> bool:
         _logger.warning(f"-> filtered {name} with no result")
         return False
 
+
 def is_row(driver: Driver, idx: int, status: _Status) -> bool:
     "Check if row at `idx` is _status_, first row is id=2"
     ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
     _logger.debug(f"checking {name}: {status}")
     return ele.text.strip() == status
+
 
 def is_row_expandable(driver: Driver, idx: int) -> bool:
     "Check if row at `idx` is expandable, first row is id=2"
@@ -68,17 +74,19 @@ def is_row_expandable(driver: Driver, idx: int) -> bool:
         ele = driver.find(
             f".right-content tbody tr:nth-child({idx}) td:nth-child(1) button"
         )
-    except:
+    except NoSuchElementException:
         return False
     class_list = ele.get_attribute("class")
     assert class_list is not None
     return "ant-table-row-expand-icon-collapsed" in class_list
+
 
 def expand_row(driver: Driver, idx: int):
     "Expand row at `idx`"
     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
     _logger.debug(f"expanding {name}")
     driver.clicking(f".right-content tbody tr:nth-child({idx}) td:nth-child(1) button")
+
 
 def _sign_new_tab(driver: Driver, idx: int, sign_fn: DriverFn):
     tab0 = driver.current_window_handle
@@ -90,6 +98,7 @@ def _sign_new_tab(driver: Driver, idx: int, sign_fn: DriverFn):
     time.sleep(2)
     driver.clicking(f"a[data-key='{datakey}'] button", f"edit button {idx - 1}")
     driver.goto_newtab_do_smth_then_goback(tab0, sign_fn)
+
 
 def _sign_current(driver: Driver):
     driver.clicking(".right-content .__action button:nth-child(2)", "clicking Ký tên")
@@ -107,6 +116,7 @@ def _sign_current(driver: Driver):
     else:
         raise EndOfLoop("can't sign current")
     time.sleep(2)
+
 
 def _filter_check_expand_sign_curent(
     driver: Driver, name: str, status_list: list[_Status]
@@ -136,6 +146,7 @@ def _filter_check_expand_sign_curent(
                 _logger.info("row condition: OK")
     time.sleep(2)
 
+
 def _filter_check_expand_sign_new_tab(
     driver: Driver, name: str, sign_fn: DriverFn, status_list: list[_Status]
 ):
@@ -163,6 +174,7 @@ def _filter_check_expand_sign_new_tab(
                 _logger.info("row condition: OK")
     time.sleep(3)
 
+
 @_trace
 def tobiabenhannhikhoa(driver: Driver):
     "Filter and sign name: *Tờ bìa bệnh án nhi khoa*"
@@ -172,6 +184,7 @@ def tobiabenhannhikhoa(driver: Driver):
         sign_fn=sign_staff_name.tobiabenhannhikhoa,
         status_list=[_Status.CHUAKY],
     )
+
 
 @_trace
 def mucAbenhannhikhoa(driver: Driver):
@@ -183,6 +196,7 @@ def mucAbenhannhikhoa(driver: Driver):
         status_list=[_Status.CHUAKY],
     )
 
+
 @_trace
 def mucBtongketbenhan(driver: Driver):
     "Filter and sign name: *Mục B tổng kết bệnh án*"
@@ -193,12 +207,14 @@ def mucBtongketbenhan(driver: Driver):
         status_list=[_Status.CHUAKY],
     )
 
+
 @_trace
 def phieuchidinhxetnghiem(driver: Driver):
     "Filter and sign name: *Phiếu chỉ định xét nghiệm*"
     _filter_check_expand_sign_curent(
         driver, name="Phiếu chỉ định xét nghiệm", status_list=[_Status.CHUAKY]
     )
+
 
 @_trace
 def todieutri(driver: Driver):
@@ -210,6 +226,7 @@ def todieutri(driver: Driver):
         status_list=[_Status.CHUAKY],
     )
 
+
 @_trace
 def phieuCT(driver: Driver):
     "Filter and sign name: *Phiếu chỉ định chụp CT*"
@@ -219,6 +236,7 @@ def phieuCT(driver: Driver):
         sign_fn=sign_staff_name.phieuCT,
         status_list=[_Status.CHUAKY],
     )
+
 
 @_trace
 def phieuMRI(driver: Driver, signature: str | None):
@@ -230,6 +248,7 @@ def phieuMRI(driver: Driver, signature: str | None):
         status_list=[_Status.CHUAKY, _Status.DANGKY],
     )
 
+
 @_trace
 def giaiphaubenh(driver: Driver):
     "Filter and sign name: *Phiếu xét nghiệm giải phẫu bệnh sinh thiết*"
@@ -239,6 +258,7 @@ def giaiphaubenh(driver: Driver):
         sign_fn=sign_staff_name.giaiphaubenh,
         status_list=[_Status.CHUAKY],
     )
+
 
 @_trace
 def phieusanglocdinhduong(driver: Driver):

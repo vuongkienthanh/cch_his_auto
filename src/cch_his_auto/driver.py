@@ -8,15 +8,21 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver import ActionChains
-from selenium.common import NoSuchElementException
+from selenium.common import (
+    NoSuchElementException,
+    StaleElementReferenceException,
+    TimeoutException,
+)
 from selenium.webdriver import Keys
 
 _logger = logging.getLogger().getChild("driver")
+
 
 class DriverFn(Protocol):
     "A function typing hint that accepts Driver as first argument"
 
     def __call__(self, driver: "Driver", /, *args, **kwargs) -> Any: ...
+
 
 class Driver(webdriver.Chrome):
     """
@@ -70,9 +76,9 @@ class Driver(webdriver.Chrome):
         try:
             _logger.debug(f"waiting {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
-        except Exception as e:
+        except (TimeoutException, StaleElementReferenceException):
             _logger.error(f"-> can't find {name or css}")
-            raise e
+            raise NoSuchElementException(f"can't find {name or css}")
         else:
             _logger.debug(f"-> done waiting {name or css}")
             time.sleep(2)
@@ -86,9 +92,9 @@ class Driver(webdriver.Chrome):
         try:
             _logger.debug(f"waiting {name or css} to be {to_be}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
-        except Exception as e:
+        except (TimeoutException, StaleElementReferenceException):
             _logger.error(f"-> can't find {name or css}")
-            raise e
+            raise NoSuchElementException(f"can't find {name or css}")
         else:
             for _ in range(120):
                 time.sleep(1)
@@ -110,14 +116,14 @@ class Driver(webdriver.Chrome):
         try:
             _logger.debug(f"clicking {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
-        except Exception as e:
+        except (TimeoutException, StaleElementReferenceException):
             _logger.error(f"-> can't find {name or css}")
-            raise e
+            raise NoSuchElementException(f"can't find {name or css}")
         else:
             try:
                 ele = self.find(css)
                 ActionChains(self).scroll_to_element(ele).pause(1).click(ele).perform()
-            except Exception as e:
+            except NoSuchElementException as e:
                 _logger.error(f"-> can't click {name or css}")
                 raise e
             else:
@@ -191,5 +197,6 @@ class Driver(webdriver.Chrome):
         ele.send_keys(Keys.DELETE)
         time.sleep(2)
         return ele
+
 
 __all__ = ["Driver", "DriverFn"]

@@ -4,6 +4,7 @@ from typing import cast
 
 from cch_his_auto.app import kiemtrahoso, kybangkexuatvien, kytodieutrihangngay
 
+
 class MainApp(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -20,6 +21,7 @@ class MainApp(tk.Tk):
 
         for m in [kytodieutrihangngay, kiemtrahoso, kybangkexuatvien]:
             nb.add(m.App(), text=m.TITLE, sticky="NSEW")
+
 
 if __name__ == "__main__":
     MainApp().mainloop()

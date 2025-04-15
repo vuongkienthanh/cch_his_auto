@@ -15,12 +15,12 @@ from cch_his_auto.helper import EndOfLoop, tracing
 _logger = logging.getLogger().getChild("editor")
 _trace = tracing(_logger)
 
+
 def _sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
     ele = driver.waiting_to_be(btn_css, btn_txt, name)
-    _logger.debug("click sign button")
     ele.click()
-    _logger.debug("-> finish click sign button")
     driver.waiting(img_css, "signature image")
+
 
 @_trace
 def tobiabenhannhikhoa(driver: Driver):
@@ -33,6 +33,7 @@ def tobiabenhannhikhoa(driver: Driver):
         img_css=".layout-line-item div:nth-child(2) .sign-image img",
     )
 
+
 @_trace
 def mucAbenhannhikhoa(driver: Driver):
     "*Mục A bệnh án nhi khoa*"
@@ -43,6 +44,7 @@ def mucAbenhannhikhoa(driver: Driver):
         btn_txt="Xác nhận ký Bác sĩ làm bệnh án",
         img_css=".sign-image img",
     )
+
 
 @_trace
 def mucBtongketbenhan(driver: Driver):
@@ -55,6 +57,7 @@ def mucBtongketbenhan(driver: Driver):
         img_css="td:nth-child(3) .sign-image img",
     )
 
+
 @_trace
 def todieutri(driver: Driver):
     "*Tờ điều trị*"
@@ -65,6 +68,7 @@ def todieutri(driver: Driver):
         btn_txt="Xác nhận ký Bác sĩ điều trị",
         img_css=".sign-image img",
     )
+
 
 @_trace
 def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, bool]):
@@ -129,6 +133,7 @@ def phieuthuchienylenh_bs(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
             _logger.warning(f"get {e} -> proceed to next in queue")
     time.sleep(2)
 
+
 @_trace
 def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, bool]):
     "*Phiếu thực hiện y lệnh (điều dưỡng)*"
@@ -184,6 +189,7 @@ def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
             _logger.warning(f"get {e} -> proceed to next in queue")
     time.sleep(2)
 
+
 @_trace
 def phieuCT(driver: Driver):
     "*Phiếu chỉ định CT*"
@@ -194,6 +200,7 @@ def phieuCT(driver: Driver):
         btn_txt="Xác nhận ký Bác sĩ điều trị",
         img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(13) .sign-image img",
     )
+
 
 @_trace
 def phieuMRI_bschidinh(driver: Driver):
@@ -206,6 +213,7 @@ def phieuMRI_bschidinh(driver: Driver):
         img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(22) .sign-image img",
     )
 
+
 @_trace
 def phieuMRI_bsthuchien(driver: Driver):
     "*Phiếu chỉ định MRI, bs thực hiện*"
@@ -217,6 +225,7 @@ def phieuMRI_bsthuchien(driver: Driver):
         img_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25)>div[data-type=block]:nth-child(1) .sign-image img",
     )
 
+
 @_trace
 def phieuMRI_all(driver: Driver, signature: str | None):
     "*Phiếu chỉ định MRI all*"
@@ -224,6 +233,7 @@ def phieuMRI_all(driver: Driver, signature: str | None):
     phieuMRI_bsthuchien(driver)
     if signature:
         sign_patient_name.phieuMRI_bn(driver, signature)
+
 
 @_trace
 def giaiphaubenh(driver: Driver):
