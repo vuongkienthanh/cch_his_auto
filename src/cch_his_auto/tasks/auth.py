@@ -19,7 +19,7 @@ _trace = tracing(_logger)
 def login(driver: Driver, username: str, password: str):
     "login with provided `username` and `password`"
     URL = "http://emr.ndtp.org/login"
-    _logger.info(f"username ={username}")
+    _logger.info(f"username={username}")
     if not driver.current_url.startswith(URL):
         driver.goto(URL)
     for i in range(120):

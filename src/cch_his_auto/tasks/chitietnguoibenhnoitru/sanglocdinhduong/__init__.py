@@ -5,7 +5,7 @@ import time
 from selenium.common import NoSuchElementException
 
 from cch_his_auto.driver import Driver
-from cch_his_auto.helper import tracing
+from cch_his_auto.helper import EndOfLoop, tracing
 from cch_his_auto.tasks.chitietnguoibenhnoitru import get_admission_date
 from cch_his_auto.tasks.chitietnguoibenhnoitru import chitietthongtin as cttt
 from .phieusangloc import save_new_phieusangloc
@@ -16,13 +16,26 @@ _trace = tracing(_logger)
 
 
 @_trace
-def open_dialog(driver: Driver):
+def open_dialog(driver: Driver) -> bool:
     "Open *Sàng lọc dinh dưỡng* dialog from *Chi tiết người bệnh nội trú*"
     driver.clicking(
         ".footer-btn .right button:nth-child(1)", "open Sàng lọc dinh dưỡng button"
     )
-    driver.waiting(".ant-modal-body .ant-table", "Sàng lọc dinh dưỡng dialog")
-    time.sleep(3)
+    for i in range(120):
+        try:
+            _logger.debug(f"checking Sàng lọc dinh dưỡng dialog {i}...")
+            driver.find(".ant-modal-body .ant-table")
+        except NoSuchElementException:
+            if driver.current_url.startswith(
+                "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
+            ):
+                return False
+            else:
+                continue
+        else:
+            return True
+    else:
+        raise EndOfLoop("should have a dialog or new phieusangloc")
 
 
 @_trace
@@ -65,20 +78,22 @@ def complete_sanglocdinhduong(driver: Driver):
     chieucao = cttt.get_chieucao(driver)
     cttt.close_dialog(driver)
     if (cannang == "") or (chieucao == "") or (cannang is None) or (chieucao is None):
-        _logger.warning("cannang or chieucao is empty")
+        _logger.warning("cannang or chieucao is empty -> skip Sàng lọc dinh dưỡng")
         return
-    open_dialog(driver)
-    if last_date := get_last_date(driver):
-        next_date = last_date + dt.timedelta(days=7)
-    else:
-        next_date = admission_date
 
     today = dt.date.today()
+    if open_dialog(driver):
+        if last_date := get_last_date(driver):
+            next_date = last_date + dt.timedelta(days=7)
+        else:
+            next_date = admission_date
 
-    while next_date <= today:
-        add_new(driver)
-        save_new_phieusangloc(driver, next_date, cannang, chieucao)
-        next_date = next_date + dt.timedelta(days=7)
-        open_dialog(driver)
+        while next_date <= today:
+            add_new(driver)
+            save_new_phieusangloc(driver, next_date, cannang, chieucao)
+            next_date = next_date + dt.timedelta(days=7)
+            open_dialog(driver)
 
-    close_dialog(driver)
+        close_dialog(driver)
+    else:
+
