@@ -21,21 +21,17 @@ def open_dialog(driver: Driver) -> bool:
     driver.clicking(
         ".footer-btn .right button:nth-child(1)", "open Sàng lọc dinh dưỡng button"
     )
-    for i in range(120):
-        try:
-            _logger.debug(f"checking Sàng lọc dinh dưỡng dialog {i}...")
-            driver.find(".ant-modal-body .ant-table")
-        except NoSuchElementException:
-            if driver.current_url.startswith(
-                "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
-            ):
-                return False
-            else:
-                continue
+    try:
+        driver.waiting(".ant-modal-body .ant-table", "Sàng lọc dinh dưỡng dialog")
+    except NoSuchElementException:
+        if driver.current_url.startswith(
+            "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
+        ):
+            return False
         else:
-            return True
+            raise Exception("should have a dialog or new phieusangloc")
     else:
-        raise EndOfLoop("should have a dialog or new phieusangloc")
+        return True
 
 
 @_trace
@@ -48,18 +44,14 @@ def close_dialog(driver: Driver):
     time.sleep(3)
 
 
-def get_last_date(driver: Driver) -> dt.date | None:
+def get_last_date(driver: Driver) -> dt.date:
     "Get last date in *Sàng lọc dinh dưỡng* dialog"
-    try:
-        date = dt.datetime.strptime(
-            driver.find("tbody tr:nth-child(2) td:nth-child(2)").text,
-            "%d/%m/%Y %H:%M:%S",
-        ).date()
-        _logger.debug(f"-> found last_date = {date}")
-        return date
-    except NoSuchElementException:
-        _logger.warning("-> can't find last_date")
-        return None
+    date = dt.datetime.strptime(
+        driver.find("tbody tr:nth-child(2) td:nth-child(2)").text,
+        "%d/%m/%Y %H:%M:%S",
+    ).date()
+    _logger.debug(f"-> found last_date = {date}")
+    return date
 
 
 def add_new(driver: Driver):
@@ -82,18 +74,18 @@ def complete_sanglocdinhduong(driver: Driver):
         return
 
     today = dt.date.today()
+
     if open_dialog(driver):
-        if last_date := get_last_date(driver):
-            next_date = last_date + dt.timedelta(days=7)
-        else:
-            next_date = admission_date
-
-        while next_date <= today:
-            add_new(driver)
-            save_new_phieusangloc(driver, next_date, cannang, chieucao)
-            next_date = next_date + dt.timedelta(days=7)
-            open_dialog(driver)
-
-        close_dialog(driver)
+        next_date = get_last_date(driver) + dt.timedelta(days=7)
+        add_new(driver)
     else:
+        next_date = admission_date
 
+    save_new_phieusangloc(driver, next_date, cannang, chieucao)
+    next_date = next_date + dt.timedelta(days=7)
+
+    while next_date <= today:
+        open_dialog(driver)
+        add_new(driver)
+        save_new_phieusangloc(driver, next_date, cannang, chieucao)
+        next_date = next_date + dt.timedelta(days=7)

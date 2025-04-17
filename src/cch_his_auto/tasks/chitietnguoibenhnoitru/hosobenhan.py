@@ -118,7 +118,7 @@ def _sign_current(driver: Driver):
     time.sleep(2)
 
 
-def _filter_check_expand_sign_curent(
+def _filter_check_expand_sign_current(
     driver: Driver, name: str, status_list: list[_Status]
 ):
     if filter(driver, name) and (
@@ -209,10 +209,22 @@ def mucBtongketbenhan(driver: Driver):
 
 
 @_trace
+def phieukhambenhvaovien(driver: Driver):
+    "Filter and sign name: *Phiếu khám bệnh vào viện*"
+    _filter_check_expand_sign_current(
+        driver,
+        name="Phiếu khám bệnh vào viện",
+        status_list=[_Status.CHUAKY],
+    )
+
+
+@_trace
 def phieuchidinhxetnghiem(driver: Driver):
     "Filter and sign name: *Phiếu chỉ định xét nghiệm*"
-    _filter_check_expand_sign_curent(
-        driver, name="Phiếu chỉ định xét nghiệm", status_list=[_Status.CHUAKY]
+    _filter_check_expand_sign_current(
+        driver,
+        name="Phiếu chỉ định xét nghiệm",
+        status_list=[_Status.CHUAKY],
     )
 
 
@@ -263,7 +275,7 @@ def giaiphaubenh(driver: Driver):
 @_trace
 def phieusanglocdinhduong(driver: Driver):
     "Filter and sign name: *Phiếu sàng lọc dinh dưỡng - Bệnh nhi nội trú*"
-    _filter_check_expand_sign_curent(
+    _filter_check_expand_sign_current(
         driver,
         name="Phiếu sàng lọc dinh dưỡng - Bệnh nhi nội trú",
         status_list=[_Status.CHUAKY],
