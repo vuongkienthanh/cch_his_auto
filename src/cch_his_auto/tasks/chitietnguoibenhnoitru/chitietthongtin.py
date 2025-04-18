@@ -27,7 +27,7 @@ def close_dialog(driver: Driver):
 
 
 def get_chieucao(driver: Driver) -> str | None:
-    for _ in range(120):
+    for _ in range(60):
         try:
             value = driver.find(
                 ".ant-modal:has( .avatar__image) div:nth-child(5) .ant-row div:nth-child(5) input"
@@ -41,7 +41,7 @@ def get_chieucao(driver: Driver) -> str | None:
 
 
 def get_cannang(driver: Driver) -> str | None:
-    for _ in range(120):
+    for _ in range(60):
         try:
             value = driver.find(
                 ".ant-modal:has( .avatar__image) div:nth-child(5) .ant-row div:nth-child(6) input"

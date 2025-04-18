@@ -29,7 +29,7 @@ def sign_phieuchidinh(driver: Driver):
 
     open_menu(driver)
     goto(driver, name="Phiếu chỉ định")
-    for i in range(120):
+    for i in range(60):
         time.sleep(1)
         _logger.debug(f"checking button state {i}...")
         for ele in driver.find_all(".__button button"):

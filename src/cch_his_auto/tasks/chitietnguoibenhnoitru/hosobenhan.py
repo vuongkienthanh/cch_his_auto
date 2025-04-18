@@ -42,7 +42,7 @@ def filter(driver: Driver, name: str) -> bool:
     _logger.debug("+++++ typing name")
     ele.send_keys(name)
     ele.send_keys(Keys.ENTER)
-    for _ in range(120):
+    for _ in range(60):
         time.sleep(1)
         try:
             ele = driver.find(
@@ -103,7 +103,7 @@ def _sign_new_tab(driver: Driver, idx: int, sign_fn: DriverFn):
 def _sign_current(driver: Driver):
     driver.clicking(".right-content .__action button:nth-child(2)", "clicking Ký tên")
     _logger.debug("waiting for it to become Hủy ký bác sĩ")
-    for _ in range(120):
+    for _ in range(60):
         time.sleep(1)
         try:
             if (

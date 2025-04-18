@@ -75,7 +75,7 @@ class Driver(webdriver.Chrome):
         """
         try:
             _logger.debug(f"waiting {name or css}")
-            WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
+            WebDriverWait(self, 60).until(lambda _: self.find(css).is_displayed())
         except (TimeoutException, StaleElementReferenceException):
             _logger.error(f"-> can't find {name or css}")
             raise NoSuchElementException(f"can't find {name or css}")
@@ -91,12 +91,12 @@ class Driver(webdriver.Chrome):
         """
         try:
             _logger.debug(f"waiting {name or css} to be {to_be}")
-            WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
+            WebDriverWait(self, 60).until(lambda _: self.find(css).is_displayed())
         except (TimeoutException, StaleElementReferenceException):
             _logger.error(f"-> can't find {name or css}")
             raise NoSuchElementException(f"can't find {name or css}")
         else:
-            for _ in range(120):
+            for _ in range(60):
                 time.sleep(1)
                 if (ele := self.find(css)).text.strip().startswith(to_be.strip()):
                     _logger.debug(f"-> done waiting {name or css} to be {to_be}")
@@ -115,7 +115,7 @@ class Driver(webdriver.Chrome):
         """
         try:
             _logger.debug(f"clicking {name or css}")
-            WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
+            WebDriverWait(self, 60).until(lambda _: self.find(css).is_displayed())
         except (TimeoutException, StaleElementReferenceException):
             _logger.error(f"-> can't find {name or css}")
             raise NoSuchElementException(f"can't find {name or css}")
@@ -137,7 +137,7 @@ class Driver(webdriver.Chrome):
         """
         try:
             _logger.debug(f"clicking svg {name or css}")
-            WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
+            WebDriverWait(self, 60).until(lambda _: self.find(css).is_displayed())
         except Exception as e:
             _logger.error(f"-> can't find {name or css}")
             raise e

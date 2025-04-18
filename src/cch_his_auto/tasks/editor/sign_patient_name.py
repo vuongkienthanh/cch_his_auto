@@ -9,13 +9,11 @@ from selenium.common import NoSuchElementException, TimeoutException
 from selenium.webdriver import ActionChains
 
 from cch_his_auto.driver import Driver
-from cch_his_auto.helper import EndOfLoop, tracing
+from cch_his_auto.helper import EndOfLoop
 
 _logger = logging.getLogger().getChild("editor")
-_trace = tracing(_logger)
 
 
-@_trace
 def sign_canvas(driver: Driver, signature: str):
     "use when patient signature needed"
     driver.waiting("canvas")
@@ -47,17 +45,17 @@ def _sign(
     driver.waiting(img_css, "signature image")
 
 
-@_trace
 def phieuthuchienylenh_bn(
     driver: Driver, arr: tuple[bool, bool, bool, bool, bool], signature: str
 ):
     "*Phiếu thực hiện y lệnh (bệnh nhân)*"
+    _logger.info("++++ doing phieuthuchienylenh_bn, may take a while")
     driver.waiting(".table-tbody")
     time.sleep(3)
     for col in map(lambda x: x[0], filter(lambda x: x[1], zip([3, 4, 5, 6, 7], arr))):
         try:
             _logger.debug(f"cheking row 4 col {col - 2}")
-            for i in range(120):
+            for i in range(60):
                 try:
                     _logger.debug(f"finding row 4 col {col - 2} button {i}...")
                     ele = driver.find(
@@ -106,7 +104,6 @@ def phieuthuchienylenh_bn(
     time.sleep(2)
 
 
-@_trace
 def phieuMRI_bn(driver: Driver, signature: str):
     "*Phiếu chỉ định MRI (bệnh nhân)*"
     _sign(

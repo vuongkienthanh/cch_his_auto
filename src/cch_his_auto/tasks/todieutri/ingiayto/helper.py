@@ -8,7 +8,6 @@ _logger = logging.getLogger().getChild("tasks.ingiayto")
 _trace = tracing(_logger)
 
 
-@_trace
 def open_menu(driver: Driver):
     "Open menu *In giấy tờ*"
     driver.clicking(".footer-btn .right button:nth-child(1)", "open menu In giấy tờ")
@@ -17,7 +16,8 @@ def open_menu(driver: Driver):
 @_trace
 def goto(driver: Driver, name: str):
     "After `open_menu`, click `name`"
-    for i in range(120):
+    _logger.info(f"goto name={name}")
+    for i in range(60):
         time.sleep(1)
         _logger.debug(f"finding link {name} {i}...")
         for ele in driver.find_all(".ant-dropdown li div div , .ant-dropdown li a"):

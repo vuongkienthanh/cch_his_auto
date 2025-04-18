@@ -10,7 +10,6 @@ _logger = logging.getLogger().getChild("indieuduong")
 _trace = tracing(_logger)
 
 
-@_trace
 def open_menu(driver: Driver):
     "Open menu *In điều dưỡng* from *Chi tiết người bệnh nội trú*"
     driver.clicking(".footer-btn .right button:nth-child(3)", "open In điều dưỡng")
@@ -21,7 +20,7 @@ def open_menu(driver: Driver):
 @_trace
 def goto(driver: Driver, name: str):
     "After `open_menu`, filter selection based on `name`"
-    _logger.info(f"name={name}")
+    _logger.info(f"goto name={name}")
     ele = driver.clear_input(".ant-popover .ant-select input")
     _logger.info("+++++ typing name")
     ele.send_keys(name)

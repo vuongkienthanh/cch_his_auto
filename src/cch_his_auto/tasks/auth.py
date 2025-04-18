@@ -22,7 +22,7 @@ def login(driver: Driver, username: str, password: str):
     _logger.info(f"username={username}")
     if not driver.current_url.startswith(URL):
         driver.goto(URL)
-    for i in range(120):
+    for i in range(60):
         time.sleep(1)
         try:
             _logger.debug(f"waiting login page {i}...")
@@ -35,16 +35,18 @@ def login(driver: Driver, username: str, password: str):
                 _logger.debug("no user is currently logged in")
                 continue
             else:
-                _logger.debug("found user already logged in -> proceed to log out")
+                _logger.info("found user already logged in -> proceed to log out")
                 time.sleep(2)
                 logout(driver)
+                login(driver, username, password)
         else:
             _logger.debug("found login screen")
             inputs = driver.find_elements(By.TAG_NAME, "input")
-            time.sleep(3)  # wait for js to load
+            time.sleep(2)  # wait for js to load
             _logger.debug("+++++ typing username and password")
             inputs[0].send_keys(username)
             inputs[1].send_keys(password)
+            time.sleep(2)  # wait for js to load
             driver.clicking(".action>button", "submit button")
             driver.waiting(".card", "main screen")
             return
@@ -56,7 +58,7 @@ def login(driver: Driver, username: str, password: str):
 def logout(driver: Driver):
     "logout, then back to login page"
     time.sleep(5)  # wait for it to be dropdown-able
-    for i in range(120):
+    for i in range(60):
         time.sleep(1)
         _logger.debug(f"trying logout {i}...")
         driver.clicking(".header .header-icon:has(+.username)", "log menu drop down")
@@ -86,7 +88,7 @@ def set_dept(driver: Driver, dept: str):
         ).perform()
         driver.waiting(".khoaLamViec div span", "dept name")
 
-    for i in range(120):
+    for i in range(60):
         time.sleep(1)
         try:
             _logger.debug(f"waiting choose dept dialog {i}...")
