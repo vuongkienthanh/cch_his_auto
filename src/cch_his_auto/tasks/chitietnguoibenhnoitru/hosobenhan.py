@@ -240,6 +240,16 @@ def todieutri(driver: Driver):
 
 
 @_trace
+def phieuchidinhPTTT(driver: Driver):
+    "Filter and sign name: *Phiếu chỉ định PTTT*"
+    _filter_check_expand_sign_current(
+        driver,
+        name="Phiếu chỉ định PTTT",
+        status_list=[_Status.CHUAKY],
+    )
+
+
+@_trace
 def phieuCT(driver: Driver):
     "Filter and sign name: *Phiếu chỉ định chụp CT*"
     _filter_check_expand_sign_new_tab(

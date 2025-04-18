@@ -139,6 +139,7 @@ def process_normal_day(driver: Driver, signature: str | None):
     hosobenhan.phieuMRI(driver, signature)
     hosobenhan.giaiphaubenh(driver)
     hosobenhan.phieusanglocdinhduong(driver)
+    hosobenhan.phieuchidinhPTTT(driver)
     hosobenhan.close_dialog(driver)
 
 
@@ -155,4 +156,5 @@ def process_final_day(driver: Driver, signature: str | None):
     hosobenhan.phieuMRI(driver, signature)
     hosobenhan.giaiphaubenh(driver)
     hosobenhan.phieusanglocdinhduong(driver)
+    hosobenhan.phieuchidinhPTTT(driver)
     hosobenhan.close_dialog(driver)
