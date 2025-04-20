@@ -55,7 +55,7 @@ def phieuthuchienylenh_bn(
     for col in map(lambda x: x[0], filter(lambda x: x[1], zip([3, 4, 5, 6, 7], arr))):
         try:
             _logger.debug(f"cheking row 4 col {col - 2}")
-            for i in range(60):
+            for i in range(120):
                 try:
                     _logger.debug(f"finding row 4 col {col - 2} button {i}...")
                     ele = driver.find(

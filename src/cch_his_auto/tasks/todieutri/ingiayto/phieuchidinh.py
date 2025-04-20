@@ -29,7 +29,7 @@ def sign_phieuchidinh(driver: Driver):
 
     open_menu(driver)
     goto(driver, name="Phiếu chỉ định")
-    for i in range(60):
+    for i in range(120):
         time.sleep(1)
         _logger.debug(f"checking button state {i}...")
         for ele in driver.find_all(".__button button"):
@@ -41,7 +41,7 @@ def sign_phieuchidinh(driver: Driver):
                 elif ele.text == "Ký Bác sĩ":
                     _logger.debug(f"button state is {_State.Sign} -> click")
                     ele.click()
-                    driver.waiting(".ant-message-success")
+                    time.sleep(5)
                     _close_dialog()
                     return
             except StaleElementReferenceException as e:

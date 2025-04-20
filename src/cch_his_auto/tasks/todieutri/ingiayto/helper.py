@@ -17,7 +17,7 @@ def open_menu(driver: Driver):
 def goto(driver: Driver, name: str):
     "After `open_menu`, click `name`"
     _logger.info(f"goto name={name}")
-    for i in range(60):
+    for i in range(120):
         time.sleep(1)
         _logger.debug(f"finding link {name} {i}...")
         for ele in driver.find_all(".ant-dropdown li div div , .ant-dropdown li a"):

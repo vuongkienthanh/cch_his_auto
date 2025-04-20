@@ -20,7 +20,7 @@ _logger = logging.getLogger().getChild("editor")
 
 
 def _sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
-    for _ in range(60):
+    for _ in range(120):
         time.sleep(1)
         try:
             _logger.debug(f"finding {name} button")
@@ -55,7 +55,7 @@ def _sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
 def _sign_phieuthuchienylenh(driver: Driver, row: int, col: int):
     try:
         _logger.debug(f"checking row {5 - row} col {col - 2}")
-        for i in range(60):
+        for i in range(120):
             try:
                 _logger.debug(f"finding row {5 - row} col {col - 2} button {i}...")
                 ele = driver.find(

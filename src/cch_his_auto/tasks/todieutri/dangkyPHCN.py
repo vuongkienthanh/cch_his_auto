@@ -37,7 +37,7 @@ def _cancel(driver: Driver):
 @_trace
 def open_dialog(driver: Driver):
     "Click *Đăng ký PHCN* or *Thêm mới đợt PHCN* button"
-    for i in range(60):
+    for i in range(120):
         time.sleep(1)
         try:
             _logger.debug(f"checking PHCN button state {i}...")
@@ -65,7 +65,7 @@ def open_dialog(driver: Driver):
 def cancel(driver: Driver):
     "Click *Hủy đăng ký PHCN* button"
 
-    for i in range(60):
+    for i in range(120):
         time.sleep(1)
         try:
             _logger.debug(f"checking PHCN button state {i}...")
@@ -140,7 +140,7 @@ def add_vandong(driver: Driver):
 def save(driver: Driver):
     "Finish and click save dialog"
     driver.clicking(".ant-modal-body .bottom-action-right button", "save button")
-    for i in range(60):
+    for i in range(120):
         time.sleep(1)
         try:
             _logger.debug(f"checking PHCN button state {i}...")

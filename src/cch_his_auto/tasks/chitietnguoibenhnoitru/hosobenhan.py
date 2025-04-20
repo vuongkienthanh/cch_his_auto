@@ -42,7 +42,7 @@ def filter(driver: Driver, name: str) -> bool:
     _logger.debug("+++++ typing name")
     ele.send_keys(name)
     ele.send_keys(Keys.ENTER)
-    for _ in range(60):
+    for _ in range(120):
         time.sleep(1)
         try:
             ele = driver.find(
@@ -84,10 +84,11 @@ def is_row_expandable(driver: Driver, idx: int) -> bool:
 def expand_row(driver: Driver, idx: int):
     "Expand row at `idx`"
     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
-    _logger.debug(f"expanding {name}")
+    _logger.info(f"expanding {name}")
     driver.clicking(f".right-content tbody tr:nth-child({idx}) td:nth-child(1) button")
 
 
+@_trace
 def _sign_new_tab(driver: Driver, idx: int, sign_fn: DriverFn):
     tab0 = driver.current_window_handle
     datakey = driver.find(f".ant-table-tbody tr:nth-child({idx})").get_attribute(
@@ -100,32 +101,20 @@ def _sign_new_tab(driver: Driver, idx: int, sign_fn: DriverFn):
     driver.goto_newtab_do_smth_then_goback(tab0, sign_fn)
 
 
+@_trace
 def _sign_current(driver: Driver):
     driver.clicking(".right-content .__action button:nth-child(2)", "clicking Ký tên")
-    _logger.debug("waiting for it to become Hủy ký bác sĩ")
-    for _ in range(60):
-        time.sleep(1)
-        try:
-            if (
-                driver.find(".right-content .__action button:nth-child(2)").text.strip()
-                == "Hủy ký Bác sĩ"
-            ):
-                break
-        except (NoSuchElementException, StaleElementReferenceException):
-            break
-    else:
-        raise EndOfLoop("can't sign current")
-    time.sleep(2)
+    time.sleep(5)
 
 
 def _filter_check_expand_sign_current(
     driver: Driver, name: str, status_list: list[_Status]
 ):
     if filter(driver, name) and (
-        not driver.waiting(
+        driver.waiting(
             ".right-content tbody tr:nth-child(2) td:nth-child(3)"
         ).text.strip()
-        == _Status.HOANTHANH
+        != _Status.HOANTHANH
     ):
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
@@ -151,10 +140,10 @@ def _filter_check_expand_sign_new_tab(
     driver: Driver, name: str, sign_fn: DriverFn, status_list: list[_Status]
 ):
     if filter(driver, name) and (
-        not driver.waiting(
+        driver.waiting(
             ".right-content tbody tr:nth-child(2) td:nth-child(3)"
         ).text.strip()
-        == _Status.HOANTHANH
+        != _Status.HOANTHANH
     ):
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)

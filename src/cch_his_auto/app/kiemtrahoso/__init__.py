@@ -5,7 +5,11 @@ from . import config
 
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.auth import session
-from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan, sanglocdinhduong
+from cch_his_auto.tasks.chitietnguoibenhnoitru import (
+    hosobenhan,
+    sanglocdinhduong,
+    chitietthongtin,
+)
 from cch_his_auto.tasks import danhsachnguoibenhnoitru
 
 from cch_his_auto.app import PROFILE_PATH
@@ -57,7 +61,9 @@ class App(tk.Frame):
             text=APP_INTRO,
             justify="left",
             anchor="w",
-        ).grid(row=3, column=0, sticky="SEW", padx=20)
+        ).grid(row=3, column=0, rowspan=4, sticky="SEW", padx=20)
+        run_check_btn = tk.Button(mainframe, text="Kiểm tra trước")
+        run_check_btn.grid(row=3, column=1, padx=20)
 
         button_frame = ButtonFrame(self)
         button_frame.grid(row=0, column=1, rowspan=2, padx=20, sticky="S", pady=(0, 20))
@@ -95,6 +101,9 @@ class App(tk.Frame):
         button_frame.bind_load(load)
         button_frame.bind_save(save)
         button_frame.bind_run(lambda: run(get_config(), button_frame.get_config()))
+        run_check_btn.configure(
+            command=lambda: run(get_config(), button_frame.get_config())
+        )
 
 
 def run(cfg: config.Config, run_cfg: RunConfig):
@@ -131,7 +140,7 @@ def run(cfg: config.Config, run_cfg: RunConfig):
 
 
 def process_normal_day(driver: Driver, signature: str | None):
-    sanglocdinhduong.complete_sanglocdinhduong(driver)
+    sanglocdinhduong.add_all_phieusanglocdinhduong(driver)
 
     hosobenhan.open_dialog(driver)
     hosobenhan.phieuchidinhxetnghiem(driver)
@@ -145,17 +154,62 @@ def process_normal_day(driver: Driver, signature: str | None):
 
 
 def process_final_day(driver: Driver, signature: str | None):
-    sanglocdinhduong.complete_sanglocdinhduong(driver)
+    sanglocdinhduong.add_all_phieusanglocdinhduong(driver)
 
     hosobenhan.open_dialog(driver)
-    hosobenhan.tobiabenhannhikhoa(driver)
-    hosobenhan.mucAbenhannhikhoa(driver)
-    hosobenhan.mucBtongketbenhan(driver)
-    hosobenhan.phieuchidinhxetnghiem(driver)
-    hosobenhan.todieutri(driver)
-    hosobenhan.phieuCT(driver)
-    hosobenhan.phieuMRI(driver, signature)
-    hosobenhan.giaiphaubenh(driver)
-    hosobenhan.phieusanglocdinhduong(driver)
-    hosobenhan.phieuchidinhPTTT(driver)
-    hosobenhan.close_dialog(driver)
+    try:
+        hosobenhan.tobiabenhannhikhoa(driver)
+        hosobenhan.mucAbenhannhikhoa(driver)
+        hosobenhan.mucBtongketbenhan(driver)
+        hosobenhan.phieukhambenhvaovien(driver)
+        hosobenhan.phieuchidinhxetnghiem(driver)
+        hosobenhan.todieutri(driver)
+        hosobenhan.phieuCT(driver)
+        hosobenhan.phieuMRI(driver, signature)
+        hosobenhan.giaiphaubenh(driver)
+        hosobenhan.phieusanglocdinhduong(driver)
+        hosobenhan.phieuchidinhPTTT(driver)
+    finally:
+        hosobenhan.close_dialog(driver)
+
+
+def run_check(cfg: config.Config, run_cfg: RunConfig):
+    listing = [int(ma_hs) for ma_hs in cfg["listing"].strip().splitlines()]
+    if len(listing) == 0:
+        messagebox.showerror(message="không có bệnh nhân")
+        return
+
+    chieucao_cannang_missing = []
+
+    def check_chieucao_cannang(driver: Driver, ma_hs: int):
+
+        chitietthongtin.open_dialog(driver)
+        if not (
+            chitietthongtin.get_chieucao(driver) and chitietthongtin.get_cannang(driver)
+        ):
+            chieucao_cannang_missing.append(ma_hs)
+
+        chitietthongtin.close_dialog(driver)
+
+    setLogLevel(run_cfg)
+    driver = Driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH)
+    try:
+        with create_connection() as con:
+            with session(driver, cfg["username"], cfg["password"], cfg["department"]):
+                ma_hs = listing.pop()
+                first_patient(driver, con, ma_hs)
+                check_chieucao_cannang(driver, ma_hs)
+                while len(listing) > 0:
+                    ma_hs = listing.pop()
+                    next_patient(driver, con, ma_hs)
+                    check_chieucao_cannang(driver, ma_hs)
+
+    finally:
+        driver.quit()
+        if len(chieucao_cannang_missing):
+            messagebox.showinfo(
+                message="Thiếu chiều cao nặng ở chi tiết thông tin:\n"
+                + ", ".join(chieucao_cannang_missing)
+            )
+
+        messagebox.showinfo(message="finish")

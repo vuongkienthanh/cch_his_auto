@@ -48,8 +48,18 @@ def close_dialog(driver: Driver):
 
 def get_last_date(driver: Driver) -> dt.date:
     "Get last date in *Sàng lọc dinh dưỡng* dialog"
+    max_rank = 0
+    max_i = 0
+    for i in range(2, 12):
+        try:
+            rank = driver.find(f"tbody tr:nth-child({i}) td:nth-child(3)").text
+            if (r := int(rank)) > max_rank:
+                max_rank = r
+                max_i = i
+        except:
+            break
     date = dt.datetime.strptime(
-        driver.find("tbody tr:nth-child(2) td:nth-child(2)").text,
+        driver.find(f"tbody tr:nth-child({max_i}) td:nth-child(2)").text,
         "%d/%m/%Y %H:%M:%S",
     ).date()
     _logger.info(f"-> found last_date = {date}")
@@ -64,7 +74,7 @@ def add_new(driver: Driver):
 
 
 @_trace
-def complete_sanglocdinhduong(driver: Driver):
+def add_all_phieusanglocdinhduong(driver: Driver):
     "Complete all *Phiếu sàng lọc* from admission_date up til today"
     admission_date = get_admission_date(driver)
     cttt.open_dialog(driver)
@@ -82,6 +92,7 @@ def complete_sanglocdinhduong(driver: Driver):
         if next_date <= today:
             add_new(driver)
         else:
+            close_dialog(driver)
             return
     else:
         next_date = admission_date

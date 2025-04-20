@@ -22,7 +22,7 @@ def login(driver: Driver, username: str, password: str):
     _logger.info(f"login with username={username}")
     if not driver.current_url.startswith(URL):
         driver.goto(URL)
-    for i in range(60):
+    for i in range(120):
         time.sleep(1)
         try:
             _logger.debug(f"waiting login page {i}...")
@@ -59,7 +59,7 @@ def login(driver: Driver, username: str, password: str):
 def logout(driver: Driver):
     "logout, then back to login page"
     time.sleep(5)  # wait for it to be dropdown-able
-    for i in range(60):
+    for i in range(120):
         time.sleep(1)
         _logger.debug(f"trying logout {i}...")
         driver.clicking(".header .header-icon:has(+.username)", "log menu drop down")
@@ -89,7 +89,7 @@ def set_dept(driver: Driver, dept: str):
         ).perform()
         driver.waiting(".khoaLamViec div span", "dept name")
 
-    for i in range(60):
+    for i in range(120):
         time.sleep(1)
         try:
             _logger.debug(f"waiting choose dept dialog {i}...")

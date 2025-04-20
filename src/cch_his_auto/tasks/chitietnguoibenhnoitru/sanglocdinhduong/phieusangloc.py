@@ -37,6 +37,7 @@ def back(driver: Driver):
 @_trace
 def save_new_phieusangloc(driver: Driver, date: dt.date, cannang: str, chieucao: str):
     "Complete this *Phiếu sàng lọc* then go back to *Chi tiết bệnh nhân nội trú*"
+    _logger.info(f"new phieusangloc: date= {date}")
     set_date(driver, date)
     set_cannang(driver, cannang)
     set_chieucao(driver, chieucao)
