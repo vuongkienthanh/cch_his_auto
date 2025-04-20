@@ -34,7 +34,7 @@ class Driver(webdriver.Chrome):
     ):
         """
         - `headless`: run driver in headless mode
-        - `profile_path`: provide a profile path for more efficient subsequent use
+        - `profile_path`: provide a profile path for more efficient subsequent uses
         """
         _logger.info("---opening chrome")
         options = webdriver.ChromeOptions()
@@ -85,9 +85,9 @@ class Driver(webdriver.Chrome):
             _logger.debug(f"-> done waiting {name or css}")
             return self.find(css)
 
-    def wait_closing(self, css: str, /, name: str = ""):
+    def wait_closing(self, css: str, /, name: str = "") -> None:
         """
-        Wait closing element by `css`.
+        Wait element by `css` to be closed.
         You can also provide a `name` for logging
         """
         try:

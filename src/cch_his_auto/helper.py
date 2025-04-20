@@ -24,7 +24,7 @@ def tracing(logger: logging.Logger):
                 ret = f(*args, **kwargs)
             except:
                 logger.error(f"??? error running {name}")
-                raise 
+                raise
             else:
                 logger.info(f">>> finish {name}")
                 return ret
@@ -35,9 +35,7 @@ def tracing(logger: logging.Logger):
 
 
 class EndOfLoop(Exception):
-    def __init__(self, *args):
-        super().__init__(*args)
-
+    "Loop checking css element but not found"
 
 _iframe_logger = _logger.getChild("iframe")
 

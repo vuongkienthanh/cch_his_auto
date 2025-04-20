@@ -6,7 +6,7 @@ from selenium.common import NoSuchElementException
 from cch_his_auto.driver import Driver
 from cch_his_auto.helper import tracing
 from cch_his_auto.tasks.chitietnguoibenhnoitru import get_admission_date
-from cch_his_auto.tasks.chitietnguoibenhnoitru import chitietthongtin as cttt
+from cch_his_auto.tasks.chitietnguoibenhnoitru import chitietthongtin
 from .phieusangloc import save_new_phieusangloc
 
 URL = "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
@@ -78,16 +78,15 @@ def add_new(driver: Driver):
 def add_all_phieusanglocdinhduong(driver: Driver):
     "Complete all *Phiếu sàng lọc* from admission_date up til today"
     admission_date = get_admission_date(driver)
-    cttt.open_dialog(driver)
-    try:
-        cannang = cttt.get_cannang(driver)
-        chieucao = cttt.get_chieucao(driver)
-    finally:
-        cttt.close_dialog(driver)
-
-    if (cannang == "") or (chieucao == "") or (cannang is None) or (chieucao is None):
-        _logger.warning("cannang or chieucao is empty -> skip Sàng lọc dinh dưỡng")
-        return
+    with chitietthongtin.session(driver):
+        cannang = chitietthongtin.get_cannang(driver)
+        if not cannang:
+            _logger.warning("cannang is empty -> skip Sàng lọc dinh dưỡng")
+            return
+        chieucao = chitietthongtin.get_chieucao(driver)
+        if not chieucao:
+            _logger.warning("chieucao is empty -> skip Sàng lọc dinh dưỡng")
+            return
 
     today = dt.date.today()
 

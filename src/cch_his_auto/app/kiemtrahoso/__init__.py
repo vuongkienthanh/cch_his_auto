@@ -142,8 +142,7 @@ def run(cfg: config.Config, run_cfg: RunConfig):
 def process_normal_day(driver: Driver, signature: str | None):
     sanglocdinhduong.add_all_phieusanglocdinhduong(driver)
 
-    hosobenhan.open_dialog(driver)
-    try:
+    with hosobenhan.session(driver):
         hosobenhan.phieuchidinhxetnghiem(driver)
         hosobenhan.todieutri(driver)
         hosobenhan.phieuCT(driver, signature)
@@ -152,15 +151,12 @@ def process_normal_day(driver: Driver, signature: str | None):
         hosobenhan.phieusanglocdinhduong(driver)
         hosobenhan.phieuchidinhPTTT(driver)
         hosobenhan.phieusoket15ngay(driver)
-    finally:
-        hosobenhan.close_dialog(driver)
 
 
 def process_final_day(driver: Driver, signature: str | None):
     sanglocdinhduong.add_all_phieusanglocdinhduong(driver)
 
-    hosobenhan.open_dialog(driver)
-    try:
+    with hosobenhan.session(driver):
         hosobenhan.tobiabenhannhikhoa(driver)
         hosobenhan.mucAbenhannhikhoa(driver)
         hosobenhan.mucBtongketbenhan(driver)
@@ -174,8 +170,6 @@ def process_final_day(driver: Driver, signature: str | None):
         hosobenhan.phieusanglocdinhduong(driver)
         hosobenhan.phieuchidinhPTTT(driver)
         hosobenhan.phieusoket15ngay(driver)
-    finally:
-        hosobenhan.close_dialog(driver)
 
 
 def run_check(cfg: config.Config, run_cfg: RunConfig):
@@ -187,13 +181,12 @@ def run_check(cfg: config.Config, run_cfg: RunConfig):
     chieucao_cannang_missing = []
 
     def check_chieucao_cannang(driver: Driver, ma_hs: int):
-        chitietthongtin.open_dialog(driver)
-        if not (
-            chitietthongtin.get_chieucao(driver) and chitietthongtin.get_cannang(driver)
-        ):
-            chieucao_cannang_missing.append(ma_hs)
-
-        chitietthongtin.close_dialog(driver)
+        with chitietthongtin.session(driver):
+            if not (
+                chitietthongtin.get_chieucao(driver)
+                and chitietthongtin.get_cannang(driver)
+            ):
+                chieucao_cannang_missing.append(ma_hs)
 
     setLogLevel(run_cfg)
     driver = Driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH)

@@ -148,7 +148,7 @@ def run_bs(driver: Driver, cfg: config.Config):
         if p["ky_ct"]:
             driver.clicking(".right button:nth-child(2)")
             hosobenhan.open_dialog(driver)
-            hosobenhan.phieuCT(driver)
+            hosobenhan.phieuCT_bschidinh(driver)
             hosobenhan.close_dialog(driver)
             driver.goto(p["url"])
         if p["ky_todieutri"]:

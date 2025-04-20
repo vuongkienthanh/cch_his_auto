@@ -1,16 +1,23 @@
 import logging
 import time
+from contextlib import contextmanager
 
 from selenium.common import NoSuchElementException
 
 from cch_his_auto.driver import Driver
-from cch_his_auto.helper import tracing
 
 _logger = logging.getLogger().getChild("chitietthongtin")
-_trace = tracing(_logger)
 
 
-@_trace
+@contextmanager
+def session(driver):
+    "use as contextmanager for open and close chitietthongtin dialog"
+    try:
+        yield open_dialog(driver)
+    finally:
+        close_dialog(driver)
+
+
 def open_dialog(driver: Driver):
     driver.clicking(
         ".thong-tin-benh-nhan .bunch-icon div:first-child",
@@ -19,7 +26,6 @@ def open_dialog(driver: Driver):
     driver.waiting(".avatar__image", "Chi tiết thông tin dialog")
 
 
-@_trace
 def close_dialog(driver: Driver):
     driver.clicking(
         ".ant-modal-close:has(~.ant-modal-body .avatar__image)",
@@ -35,7 +41,7 @@ def get_chieucao(driver: Driver) -> str | None:
             value = driver.find(
                 ".ant-modal:has( .avatar__image) div:nth-child(5) .ant-row div:nth-child(5) input"
             ).get_attribute("value")
-            if value == "" :
+            if value == "":
                 continue
             else:
                 _logger.info(f"-> found chieucao={value}")
@@ -53,7 +59,7 @@ def get_cannang(driver: Driver) -> str | None:
             value = driver.find(
                 ".ant-modal:has( .avatar__image) div:nth-child(5) .ant-row div:nth-child(6) input"
             ).get_attribute("value")
-            if value == "" :
+            if value == "":
                 continue
             else:
                 _logger.info(f"-> found cannang={value}")
