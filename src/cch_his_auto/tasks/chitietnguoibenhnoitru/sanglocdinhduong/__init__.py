@@ -5,7 +5,7 @@ import time
 from selenium.common import NoSuchElementException
 
 from cch_his_auto.driver import Driver
-from cch_his_auto.helper import EndOfLoop, tracing
+from cch_his_auto.helper import tracing
 from cch_his_auto.tasks.chitietnguoibenhnoitru import get_admission_date
 from cch_his_auto.tasks.chitietnguoibenhnoitru import chitietthongtin as cttt
 from .phieusangloc import save_new_phieusangloc

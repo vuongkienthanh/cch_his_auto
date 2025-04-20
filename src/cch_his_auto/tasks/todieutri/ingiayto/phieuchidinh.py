@@ -41,7 +41,7 @@ def sign_phieuchidinh(driver: Driver):
                 elif ele.text == "Ký Bác sĩ":
                     _logger.debug(f"button state is {_State.Sign} -> click")
                     ele.click()
-                    time.sleep(5)
+                    driver.waiting(".ant-message-success")
                     _close_dialog()
                     return
             except StaleElementReferenceException as e:

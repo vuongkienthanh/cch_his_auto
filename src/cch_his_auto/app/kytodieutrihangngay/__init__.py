@@ -11,7 +11,7 @@ from cch_his_auto.tasks.todieutri import ingiayto as igt
 from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan
 
 from cch_his_auto.app import PROFILE_PATH
-from cch_his_auto.app.global_db import create_connection, get_url_from_db
+from cch_his_auto.app.global_db import create_connection
 from cch_his_auto.app.common_ui.staff_info import UsernamePasswordFrame
 from cch_his_auto.app.common_ui.button_frame import ButtonFrame2, RunConfig, setLogLevel
 from cch_his_auto.app.common_tasks.signature import get_signature_from_elsewhere
