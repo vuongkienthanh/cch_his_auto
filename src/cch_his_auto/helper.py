@@ -22,9 +22,9 @@ def tracing(logger: logging.Logger):
             logger.debug(f"+++ start {name}")
             try:
                 ret = f(*args, **kwargs)
-            except Exception as e:
-                logger.error(f"??? error running {name}: {e}")
-                raise e
+            except:
+                logger.error(f"??? error running {name}")
+                raise 
             else:
                 logger.info(f">>> finish {name}")
                 return ret
