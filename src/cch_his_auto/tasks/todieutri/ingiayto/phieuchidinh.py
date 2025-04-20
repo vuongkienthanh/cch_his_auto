@@ -21,11 +21,12 @@ class _State(StrEnum):
 def sign_phieuchidinh(driver: Driver):
     "Inside *tờ điều trị*, try to sign *phiếu chỉ định* in sequence"
 
-    def _close_dialog():
+    def close_dialog():
         driver.clicking(
             ".ant-modal-close:has(~.ant-modal-body .__list)",
             "close dialog button",
         )
+        driver.wait_closing(".ant-modal-body .__list", "phieu chi dinh dialog")
 
     open_menu(driver)
     goto(driver, name="Phiếu chỉ định")
@@ -36,16 +37,16 @@ def sign_phieuchidinh(driver: Driver):
             try:
                 if ele.text == _State.Cancel:
                     _logger.debug(f"button state is {_State.Cancel}")
-                    _close_dialog()
+                    close_dialog()
                     return
                 elif ele.text == "Ký Bác sĩ":
                     _logger.debug(f"button state is {_State.Sign} -> click")
                     ele.click()
                     time.sleep(5)
-                    _close_dialog()
+                    close_dialog()
                     return
             except StaleElementReferenceException as e:
                 _logger.warning(f"get {e}")
     else:
-        _close_dialog()
+        close_dialog()
         raise EndOfLoop("can't sign phieuchidinh while in dialog")

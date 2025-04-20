@@ -25,13 +25,13 @@ def open_dialog(driver: Driver):
     driver.clicking(
         ".thong-tin-benh-nhan .bunch-icon div:nth-child(3)", "xem ho so benh an"
     )
-    driver.waiting(".right-content tbody tr:nth-child(2)", "Danh sách phiếu")
+    driver.waiting(".ant-modal:has(.img-avatar) .right-content tr:nth-child(2)", "Danh sách phiếu first item")
 
 
 @_trace
 def close_dialog(driver: Driver):
-    driver.clicking(".ant-modal button[aria-label='Close']", "close button")
-    time.sleep(5)
+    driver.clicking(".ant-modal:has(.img-avatar) .ant-modal-close", "close button")
+    driver.wait_closing(".ant-modal .img-avatar", "Hồ sơ bệnh án dialog")
 
 
 def filter(driver: Driver, name: str) -> bool:

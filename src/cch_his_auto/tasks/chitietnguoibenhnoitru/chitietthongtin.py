@@ -25,6 +25,7 @@ def close_dialog(driver: Driver):
         ".ant-modal-close:has(~.ant-modal-body .avatar__image)",
         "close Chi tiết thông tin dialog",
     )
+    driver.wait_closing(".ant-modal-body .avatar__image")
 
 
 def get_chieucao(driver: Driver) -> str | None:

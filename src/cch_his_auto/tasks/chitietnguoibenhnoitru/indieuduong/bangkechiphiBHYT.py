@@ -50,3 +50,4 @@ def sign_bangkechiphiBHYT(driver: Driver, signature: str):
         sign_staff(driver)
         sign_patient(driver, signature)
     driver.find(".ant-modal-close:has(~.ant-modal-body iframe)").click()
+    driver.wait_closing(".ant-modal-body iframe")

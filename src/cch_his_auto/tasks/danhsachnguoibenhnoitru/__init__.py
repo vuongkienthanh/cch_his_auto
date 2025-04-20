@@ -44,6 +44,7 @@ def filter_trangthainguoibenh(driver: Driver, indexes: list[int]):
         ".base-search_component .ant-col:nth-child(7) button",
         "close menu trạng thái người bệnh",
     )
+    driver.wait_closing(".ant-popover:has(label:nth-child(10))")
 
 
 @_trace
@@ -59,6 +60,7 @@ def open_filter_boloc(driver: Driver):
 def close_filter_boloc(driver: Driver):
     "Close filter *Bộ lọc* after `open_filter_boloc` and finish all tasks inside"
     driver.clicking(".ant-popover .content-popover +div button", "Tìm button")
+    driver.wait_closing(".ant-popover .content-popover +div button")
 
 
 @_trace

@@ -1,6 +1,5 @@
 import datetime as dt
 import logging
-import time
 
 from selenium.common import NoSuchElementException
 
@@ -24,10 +23,11 @@ def open_dialog(driver: Driver) -> bool:
     try:
         driver.waiting(".ant-modal-body .ant-table", "Sàng lọc dinh dưỡng dialog")
     except NoSuchElementException:
-        _logger.info("-> can't sàng lọc dinh dưỡng dialog")
+        _logger.info("-> can't find sàng lọc dinh dưỡng dialog")
         if driver.current_url.startswith(
             "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
         ):
+            _logger.info("-> found new phieu sàng lọc dinh dưỡng")
             return False
         else:
             raise Exception("should have a dialog or new phieusangloc")
@@ -44,7 +44,7 @@ def close_dialog(driver: Driver):
         ".ant-modal-close:has(~.ant-modal-body .ant-table)",
         "close Sàng lọc dinh dưỡng dialog",
     )
-    time.sleep(3)
+    driver.wait_closing(".ant-modal-body .ant-table")
 
 
 def get_last_date(driver: Driver) -> dt.date:
@@ -79,9 +79,12 @@ def add_all_phieusanglocdinhduong(driver: Driver):
     "Complete all *Phiếu sàng lọc* from admission_date up til today"
     admission_date = get_admission_date(driver)
     cttt.open_dialog(driver)
-    cannang = cttt.get_cannang(driver)
-    chieucao = cttt.get_chieucao(driver)
-    cttt.close_dialog(driver)
+    try:
+        cannang = cttt.get_cannang(driver)
+        chieucao = cttt.get_chieucao(driver)
+    finally:
+        cttt.close_dialog(driver)
+
     if (cannang == "") or (chieucao == "") or (cannang is None) or (chieucao is None):
         _logger.warning("cannang or chieucao is empty -> skip Sàng lọc dinh dưỡng")
         return

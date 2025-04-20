@@ -76,13 +76,30 @@ class Driver(webdriver.Chrome):
         try:
             _logger.debug(f"waiting {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
-        except (TimeoutException, StaleElementReferenceException):
+        except TimeoutException:
             _logger.error(f"-> can't find {name or css}")
             raise NoSuchElementException(f"can't find {name or css}")
+        except StaleElementReferenceException:
+            return self.waiting(css, name)
         else:
             _logger.debug(f"-> done waiting {name or css}")
-            time.sleep(2)
             return self.find(css)
+
+    def wait_closing(self, css: str, /, name: str = ""):
+        """
+        Wait closing element by `css`.
+        You can also provide a `name` for logging
+        """
+        try:
+            WebDriverWait(self, 120).until_not(lambda _: self.find(css).is_displayed())
+            _logger.debug(f"closing {name or css}")
+        except TimeoutException:
+            _logger.error(f"-> can't close {name or css}")
+            raise Exception(f"can't close {name or css}")
+        except StaleElementReferenceException:
+            return self.wait_closing(css, name)
+        else:
+            _logger.debug(f"-> done closing {name or css}")
 
     def waiting_to_be(self, css: str, to_be: str, /, name: str = "") -> WebElement:
         """
@@ -92,15 +109,16 @@ class Driver(webdriver.Chrome):
         try:
             _logger.debug(f"waiting {name or css} to be {to_be}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
-        except (TimeoutException, StaleElementReferenceException):
+        except TimeoutException:
             _logger.error(f"-> can't find {name or css}")
             raise NoSuchElementException(f"can't find {name or css}")
+        except StaleElementReferenceException:
+            return self.waiting_to_be(css, to_be, name)
         else:
             for _ in range(120):
                 time.sleep(1)
                 if (ele := self.find(css)).text.strip().startswith(to_be.strip()):
                     _logger.debug(f"-> done waiting {name or css} to be {to_be}")
-                    time.sleep(2)
                     return ele
             else:
                 txt = self.find(css).text.strip()
@@ -116,9 +134,11 @@ class Driver(webdriver.Chrome):
         try:
             _logger.debug(f"clicking {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
-        except (TimeoutException, StaleElementReferenceException):
+        except TimeoutException:
             _logger.error(f"-> can't find {name or css}")
             raise NoSuchElementException(f"can't find {name or css}")
+        except StaleElementReferenceException:
+            return self.clicking(css, name)
         else:
             try:
                 ele = self.find(css)
@@ -137,9 +157,11 @@ class Driver(webdriver.Chrome):
         try:
             _logger.debug(f"clicking svg {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
-        except Exception as e:
+        except TimeoutException:
             _logger.error(f"-> can't find {name or css}")
-            raise e
+            raise NoSuchElementException(f"can't find {name or css}")
+        except StaleElementReferenceException:
+            return self.clicking_svg(css, name)
         else:
             try:
                 self.execute_script(f"""
@@ -152,7 +174,6 @@ class Driver(webdriver.Chrome):
                 raise e
             else:
                 _logger.debug(f"-> done clicking svg {name or css}")
-                time.sleep(2)
 
     def goto(self, url: str) -> None:
         "Go to `url`"

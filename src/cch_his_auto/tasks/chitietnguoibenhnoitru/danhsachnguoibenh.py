@@ -21,7 +21,8 @@ def open_dialog(driver: Driver):
 
 @_trace
 def close_dialog(driver: Driver):
-    driver.clicking(".ant-drawer-mask", "close Danh sách người bệnh panel")
+    driver.clicking(".ant-drawer-mask", "outside Danh sách người bệnh panel")
+    driver.wait_closing(".ant-drawer .searching input", "Danh sách người bệnh panel")
 
 
 def filter_patient(driver: Driver, ma_hs: int):
