@@ -25,7 +25,10 @@ def open_dialog(driver: Driver):
     driver.clicking(
         ".thong-tin-benh-nhan .bunch-icon div:nth-child(3)", "xem ho so benh an"
     )
-    driver.waiting(".ant-modal:has(.img-avatar) .right-content tr:nth-child(2)", "Danh sách phiếu first item")
+    driver.waiting(
+        ".ant-modal:has(.img-avatar) .right-content tr:nth-child(2)",
+        "Danh sách phiếu first item",
+    )
 
 
 @_trace
@@ -59,34 +62,45 @@ def filter(driver: Driver, name: str) -> bool:
 
 def is_row(driver: Driver, idx: int, status: _Status) -> bool:
     "Check if row at `idx` is _status_, first row is id=2"
-    ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
-    name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
-    _logger.debug(f"checking {name}: {status}")
     try:
-        return ele.text.strip() == status
-    except StaleElementReferenceException as e:
-        _logger.warning(f"checking row: get {e} => retry")
+        _logger.debug(f"checking status = {status}")
+        return (
+            driver.waiting(
+                f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)",
+                f"row {idx} status",
+            ).text.strip()
+            == status
+        )
+    except StaleElementReferenceException:
         return is_row(driver, idx, status)
 
 
 def is_row_expandable(driver: Driver, idx: int) -> bool:
     "Check if row at `idx` is expandable, first row is id=2"
-    name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
+    name = driver.waiting(
+        f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)", f"row {idx}"
+    ).text
     _logger.debug(f"checking {name}: expandable")
-    try:
-        ele = driver.find(
-            f".right-content tbody tr:nth-child({idx}) td:nth-child(1) button"
-        )
-    except NoSuchElementException:
+    for _ in range(5):
+        time.sleep(1)
+        try:
+            ele = driver.find(
+                f".right-content tbody tr:nth-child({idx}) td:nth-child(1) button"
+            )
+            class_list = ele.get_attribute("class")
+            assert class_list is not None
+            return "ant-table-row-expand-icon-collapsed" in class_list
+        except (NoSuchElementException, StaleElementReferenceException):
+            continue
+    else:
         return False
-    class_list = ele.get_attribute("class")
-    assert class_list is not None
-    return "ant-table-row-expand-icon-collapsed" in class_list
 
 
 def expand_row(driver: Driver, idx: int):
     "Expand row at `idx`"
-    name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
+    name = driver.waiting(
+        f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)", f"row {idx}"
+    ).text
     _logger.info(f"expanding {name}")
     driver.clicking(f".right-content tbody tr:nth-child({idx}) td:nth-child(1) button")
 
@@ -122,16 +136,23 @@ def _filter_check_expand_sign_current(
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
             for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
+                name = driver.waiting(
+                    f".ant-table-tbody tr:nth-child({i}) td:nth-child(2)"
+                ).text
+                _logger.debug(f"checking {name}")
                 if any([is_row(driver, i, status) for status in status_list]):
-                    _logger.info("row condition: not met")
+                    _logger.info(f"row condition: not met: {name}")
                     driver.clicking(f"tbody tr:nth-child({i})")
-                    time.sleep(1)
                     _sign_current(driver)
                 else:
                     _logger.info("row condition: OK")
         else:
+            name = driver.waiting(
+                ".ant-table-tbody tr:nth-child(2) td:nth-child(2)"
+            ).text
+            _logger.debug(f"checking {name}")
             if any([is_row(driver, 2, status) for status in status_list]):
-                _logger.info("row condition: not met")
+                _logger.info(f"row condition: not met: {name}")
                 driver.clicking("tbody tr:nth-child(2)")
                 _sign_current(driver)
             else:
@@ -151,16 +172,23 @@ def _filter_check_expand_sign_new_tab(
         if is_row_expandable(driver, 2):
             expand_row(driver, 2)
             for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
+                name = driver.waiting(
+                    f".ant-table-tbody tr:nth-child({i}) td:nth-child(2)"
+                ).text
+                _logger.debug(f"checking {name}")
                 if any([is_row(driver, i, status) for status in status_list]):
-                    _logger.info("row condition: not met")
+                    _logger.info(f"row condition: not met: {name}")
                     driver.clicking(f"tbody tr:nth-child({i})")
-                    time.sleep(1)
                     _sign_new_tab(driver, i, sign_fn)
                 else:
                     _logger.info("row condition: OK")
         else:
+            name = driver.waiting(
+                ".ant-table-tbody tr:nth-child(2) td:nth-child(2)"
+            ).text
+            _logger.debug(f"checking {name}")
             if any([is_row(driver, 2, status) for status in status_list]):
-                _logger.info("row condition: not met")
+                _logger.info(f"row condition: not met: {name}")
                 _sign_new_tab(driver, 2, sign_fn)
             else:
                 _logger.info("row condition: OK")
