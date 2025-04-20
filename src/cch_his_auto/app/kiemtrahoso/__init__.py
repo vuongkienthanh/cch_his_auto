@@ -143,14 +143,16 @@ def process_normal_day(driver: Driver, signature: str | None):
     sanglocdinhduong.add_all_phieusanglocdinhduong(driver)
 
     hosobenhan.open_dialog(driver)
-    hosobenhan.phieuchidinhxetnghiem(driver)
-    hosobenhan.todieutri(driver)
-    hosobenhan.phieuCT(driver)
-    hosobenhan.phieuMRI(driver, signature)
-    hosobenhan.giaiphaubenh(driver)
-    hosobenhan.phieusanglocdinhduong(driver)
-    hosobenhan.phieuchidinhPTTT(driver)
-    hosobenhan.close_dialog(driver)
+    try:
+        hosobenhan.phieuchidinhxetnghiem(driver)
+        hosobenhan.todieutri(driver)
+        hosobenhan.phieuCT(driver)
+        hosobenhan.phieuMRI(driver, signature)
+        hosobenhan.giaiphaubenh(driver)
+        hosobenhan.phieusanglocdinhduong(driver)
+        hosobenhan.phieuchidinhPTTT(driver)
+    finally:
+        hosobenhan.close_dialog(driver)
 
 
 def process_final_day(driver: Driver, signature: str | None):

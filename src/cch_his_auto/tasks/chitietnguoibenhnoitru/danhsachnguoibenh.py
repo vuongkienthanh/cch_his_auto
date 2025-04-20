@@ -24,7 +24,6 @@ def close_dialog(driver: Driver):
     driver.clicking(".ant-drawer-mask", "close Danh sách người bệnh panel")
 
 
-@_trace
 def filter_patient(driver: Driver, ma_hs: int):
     "After `open_dialog`, filter patient based on `ma_hs`"
     _logger.debug(f"ma_hs={ma_hs}")
@@ -41,6 +40,7 @@ def filter_patient(driver: Driver, ma_hs: int):
 @_trace
 def goto_patient(driver: Driver, ma_hs: int):
     "After `open_dialog`, filter patient based on `ma_hs`, then open that patient"
+    _logger.info(f"goto patient ma_hs={ma_hs}")
     filter_patient(driver, ma_hs)
     driver.clicking("tbody tr:nth-child(2)", "first row")
     driver.waiting_to_be(

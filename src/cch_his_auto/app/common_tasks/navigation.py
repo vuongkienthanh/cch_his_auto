@@ -15,6 +15,8 @@ def first_patient(driver: Driver, con: Connection, ma_hs: int):
         driver.goto(url)
     else:
         danhsachnguoibenhnoitru.goto_patient(driver, ma_hs)
+        _logger.info("patient url is", driver.current_url)
+    _logger.info(f"************ ma_hs= {ma_hs} ************")
 
 
 def next_patient(driver: Driver, con: Connection, ma_hs: int):
@@ -24,3 +26,5 @@ def next_patient(driver: Driver, con: Connection, ma_hs: int):
     else:
         danhsachnguoibenh.open_dialog(driver)
         danhsachnguoibenh.goto_patient(driver, ma_hs)
+        _logger.info("patient url is", driver.current_url)
+    _logger.info(f"************ ma_hs= {ma_hs} ************")

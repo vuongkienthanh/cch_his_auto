@@ -4,11 +4,11 @@ from enum import StrEnum
 from functools import partial
 
 from selenium.webdriver import Keys
-from selenium.common import NoSuchElementException, StaleElementReferenceException
+from selenium.common import NoSuchElementException
 
 from cch_his_auto.driver import Driver, DriverFn
 from cch_his_auto.tasks.editor import sign_staff_name as sign_staff_name
-from cch_his_auto.helper import EndOfLoop, tracing
+from cch_his_auto.helper import tracing
 
 _logger = logging.getLogger().getChild("hosobenhan")
 _trace = tracing(_logger)
@@ -34,7 +34,6 @@ def close_dialog(driver: Driver):
     time.sleep(5)
 
 
-@_trace
 def filter(driver: Driver, name: str) -> bool:
     "Filter document based on `name`"
     _logger.debug(f"name={name}")

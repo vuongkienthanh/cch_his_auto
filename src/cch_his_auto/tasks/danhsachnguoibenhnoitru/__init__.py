@@ -76,7 +76,6 @@ def filter_boloc_thoigiannhapvien(driver: Driver, start: dt.date, end: dt.date):
     ).send_keys(Keys.ENTER).perform()
 
 
-@_trace
 def filter_patient(driver: Driver, ma_hs: int):
     "Filter patient based on `ma_hs`"
     _logger.debug(f"filter_patient ma_hs={ma_hs}")
