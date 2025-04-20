@@ -22,7 +22,6 @@ def goto(driver: Driver, name: str):
     "After `open_menu`, filter selection based on `name`"
     _logger.info(f"goto name={name}")
     ele = driver.clear_input(".ant-popover .ant-select input")
-    _logger.info("+++++ typing name")
     ele.send_keys(name)
     time.sleep(2)
     ele.send_keys(Keys.ENTER)

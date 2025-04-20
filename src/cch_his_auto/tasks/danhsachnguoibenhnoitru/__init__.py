@@ -24,7 +24,7 @@ def filter_trangthainguoibenh(driver: Driver, indexes: list[int]):
     `indexes` is 1-indexed.
     Then close it
     """
-    _logger.debug(f"indexes={indexes}")
+    _logger.debug(f"filter_trangthainguoibenh indexes={indexes}")
     driver.clicking(
         ".base-search_component .ant-col:nth-child(7) button",
         " open menu trạng thái người bệnh",
@@ -79,7 +79,7 @@ def filter_boloc_thoigiannhapvien(driver: Driver, start: dt.date, end: dt.date):
 @_trace
 def filter_patient(driver: Driver, ma_hs: int):
     "Filter patient based on `ma_hs`"
-    _logger.debug(f"ma_hs={ma_hs}")
+    _logger.debug(f"filter_patient ma_hs={ma_hs}")
     ele = driver.clear_input(".base-search_component .ant-col:nth-child(2) input")
     _logger.debug("+++++ typing ma_hs to search entry")
     ele.send_keys(str(ma_hs))
@@ -95,6 +95,7 @@ def filter_patient(driver: Driver, ma_hs: int):
 @_trace
 def goto_patient(driver: Driver, ma_hs: int):
     "Filter patient based on `ma_hs`, then open that patient"
+    _logger.info(f"goto patient ma_hs={ma_hs}")
     filter_patient(driver, ma_hs)
     driver.clicking(
         ".ant-table-body tbody tr:nth-child(2) td:nth-child(30)",
@@ -105,4 +106,3 @@ def goto_patient(driver: Driver, ma_hs: int):
         str(ma_hs),
         "patient id",
     )
-    _logger.info(f"goto patient with ma_hs={ma_hs}")

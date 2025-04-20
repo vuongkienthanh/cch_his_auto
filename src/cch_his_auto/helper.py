@@ -40,16 +40,17 @@ class EndOfLoop(Exception):
         super().__init__(*args)
 
 
+_iframe_logger = _logger.getChild("iframe")
+
+
 @contextmanager
-def iframe(driver: "driver.Driver", iframe_css: str, /, logger: logging.Logger | None):
+def iframe(driver: "driver.Driver", iframe_css: str):
     "use as contextmanager for going in and out an iframe inside a modal"
-    if logger is None:
-        logger = logging.getLogger()
     try:
-        logger.debug("go into iframe")
+        _iframe_logger.debug("go into iframe")
         iframe = driver.waiting(iframe_css)
         driver.switch_to.frame(iframe)
         yield iframe
     finally:
-        logger.debug("go back to parent frame")
+        _iframe_logger.debug("go back to parent frame")
         driver.switch_to.parent_frame()

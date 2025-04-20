@@ -46,7 +46,7 @@ def sign_bangkechiphiBHYT(driver: Driver, signature: str):
     "Sign both staff and patient in *Bảng kê chi phí BHYT*"
     open_menu(driver)
     goto(driver, "Bảng kê chi phí BHYT")
-    with iframe(driver, ".ant-modal iframe", _logger):
+    with iframe(driver, ".ant-modal iframe"):
         sign_staff(driver)
         sign_patient(driver, signature)
     driver.find(".ant-modal-close:has(~.ant-modal-body iframe)").click()

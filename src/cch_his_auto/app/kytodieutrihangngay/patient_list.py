@@ -13,13 +13,13 @@ class PatientFrame(tk.Frame):
         header.columnconfigure(0, weight=1, minsize=200)
         header.columnconfigure(1, minsize=120)
         header.columnconfigure(2, minsize=120)
-        header.columnconfigure(3, minsize=180)
-        header.columnconfigure(4, minsize=80)
+        header.columnconfigure(3, minsize=120)
+        header.columnconfigure(4, minsize=180)
+        header.columnconfigure(5, minsize=80)
 
         url = tk.Label(header, text="url", relief="raised", anchor="center")
-        ky_xetnghiem = tk.Label(
-            header, text="Ký xét nghiệm", relief="raised", anchor="center"
-        )
+        ky_xetnghiem = tk.Label(header, text="Ký XN", relief="raised", anchor="center")
+        ky_ct = tk.Label(header, text="Ký CT", relief="raised", anchor="center")
         ky_todieutri = tk.Label(
             header, text="Ký tờ điều trị", relief="raised", anchor="center"
         )
@@ -30,9 +30,10 @@ class PatientFrame(tk.Frame):
 
         url.grid(row=0, column=0, sticky="NSEW")
         ky_xetnghiem.grid(row=0, column=1, sticky="NSEW")
-        ky_todieutri.grid(row=0, column=2, sticky="NSEW")
-        ky_3tra.grid(row=0, column=3, sticky="NSEW")
-        delete_btn.grid(row=0, column=4, sticky="NSWE", padx=(0, 15))
+        ky_ct.grid(row=0, column=2, sticky="NSEW")
+        ky_todieutri.grid(row=0, column=3, sticky="NSEW")
+        ky_3tra.grid(row=0, column=4, sticky="NSEW")
+        delete_btn.grid(row=0, column=5, sticky="NSWE", padx=(0, 15))
 
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
@@ -80,6 +81,7 @@ class Line(tk.Frame):
         self.url_var = tk.StringVar()
         self.note_var = tk.StringVar()
         self.xn_var = tk.BooleanVar()
+        self.ct_var = tk.BooleanVar()
         self.tdt_var = tk.BooleanVar()
         self.bs_0_var = tk.BooleanVar()
         self.bs_1_var = tk.BooleanVar()
@@ -107,6 +109,7 @@ class Line(tk.Frame):
         note_entry = tk.Entry(info_frame, textvariable=self.note_var)
 
         xn_checkbox = tk.Checkbutton(self, variable=self.xn_var)
+        ct_checkbox = tk.Checkbutton(self, variable=self.ct_var)
         tdt_checkbox = tk.Checkbutton(self, variable=self.tdt_var)
         tdt_checkbox.select()
 
@@ -138,19 +141,14 @@ class Line(tk.Frame):
         self.columnconfigure(0, weight=1, minsize=200)
         self.columnconfigure(1, minsize=120)
         self.columnconfigure(2, minsize=120)
-        self.columnconfigure(3, minsize=180)
-        self.columnconfigure(4, minsize=80)
+        self.columnconfigure(3, minsize=120)
+        self.columnconfigure(4, minsize=180)
+        self.columnconfigure(5, minsize=80)
 
         info_frame.columnconfigure(1, weight=1)
-        info_frame.grid(row=0, column=0, sticky="WE")
         url_entry.grid(row=0, column=0, sticky="WE", columnspan=2)
         note_label.grid(row=1, column=0)
         note_entry.grid(row=1, column=1, sticky="WE")
-
-        xn_checkbox.grid(row=0, column=1)
-        tdt_checkbox.grid(row=0, column=2)
-
-        k3t.grid(row=0, column=3)
 
         k3t_bs.grid(row=0, column=0)
         k3t_bs_0.grid(row=0, column=0)
@@ -173,12 +171,18 @@ class Line(tk.Frame):
         k3t_bn_3.grid(row=0, column=3)
         k3t_bn_4.grid(row=0, column=4)
 
-        delete_button.grid(row=0, column=4)
+        info_frame.grid(row=0, column=0, sticky="WE")
+        xn_checkbox.grid(row=0, column=1)
+        ct_checkbox.grid(row=0, column=2)
+        tdt_checkbox.grid(row=0, column=3)
+        k3t.grid(row=0, column=4)
+        delete_button.grid(row=0, column=5)
 
     def set_patient(self, patient: Patient):
         self.url_var.set(patient["url"])
         self.note_var.set(patient["note"])
         self.xn_var.set(patient["ky_xetnghiem"])
+        self.ct_var.set(patient["ky_ct"])
         self.tdt_var.set(patient["ky_todieutri"])
         self.bs_0_var.set(patient["ky_3tra"]["bacsi"][0])
         self.bs_1_var.set(patient["ky_3tra"]["bacsi"][1])
@@ -201,6 +205,7 @@ class Line(tk.Frame):
             "url": self.url_var.get(),
             "note": self.note_var.get(),
             "ky_xetnghiem": self.xn_var.get(),
+            "ky_ct": self.ct_var.get(),
             "ky_todieutri": self.tdt_var.get(),
             "ky_3tra": {
                 "bacsi": (

@@ -25,6 +25,7 @@ class Patient(TypedDict):
     url: str
     note: str
     ky_xetnghiem: bool
+    ky_ct: bool
     ky_todieutri: bool
     ky_3tra: Ky_3tra
 

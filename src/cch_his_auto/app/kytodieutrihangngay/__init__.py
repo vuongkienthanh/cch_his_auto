@@ -8,9 +8,10 @@ from .patient_list import PatientFrame
 from cch_his_auto.driver import Driver
 from cch_his_auto.tasks.auth import session
 from cch_his_auto.tasks.todieutri import ingiayto as igt
+from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan
 
 from cch_his_auto.app import PROFILE_PATH
-from cch_his_auto.app.global_db import create_connection
+from cch_his_auto.app.global_db import create_connection, get_url_from_db
 from cch_his_auto.app.common_ui.staff_info import UsernamePasswordFrame
 from cch_his_auto.app.common_ui.button_frame import ButtonFrame2, RunConfig, setLogLevel
 from cch_his_auto.app.common_tasks.signature import get_signature_from_elsewhere
@@ -144,6 +145,12 @@ def run_bs(driver: Driver, cfg: config.Config):
 
         if p["ky_xetnghiem"]:
             igt.sign_phieuchidinh(driver)
+        if p["ky_ct"]:
+            driver.clicking(".right button:nth-child(2)")
+            hosobenhan.open_dialog(driver)
+            hosobenhan.phieuCT(driver)
+            hosobenhan.close_dialog(driver)
+            driver.goto(p["url"])
         if p["ky_todieutri"]:
             igt.sign_todieutri(driver)
         if any(p["ky_3tra"]["bacsi"]):
