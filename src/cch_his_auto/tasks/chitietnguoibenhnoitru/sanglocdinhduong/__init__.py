@@ -32,6 +32,7 @@ def open_dialog(driver: Driver) -> bool:
         else:
             raise Exception("should have a dialog or new phieusangloc")
     else:
+        driver.waiting("tbody tr:nth-child(2) td:nth-child(3)")
         _logger.info("-> found sàng lọc dinh dưỡng dialog")
         return True
 
