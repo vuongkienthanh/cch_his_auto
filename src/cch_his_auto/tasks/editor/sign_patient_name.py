@@ -5,7 +5,11 @@
 import logging
 import time
 
-from selenium.common import NoSuchElementException, TimeoutException
+from selenium.common import (
+    NoSuchElementException,
+    TimeoutException,
+    StaleElementReferenceException,
+)
 from selenium.webdriver import ActionChains
 
 from cch_his_auto.driver import Driver
@@ -39,10 +43,37 @@ def sign_canvas(driver: Driver, signature: str):
 def _sign(
     driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str, signature: str
 ):
-    ele = driver.waiting_to_be(btn_css, btn_txt, name)
-    ele.click()
-    sign_canvas(driver, signature)
-    driver.waiting(img_css, "signature image")
+    for _ in range(120):
+        time.sleep(1)
+        try:
+            _logger.debug(f"finding {name} button")
+            ele = driver.find(btn_css)
+        except NoSuchElementException:
+            _logger.debug("-> can't find sign button, finding signature")
+            try:
+                driver.find(img_css)
+            except NoSuchElementException:
+                _logger.debug("-> can't find signature -> continue")
+                continue
+            else:
+                _logger.info("-> found signature already signed")
+                return
+        else:
+            try:
+                if ele.text.strip().startswith(btn_txt.strip()):
+                    _logger.debug("-> found sign button with correct btn_txt")
+                    ele.click()
+                    sign_canvas(driver, signature)
+                    driver.waiting(img_css, "signature image")
+                    return
+                else:
+                    _logger.debug("-> found sign button but wrong btn_txt -> continue")
+                    continue
+            except StaleElementReferenceException as e:
+                _logger.warning(f"get {e}")
+                continue
+    else:
+        raise EndOfLoop("can't sign")
 
 
 def phieuthuchienylenh_bn(
@@ -104,11 +135,23 @@ def phieuthuchienylenh_bn(
     time.sleep(2)
 
 
+def phieuCT_bn(driver: Driver, signature: str):
+    "*Phiếu chỉ định CT (bệnh nhân)*"
+    _sign(
+        driver,
+        name="phieu CT benh nhan",
+        btn_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(29) .sign-image button",
+        btn_txt="Ký",
+        img_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(29) .sign-image img",
+        signature=signature,
+    )
+
+
 def phieuMRI_bn(driver: Driver, signature: str):
     "*Phiếu chỉ định MRI (bệnh nhân)*"
     _sign(
         driver,
-        name="phieu mri benh nhan",
+        name="phieu MRI benh nhan",
         btn_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25)>div[data-type=block]:nth-child(2) .sign-image button",
         btn_txt="Ký",
         img_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25)>div[data-type=block]:nth-child(2) .sign-image img",

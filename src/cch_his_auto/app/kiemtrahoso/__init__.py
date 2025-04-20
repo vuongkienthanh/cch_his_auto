@@ -146,11 +146,12 @@ def process_normal_day(driver: Driver, signature: str | None):
     try:
         hosobenhan.phieuchidinhxetnghiem(driver)
         hosobenhan.todieutri(driver)
-        hosobenhan.phieuCT(driver)
+        hosobenhan.phieuCT(driver, signature)
         hosobenhan.phieuMRI(driver, signature)
         hosobenhan.giaiphaubenh(driver)
         hosobenhan.phieusanglocdinhduong(driver)
         hosobenhan.phieuchidinhPTTT(driver)
+        hosobenhan.phieusoket15ngay(driver)
     finally:
         hosobenhan.close_dialog(driver)
 
@@ -164,13 +165,15 @@ def process_final_day(driver: Driver, signature: str | None):
         hosobenhan.mucAbenhannhikhoa(driver)
         hosobenhan.mucBtongketbenhan(driver)
         hosobenhan.phieukhambenhvaovien(driver)
+
         hosobenhan.phieuchidinhxetnghiem(driver)
         hosobenhan.todieutri(driver)
-        hosobenhan.phieuCT(driver)
+        hosobenhan.phieuCT(driver, signature)
         hosobenhan.phieuMRI(driver, signature)
         hosobenhan.giaiphaubenh(driver)
         hosobenhan.phieusanglocdinhduong(driver)
         hosobenhan.phieuchidinhPTTT(driver)
+        hosobenhan.phieusoket15ngay(driver)
     finally:
         hosobenhan.close_dialog(driver)
 
@@ -184,7 +187,6 @@ def run_check(cfg: config.Config, run_cfg: RunConfig):
     chieucao_cannang_missing = []
 
     def check_chieucao_cannang(driver: Driver, ma_hs: int):
-
         chitietthongtin.open_dialog(driver)
         if not (
             chitietthongtin.get_chieucao(driver) and chitietthongtin.get_cannang(driver)

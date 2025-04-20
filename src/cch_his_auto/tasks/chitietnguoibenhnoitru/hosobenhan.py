@@ -1,13 +1,13 @@
 import time
 import logging
 from enum import StrEnum
-from functools import partial
+from typing import Callable
 
 from selenium.webdriver import Keys
 from selenium.common import NoSuchElementException, StaleElementReferenceException
 
 from cch_his_auto.driver import Driver, DriverFn
-from cch_his_auto.tasks.editor import sign_staff_name as sign_staff_name
+from cch_his_auto.tasks.editor import sign_staff_name, sign_patient_name
 from cch_his_auto.helper import tracing
 
 _logger = logging.getLogger().getChild("hosobenhan")
@@ -105,8 +105,64 @@ def expand_row(driver: Driver, idx: int):
     driver.clicking(f".right-content tbody tr:nth-child({idx}) td:nth-child(1) button")
 
 
-@_trace
-def _sign_new_tab(driver: Driver, idx: int, sign_fn: DriverFn):
+type CheckSign_fn = Callable[[Driver, int], None]
+
+
+def _filter_check_expand_sign(
+    driver: Driver, name: str, chuaky_fn: CheckSign_fn, dangky_fn: CheckSign_fn
+):
+    def check_and_sign(driver: Driver, i: int):
+        name = driver.waiting(
+            f".ant-table-tbody tr:nth-child({i}) td:nth-child(2)"
+        ).text
+        _logger.debug(f"checking {name}")
+        if is_row(driver, i, _Status.CHUAKY):
+            _logger.info(f"row condition: not met: {name}")
+            driver.clicking(f"tbody tr:nth-child({i})")
+            chuaky_fn(driver, i)
+            time.sleep(5)
+        elif is_row(driver, i, _Status.DANGKY):
+            dangky_fn(driver, i)
+            time.sleep(5)
+        else:
+            _logger.info("row condition: OK")
+
+    if filter(driver, name) and (
+        driver.waiting(
+            ".right-content tbody tr:nth-child(2) td:nth-child(3)"
+        ).text.strip()
+        != _Status.HOANTHANH
+    ):
+        if is_row_expandable(driver, 2):
+            expand_row(driver, 2)
+            for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
+                check_and_sign(driver, i)
+        else:
+            check_and_sign(driver, 2)
+
+
+def _unimplemented(_: Driver):
+    _logger.warning("not implemented")
+
+
+def _sign_current(driver: Driver):
+    driver.clicking(
+        ".right-content .__action button:nth-child(2)", "clicking Ký tên BS dieu tri"
+    )
+
+
+def _sign_current2(driver: Driver):
+    driver.clicking(
+        ".right-content .__action button:nth-child(3)", "clicking Ký tên BS truong khoa"
+    )
+
+
+def _sign_current_both(driver: Driver):
+    _sign_current(driver)
+    _sign_current2(driver)
+
+
+def _sign_tab(driver: Driver, idx: int, sign_fn: DriverFn):
     tab0 = driver.current_window_handle
     datakey = driver.find(f".ant-table-tbody tr:nth-child({idx})").get_attribute(
         "data-row-key"
@@ -119,194 +175,162 @@ def _sign_new_tab(driver: Driver, idx: int, sign_fn: DriverFn):
 
 
 @_trace
-def _sign_current(driver: Driver):
-    driver.clicking(".right-content .__action button:nth-child(2)", "clicking Ký tên")
-    time.sleep(5)
-
-
-def _filter_check_expand_sign_current(
-    driver: Driver, name: str, status_list: list[_Status]
-):
-    if filter(driver, name) and (
-        driver.waiting(
-            ".right-content tbody tr:nth-child(2) td:nth-child(3)"
-        ).text.strip()
-        != _Status.HOANTHANH
-    ):
-        if is_row_expandable(driver, 2):
-            expand_row(driver, 2)
-            for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
-                name = driver.waiting(
-                    f".ant-table-tbody tr:nth-child({i}) td:nth-child(2)"
-                ).text
-                _logger.debug(f"checking {name}")
-                if any([is_row(driver, i, status) for status in status_list]):
-                    _logger.info(f"row condition: not met: {name}")
-                    driver.clicking(f"tbody tr:nth-child({i})")
-                    _sign_current(driver)
-                else:
-                    _logger.info("row condition: OK")
-        else:
-            name = driver.waiting(
-                ".ant-table-tbody tr:nth-child(2) td:nth-child(2)"
-            ).text
-            _logger.debug(f"checking {name}")
-            if any([is_row(driver, 2, status) for status in status_list]):
-                _logger.info(f"row condition: not met: {name}")
-                driver.clicking("tbody tr:nth-child(2)")
-                _sign_current(driver)
-            else:
-                _logger.info("row condition: OK")
-    time.sleep(2)
-
-
-def _filter_check_expand_sign_new_tab(
-    driver: Driver, name: str, sign_fn: DriverFn, status_list: list[_Status]
-):
-    if filter(driver, name) and (
-        driver.waiting(
-            ".right-content tbody tr:nth-child(2) td:nth-child(3)"
-        ).text.strip()
-        != _Status.HOANTHANH
-    ):
-        if is_row_expandable(driver, 2):
-            expand_row(driver, 2)
-            for i in range(3, len(driver.find_all("tbody .ant-table-row-level-1")) + 3):
-                name = driver.waiting(
-                    f".ant-table-tbody tr:nth-child({i}) td:nth-child(2)"
-                ).text
-                _logger.debug(f"checking {name}")
-                if any([is_row(driver, i, status) for status in status_list]):
-                    _logger.info(f"row condition: not met: {name}")
-                    driver.clicking(f"tbody tr:nth-child({i})")
-                    _sign_new_tab(driver, i, sign_fn)
-                else:
-                    _logger.info("row condition: OK")
-        else:
-            name = driver.waiting(
-                ".ant-table-tbody tr:nth-child(2) td:nth-child(2)"
-            ).text
-            _logger.debug(f"checking {name}")
-            if any([is_row(driver, 2, status) for status in status_list]):
-                _logger.info(f"row condition: not met: {name}")
-                _sign_new_tab(driver, 2, sign_fn)
-            else:
-                _logger.info("row condition: OK")
-    time.sleep(3)
-
-
-@_trace
 def tobiabenhannhikhoa(driver: Driver):
     "Filter and sign name: *Tờ bìa bệnh án nhi khoa*"
-    _filter_check_expand_sign_new_tab(
+    _filter_check_expand_sign(
         driver,
         name="Tờ bìa bệnh án Nhi khoa",
-        sign_fn=sign_staff_name.tobiabenhannhikhoa,
-        status_list=[_Status.CHUAKY],
+        chuaky_fn=lambda driver, i: _sign_tab(
+            driver, i, sign_staff_name.tobiabenhannhikhoa
+        ),
+        dangky_fn=lambda driver, _: _unimplemented(driver),
     )
 
 
 @_trace
 def mucAbenhannhikhoa(driver: Driver):
     "Filter and sign name: *Mục A bệnh án nhi khoa*"
-    _filter_check_expand_sign_new_tab(
+    _filter_check_expand_sign(
         driver,
         name="Mục A - Bệnh án Nhi khoa",
-        sign_fn=sign_staff_name.mucAbenhannhikhoa,
-        status_list=[_Status.CHUAKY],
+        chuaky_fn=lambda driver, i: _sign_tab(
+            driver, i, sign_staff_name.mucAbenhannhikhoa
+        ),
+        dangky_fn=lambda driver, _: _unimplemented(driver),
     )
 
 
 @_trace
 def mucBtongketbenhan(driver: Driver):
     "Filter and sign name: *Mục B tổng kết bệnh án*"
-    _filter_check_expand_sign_new_tab(
+    _filter_check_expand_sign(
         driver,
         name="Mục B - Tổng kết Bệnh án (Nội khoa, Nhi Khoa, Truyền nhiễm, Sơ sinh, Da liễu, DD-PHCN, HHTM)",
-        sign_fn=sign_staff_name.mucBtongketbenhan,
-        status_list=[_Status.CHUAKY],
+        chuaky_fn=lambda driver, i: _sign_tab(
+            driver, i, sign_staff_name.mucBtongketbenhan
+        ),
+        dangky_fn=lambda driver, _: _unimplemented(driver),
     )
 
 
 @_trace
 def phieukhambenhvaovien(driver: Driver):
     "Filter and sign name: *Phiếu khám bệnh vào viện*"
-    _filter_check_expand_sign_current(
+    _filter_check_expand_sign(
         driver,
         name="Phiếu khám bệnh vào viện",
-        status_list=[_Status.CHUAKY],
+        chuaky_fn=lambda driver, _: _sign_current(driver),
+        dangky_fn=lambda driver, _: _unimplemented(driver),
     )
 
 
 @_trace
 def phieuchidinhxetnghiem(driver: Driver):
     "Filter and sign name: *Phiếu chỉ định xét nghiệm*"
-    _filter_check_expand_sign_current(
+    _filter_check_expand_sign(
         driver,
         name="Phiếu chỉ định xét nghiệm",
-        status_list=[_Status.CHUAKY],
+        chuaky_fn=lambda driver, _: _sign_current(driver),
+        dangky_fn=lambda driver, _: _unimplemented(driver),
     )
 
 
 @_trace
 def todieutri(driver: Driver):
     "Filter and sign name: *Tờ điều trị*"
-    _filter_check_expand_sign_new_tab(
+    _filter_check_expand_sign(
         driver,
         name="Tờ điều trị",
-        sign_fn=sign_staff_name.todieutri,
-        status_list=[_Status.CHUAKY],
+        chuaky_fn=lambda driver, i: _sign_tab(driver, i, sign_staff_name.todieutri),
+        dangky_fn=lambda driver, _: _unimplemented(driver),
     )
 
 
 @_trace
 def phieuchidinhPTTT(driver: Driver):
     "Filter and sign name: *Phiếu chỉ định PTTT*"
-    _filter_check_expand_sign_current(
+    _filter_check_expand_sign(
         driver,
         name="Phiếu chỉ định PTTT",
-        status_list=[_Status.CHUAKY],
+        chuaky_fn=lambda driver, _: _sign_current(driver),
+        dangky_fn=lambda driver, _: _unimplemented(driver),
     )
 
 
 @_trace
-def phieuCT(driver: Driver):
+def phieuCT(driver: Driver, signature: str | None):
     "Filter and sign name: *Phiếu chỉ định chụp CT*"
-    _filter_check_expand_sign_new_tab(
+
+    def chuaky_fn(driver):
+        sign_staff_name.phieuCT_bschidinh(driver)
+        sign_staff_name.phieuCT_bsthuchien(driver)
+        if signature:
+            sign_patient_name.phieuCT_bn(driver, signature)
+
+    def dangky_fn(driver):
+        sign_staff_name.phieuCT_bsthuchien(driver)
+        if signature:
+            sign_patient_name.phieuCT_bn(driver, signature)
+
+    _filter_check_expand_sign(
         driver,
         name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
-        sign_fn=sign_staff_name.phieuCT,
-        status_list=[_Status.CHUAKY],
+        chuaky_fn=lambda driver, i: _sign_tab(driver, i, chuaky_fn),
+        dangky_fn=lambda driver, i: _sign_tab(driver, i, dangky_fn),
     )
 
 
 @_trace
 def phieuMRI(driver: Driver, signature: str | None):
     "Filter and sign name: *Phiếu chỉ định chụp MRI*"
-    _filter_check_expand_sign_new_tab(
+
+    def chuaky_fn(driver):
+        sign_staff_name.phieuMRI_bschidinh(driver)
+        sign_staff_name.phieuMRI_bsthuchien(driver)
+        if signature:
+            sign_patient_name.phieuMRI_bn(driver, signature)
+
+    def dangky_fn(driver):
+        sign_staff_name.phieuMRI_bsthuchien(driver)
+        if signature:
+            sign_patient_name.phieuMRI_bn(driver, signature)
+
+    _filter_check_expand_sign(
         driver,
         name="Phiếu chỉ định chụp cộng hưởng từ (MRI)",
-        sign_fn=partial(sign_staff_name.phieuMRI_all, signature=signature),
-        status_list=[_Status.CHUAKY, _Status.DANGKY],
+        chuaky_fn=lambda driver, i: _sign_tab(driver, i, chuaky_fn),
+        dangky_fn=lambda driver, i: _sign_tab(driver, i, dangky_fn),
     )
 
 
 @_trace
 def giaiphaubenh(driver: Driver):
     "Filter and sign name: *Phiếu xét nghiệm giải phẫu bệnh sinh thiết*"
-    _filter_check_expand_sign_new_tab(
+    _filter_check_expand_sign(
         driver,
         name="Phiếu xét nghiệm giải phẫu bệnh sinh thiết",
-        sign_fn=sign_staff_name.giaiphaubenh,
-        status_list=[_Status.CHUAKY],
+        chuaky_fn=lambda driver, i: _sign_tab(driver, i, sign_staff_name.giaiphaubenh),
+        dangky_fn=lambda driver, _: _unimplemented(driver),
     )
 
 
 @_trace
 def phieusanglocdinhduong(driver: Driver):
     "Filter and sign name: *Phiếu sàng lọc dinh dưỡng - Bệnh nhi nội trú*"
-    _filter_check_expand_sign_current(
+    _filter_check_expand_sign(
         driver,
         name="Phiếu sàng lọc dinh dưỡng - Bệnh nhi nội trú",
-        status_list=[_Status.CHUAKY],
+        chuaky_fn=lambda driver, _: _sign_current(driver),
+        dangky_fn=lambda driver, _: _unimplemented(driver),
+    )
+
+
+@_trace
+def phieusoket15ngay(driver: Driver):
+    "Filter and sign name: *Phiếu sơ kết 15 ngày điều trị*"
+    _filter_check_expand_sign(
+        driver,
+        name="Phiếu sơ kết 15 ngày điều trị",
+        chuaky_fn=lambda driver, _: _sign_current_both(driver),
+        dangky_fn=lambda driver, _: _sign_current2(driver),
     )

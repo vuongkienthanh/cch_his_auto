@@ -13,7 +13,6 @@ from selenium.common import (
 from selenium.webdriver import ActionChains
 
 from cch_his_auto.driver import Driver
-from cch_his_auto.tasks.editor import sign_patient_name
 from cch_his_auto.helper import EndOfLoop
 
 _logger = logging.getLogger().getChild("editor")
@@ -170,14 +169,25 @@ def phieuthuchienylenh_dd(driver: Driver, arr: tuple[bool, bool, bool, bool, boo
     time.sleep(2)
 
 
-def phieuCT(driver: Driver):
-    "*Phiếu chỉ định CT*"
+def phieuCT_bschidinh(driver: Driver):
+    "*Phiếu chỉ định CT, bs chỉ định*"
     _sign(
         driver,
-        name="phieu CT",
+        name="phieu CT bs chi dinh",
         btn_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(13) .sign-image button",
         btn_txt="Xác nhận ký Bác sĩ điều trị",
         img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(13) .sign-image img",
+    )
+
+
+def phieuCT_bsthuchien(driver: Driver):
+    "*Phiếu chỉ định CT, bs thực hiện*"
+    _sign(
+        driver,
+        name="phieu CT bs thuc hien",
+        btn_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(20) .sign-image button:nth-child(1)",
+        btn_txt="Xác nhận ký Bác sĩ Chẩn đoán hình ảnh",
+        img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(20) .sign-image img",
     )
 
 
@@ -201,14 +211,6 @@ def phieuMRI_bsthuchien(driver: Driver):
         btn_txt="Xác nhận ký Bác sĩ thực hiện",
         img_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25)>div[data-type=block]:nth-child(1) .sign-image img",
     )
-
-
-def phieuMRI_all(driver: Driver, signature: str | None):
-    "*Phiếu chỉ định MRI all*"
-    phieuMRI_bschidinh(driver)
-    phieuMRI_bsthuchien(driver)
-    if signature:
-        sign_patient_name.phieuMRI_bn(driver, signature)
 
 
 def giaiphaubenh(driver: Driver):
