@@ -4,7 +4,7 @@ from enum import StrEnum
 from functools import partial
 
 from selenium.webdriver import Keys
-from selenium.common import NoSuchElementException
+from selenium.common import NoSuchElementException, StaleElementReferenceException
 
 from cch_his_auto.driver import Driver, DriverFn
 from cch_his_auto.tasks.editor import sign_staff_name as sign_staff_name
@@ -41,7 +41,7 @@ def filter(driver: Driver, name: str) -> bool:
     _logger.debug("+++++ typing name")
     ele.send_keys(name)
     ele.send_keys(Keys.ENTER)
-    for _ in range(60): # 120 is too long
+    for _ in range(60):  # 120 is too long
         time.sleep(1)
         try:
             ele = driver.find(
@@ -62,7 +62,11 @@ def is_row(driver: Driver, idx: int, status: _Status) -> bool:
     ele = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(3)")
     name = driver.waiting(f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)").text
     _logger.debug(f"checking {name}: {status}")
-    return ele.text.strip() == status
+    try:
+        return ele.text.strip() == status
+    except StaleElementReferenceException as e:
+        _logger.warning(f"checking row: get {e} => retry")
+        return is_row(driver, idx, status)
 
 
 def is_row_expandable(driver: Driver, idx: int) -> bool:
