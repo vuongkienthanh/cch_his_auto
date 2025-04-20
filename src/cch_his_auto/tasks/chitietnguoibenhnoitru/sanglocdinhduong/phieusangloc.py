@@ -5,7 +5,7 @@ import logging
 from cch_his_auto.driver import Driver
 from cch_his_auto.helper import tracing
 
-_logger = logging.getLogger().getChild("sanglocdinhduong")
+_logger = logging.getLogger().getChild("phieusangloc")
 _trace = tracing(_logger)
 
 

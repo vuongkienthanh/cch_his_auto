@@ -39,6 +39,7 @@ def login(driver: Driver, username: str, password: str):
                 time.sleep(2)
                 logout(driver)
                 login(driver, username, password)
+                return
         else:
             _logger.debug("found login screen")
             inputs = driver.find_elements(By.TAG_NAME, "input")

@@ -1,6 +1,5 @@
 import logging
 import sys
-from functools import wraps
 from contextlib import contextmanager
 
 from . import driver
@@ -18,17 +17,17 @@ def tracing(logger: logging.Logger):
     "Add logging capability to `DriverFn`"
 
     def inner(f: "driver.DriverFn"):
-        @wraps(f)
         def inner2(*args, **kwargs):
             name = f.__qualname__
             logger.debug(f"+++ start {name}")
             try:
-                f(*args, **kwargs)
+                ret = f(*args, **kwargs)
             except Exception as e:
                 logger.error(f"??? error running {name}: {e}")
                 raise e
             else:
                 logger.info(f">>> finish {name}")
+                return ret
 
         return inner2
 

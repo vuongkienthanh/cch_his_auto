@@ -57,7 +57,7 @@ class App(tk.Frame):
             text=APP_INTRO,
             justify="left",
             anchor="w",
-        ).grid(row=2, column=0, sticky="SEW", padx=20, columnspan=2)
+        ).grid(row=3, column=0, sticky="SEW", padx=20)
 
         button_frame = ButtonFrame(self)
         button_frame.grid(row=0, column=1, rowspan=2, padx=20, sticky="S", pady=(0, 20))
@@ -89,6 +89,7 @@ class App(tk.Frame):
         def save():
             if messagebox.askyesno(message="Save?"):
                 config.save(get_config())
+                button_frame.save_config()
                 messagebox.showinfo(message="Đã lưu")
 
         button_frame.bind_load(load)

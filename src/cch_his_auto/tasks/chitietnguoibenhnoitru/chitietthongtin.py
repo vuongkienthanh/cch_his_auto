@@ -32,8 +32,11 @@ def get_chieucao(driver: Driver) -> str | None:
             value = driver.find(
                 ".ant-modal:has( .avatar__image) div:nth-child(5) .ant-row div:nth-child(5) input"
             ).get_attribute("value")
-            _logger.debug(f"-> found chieucao={value}")
-            return value
+            if value == "" :
+                continue
+            else:
+                _logger.info(f"-> found chieucao={value}")
+                return value
         except NoSuchElementException:
             _logger.debug("-> can't find chieucao")
     else:
@@ -46,8 +49,11 @@ def get_cannang(driver: Driver) -> str | None:
             value = driver.find(
                 ".ant-modal:has( .avatar__image) div:nth-child(5) .ant-row div:nth-child(6) input"
             ).get_attribute("value")
-            _logger.debug(f"-> found cannang={value}")
-            return value
+            if value == "" :
+                continue
+            else:
+                _logger.info(f"-> found cannang={value}")
+                return value
         except NoSuchElementException:
             _logger.debug("-> can't find cannang")
     else:

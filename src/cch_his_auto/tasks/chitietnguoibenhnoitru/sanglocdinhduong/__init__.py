@@ -24,6 +24,7 @@ def open_dialog(driver: Driver) -> bool:
     try:
         driver.waiting(".ant-modal-body .ant-table", "Sàng lọc dinh dưỡng dialog")
     except NoSuchElementException:
+        _logger.info("-> can't sàng lọc dinh dưỡng dialog")
         if driver.current_url.startswith(
             "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
         ):
@@ -31,6 +32,7 @@ def open_dialog(driver: Driver) -> bool:
         else:
             raise Exception("should have a dialog or new phieusangloc")
     else:
+        _logger.info("-> found sàng lọc dinh dưỡng dialog")
         return True
 
 
@@ -50,7 +52,7 @@ def get_last_date(driver: Driver) -> dt.date:
         driver.find("tbody tr:nth-child(2) td:nth-child(2)").text,
         "%d/%m/%Y %H:%M:%S",
     ).date()
-    _logger.debug(f"-> found last_date = {date}")
+    _logger.info(f"-> found last_date = {date}")
     return date
 
 
@@ -77,7 +79,10 @@ def complete_sanglocdinhduong(driver: Driver):
 
     if open_dialog(driver):
         next_date = get_last_date(driver) + dt.timedelta(days=7)
-        add_new(driver)
+        if next_date <= today:
+            add_new(driver)
+        else:
+            return
     else:
         next_date = admission_date
 
