@@ -12,6 +12,8 @@ _logger = logging.getLogger().getChild("hosobenhan")
 
 
 class Status(StrEnum):
+    "Possible status for each document"
+
     CHUAKY = "Chưa ký"
     DANGKY = "Đang ký"
     HOANTHANH = "Hoàn thành"
@@ -56,7 +58,7 @@ def filter(driver: Driver, name: str) -> bool:
 
 
 def is_row(driver: Driver, idx: int, status: Status) -> bool:
-    "Check if row at `idx` is _status_, first row is id=2"
+    "Check if row at `idx` is `status`, first row is idx=2"
     try:
         _logger.debug(f"checking status = {status}")
         return (
@@ -71,7 +73,7 @@ def is_row(driver: Driver, idx: int, status: Status) -> bool:
 
 
 def is_row_expandable(driver: Driver, idx: int) -> bool:
-    "Check if row at `idx` is expandable, first row is id=2"
+    "Check if row at `idx` is expandable, first row is idx=2"
     name = driver.waiting(
         f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)", f"row {idx}"
     ).text
@@ -92,7 +94,7 @@ def is_row_expandable(driver: Driver, idx: int) -> bool:
 
 
 def expand_row(driver: Driver, idx: int):
-    "Expand row at `idx`"
+    "Expand row at `idx`, first row is idx=2"
     name = driver.waiting(
         f".ant-table-tbody tr:nth-child({idx}) td:nth-child(2)", f"row {idx}"
     ).text
@@ -106,17 +108,20 @@ def filter_check_expand_sign(
     chuaky_fn: Callable[[Driver, int], None],
     dangky_fn: Callable[[Driver, int], None],
 ):
+    "filter `name`, expand it if possible, then call `fn` respectively bases on status"
+
     def check_and_sign(driver: Driver, i: int):
         name = driver.waiting(
             f".ant-table-tbody tr:nth-child({i}) td:nth-child(2)"
         ).text
         _logger.debug(f"checking {name}")
         if is_row(driver, i, Status.CHUAKY):
-            _logger.info(f"row condition: not met: {name}")
+            _logger.info(f"row condition: not met: {name} -> {Status.CHUAKY}")
             driver.clicking(f"tbody tr:nth-child({i})")
             chuaky_fn(driver, i)
             time.sleep(5)
         elif is_row(driver, i, Status.DANGKY):
+            _logger.info(f"row condition: not met: {name} -> {Status.DANGKY}")
             dangky_fn(driver, i)
             time.sleep(5)
         else:
@@ -136,28 +141,33 @@ def filter_check_expand_sign(
             check_and_sign(driver, 2)
 
 
-def _unimplemented(_: Driver):
-    _logger.warning("not implemented")
+def do_nothing():
+    "@private"
+    _logger.warning("should not be called")
 
 
-def _sign_current(driver: Driver):
+def sign_current(driver: Driver):
+    "@private"
     driver.clicking(
         ".right-content .__action button:nth-child(2)", "clicking Ký tên BS dieu tri"
     )
 
 
-def _sign_current2(driver: Driver):
+def sign_current2(driver: Driver):
+    "@private"
     driver.clicking(
         ".right-content .__action button:nth-child(3)", "clicking Ký tên BS truong khoa"
     )
 
 
-def _sign_current_both(driver: Driver):
-    _sign_current(driver)
-    _sign_current2(driver)
+def sign_current_both(driver: Driver):
+    "@private"
+    sign_current(driver)
+    sign_current2(driver)
 
 
-def _sign_tab(driver: Driver, idx: int, sign_fn: DriverFn):
+def sign_tab(driver: Driver, idx: int, sign_fn: DriverFn):
+    "@private"
     tab0 = driver.current_window_handle
     datakey = driver.find(f".ant-table-tbody tr:nth-child({idx})").get_attribute(
         "data-row-key"

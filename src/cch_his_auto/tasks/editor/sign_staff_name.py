@@ -222,3 +222,15 @@ def giaiphaubenh(driver: Driver):
         btn_txt="Xác nhận ký BÁC SĨ ĐIỀU TRỊ",
         img_css=".sign-image img",
     )
+
+
+# his bug
+# def phieudutrucungcapmau(driver: Driver):
+#     "*Phiếu dự trù và cung cấp máu*"
+#     _sign(
+#         driver,
+#         name="phieu du tru cung cap mau",
+#         btn_css=".sign-image button",
+#         btn_txt="Xác nhận ký BÁC SĨ ĐIỀU TRỊ",
+#         img_css=".sign-image img",
+#     )

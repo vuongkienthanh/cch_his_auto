@@ -8,11 +8,11 @@ from .helper import (
     open_dialog,
     close_dialog,
     filter_check_expand_sign,
-    _unimplemented,
-    _sign_current,
-    _sign_current2,
-    _sign_current_both,
-    _sign_tab,
+    do_nothing,
+    sign_current,
+    sign_current2,
+    sign_current_both,
+    sign_tab,
 )
 
 _logger = logging.getLogger().getChild("hosobenhan")
@@ -34,10 +34,10 @@ def tobiabenhannhikhoa(driver: Driver):
     filter_check_expand_sign(
         driver,
         name="Tờ bìa bệnh án Nhi khoa",
-        chuaky_fn=lambda driver, i: _sign_tab(
+        chuaky_fn=lambda driver, i: sign_tab(
             driver, i, sign_staff_name.tobiabenhannhikhoa
         ),
-        dangky_fn=lambda driver, _: _unimplemented(driver),
+        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -47,10 +47,10 @@ def mucAbenhannhikhoa(driver: Driver):
     filter_check_expand_sign(
         driver,
         name="Mục A - Bệnh án Nhi khoa",
-        chuaky_fn=lambda driver, i: _sign_tab(
+        chuaky_fn=lambda driver, i: sign_tab(
             driver, i, sign_staff_name.mucAbenhannhikhoa
         ),
-        dangky_fn=lambda driver, _: _unimplemented(driver),
+        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -60,10 +60,10 @@ def mucBtongketbenhan(driver: Driver):
     filter_check_expand_sign(
         driver,
         name="Mục B - Tổng kết Bệnh án (Nội khoa, Nhi Khoa, Truyền nhiễm, Sơ sinh, Da liễu, DD-PHCN, HHTM)",
-        chuaky_fn=lambda driver, i: _sign_tab(
+        chuaky_fn=lambda driver, i: sign_tab(
             driver, i, sign_staff_name.mucBtongketbenhan
         ),
-        dangky_fn=lambda driver, _: _unimplemented(driver),
+        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -73,8 +73,8 @@ def phieukhambenhvaovien(driver: Driver):
     filter_check_expand_sign(
         driver,
         name="Phiếu khám bệnh vào viện",
-        chuaky_fn=lambda driver, _: _sign_current(driver),
-        dangky_fn=lambda driver, _: _unimplemented(driver),
+        chuaky_fn=lambda driver, _: sign_current(driver),
+        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -84,8 +84,8 @@ def phieuchidinhxetnghiem(driver: Driver):
     filter_check_expand_sign(
         driver,
         name="Phiếu chỉ định xét nghiệm",
-        chuaky_fn=lambda driver, _: _sign_current(driver),
-        dangky_fn=lambda driver, _: _unimplemented(driver),
+        chuaky_fn=lambda driver, _: sign_current(driver),
+        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -95,8 +95,8 @@ def todieutri(driver: Driver):
     filter_check_expand_sign(
         driver,
         name="Tờ điều trị",
-        chuaky_fn=lambda driver, i: _sign_tab(driver, i, sign_staff_name.todieutri),
-        dangky_fn=lambda driver, _: _unimplemented(driver),
+        chuaky_fn=lambda driver, i: sign_tab(driver, i, sign_staff_name.todieutri),
+        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -106,8 +106,8 @@ def phieuchidinhPTTT(driver: Driver):
     filter_check_expand_sign(
         driver,
         name="Phiếu chỉ định PTTT",
-        chuaky_fn=lambda driver, _: _sign_current(driver),
-        dangky_fn=lambda driver, _: _unimplemented(driver),
+        chuaky_fn=lambda driver, _: sign_current(driver),
+        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -119,8 +119,8 @@ def phieuCT_bschidinh(driver: Driver):
     filter_check_expand_sign(
         driver,
         name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
-        chuaky_fn=lambda driver, i: _sign_tab(driver, i, chuaky_fn),
-        dangky_fn=lambda driver, _: _unimplemented(driver),
+        chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
+        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -140,8 +140,8 @@ def phieuCT(driver: Driver, signature: str | None):
     filter_check_expand_sign(
         driver,
         name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
-        chuaky_fn=lambda driver, i: _sign_tab(driver, i, chuaky_fn),
-        dangky_fn=lambda driver, i: _sign_tab(driver, i, dangky_fn),
+        chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
+        dangky_fn=lambda driver, i: sign_tab(driver, i, dangky_fn),
     )
 
 
@@ -161,8 +161,8 @@ def phieuMRI(driver: Driver, signature: str | None):
     filter_check_expand_sign(
         driver,
         name="Phiếu chỉ định chụp cộng hưởng từ (MRI)",
-        chuaky_fn=lambda driver, i: _sign_tab(driver, i, chuaky_fn),
-        dangky_fn=lambda driver, i: _sign_tab(driver, i, dangky_fn),
+        chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
+        dangky_fn=lambda driver, i: sign_tab(driver, i, dangky_fn),
     )
 
 
@@ -172,8 +172,8 @@ def giaiphaubenh(driver: Driver):
     filter_check_expand_sign(
         driver,
         name="Phiếu xét nghiệm giải phẫu bệnh sinh thiết",
-        chuaky_fn=lambda driver, i: _sign_tab(driver, i, sign_staff_name.giaiphaubenh),
-        dangky_fn=lambda driver, _: _unimplemented(driver),
+        chuaky_fn=lambda driver, i: sign_tab(driver, i, sign_staff_name.giaiphaubenh),
+        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -183,8 +183,8 @@ def phieusanglocdinhduong(driver: Driver):
     filter_check_expand_sign(
         driver,
         name="Phiếu sàng lọc dinh dưỡng - Bệnh nhi nội trú",
-        chuaky_fn=lambda driver, _: _sign_current(driver),
-        dangky_fn=lambda driver, _: _unimplemented(driver),
+        chuaky_fn=lambda driver, _: sign_current(driver),
+        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -194,6 +194,28 @@ def phieusoket15ngay(driver: Driver):
     filter_check_expand_sign(
         driver,
         name="Phiếu sơ kết 15 ngày điều trị",
-        chuaky_fn=lambda driver, _: _sign_current_both(driver),
-        dangky_fn=lambda driver, _: _sign_current2(driver),
+        chuaky_fn=lambda driver, _: sign_current_both(driver),
+        dangky_fn=lambda driver, _: sign_current2(driver),
     )
+
+
+@_trace
+def donthuoc(driver: Driver):
+    "Filter and sign name: *Đơn thuốc*"
+    filter_check_expand_sign(
+        driver,
+        name="Đơn thuốc",
+        chuaky_fn=lambda driver, _: sign_current(driver),
+        dangky_fn=lambda *_: do_nothing(),
+    )
+
+# his bug
+# @_trace
+# def phieudutrucungcapmau(driver: Driver):
+#     "Filter and sign name: *Phiếu dự trù và cung cấp máu*"
+#     filter_check_expand_sign(
+#         driver,
+#         name="Phiếu dự trù và cung cấp máu",
+#         chuaky_fn=lambda driver, i: sign_tab(driver,i,),
+#         dangky_fn=lambda *_: do_nothing(),
+#     )

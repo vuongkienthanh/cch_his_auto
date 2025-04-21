@@ -170,6 +170,7 @@ def process_final_day(driver: Driver, signature: str | None):
         hosobenhan.phieusanglocdinhduong(driver)
         hosobenhan.phieuchidinhPTTT(driver)
         hosobenhan.phieusoket15ngay(driver)
+        hosobenhan.donthuoc(driver)
 
 
 def run_check(cfg: config.Config, run_cfg: RunConfig):
