@@ -34,13 +34,100 @@ def scrape_signature(driver: Driver) -> str | None:
 
 
 def get_admission_date(driver: Driver) -> dt.date:
-    "Get admission date"
+    ele = driver.waiting(
+        ".tab-box .info:nth-child(1) .ant-col:nth-child(2) .item-sub:nth-child(1) b",
+        "admission date",
+    ).text
+    # should exist admission_date
+    if ele == "":
+        time.sleep(1)
+        return get_admission_date(driver)
     date = dt.datetime.strptime(
-        driver.waiting(
-            ".tab-box .content-tab .ant-row .ant-col:nth-child(2) .item-sub b",
-            "admission date",
-        ).text,
+        ele,
         "%d/%m/%Y %H:%M:%S",
     ).date()
     _logger.debug(f"admisstion_date={date}")
     return date
+
+
+def get_discharge_date(driver: Driver) -> dt.date | None:
+    for _ in range(10):
+        time.sleep(1)
+        ele = driver.waiting(
+            ".tab-box .info:nth-child(3) .ant-col:nth-child(2) .item-sub:nth-child(4) b",
+            "discharge date",
+        ).text
+        if ele != "":
+            break
+    else:
+        _logger.debug("=> can't find discharge_date")
+        return None
+    date = dt.datetime.strptime(
+        ele,
+        "%d/%m/%Y %H:%M:%S",
+    ).date()
+    _logger.debug(f"discharge_date={date}")
+    return date
+
+
+def get_discharge_diagnosis(driver: Driver) -> str | None:
+    for _ in range(10):
+        time.sleep(1)
+        ele = driver.waiting(
+            ".tab-box .info:nth-child(3) .ant-col:nth-child(1) .item-sub:nth-child(1) b",
+            "discharge diagnosis",
+        ).text
+        if ele != "":
+            break
+    else:
+        _logger.debug("=> can't find discharge_diagnosis")
+        return None
+    _logger.debug(f"discharge_diagnosis={ele}")
+    return ele
+
+
+def get_discharge_comorbid(driver: Driver) -> list[str]:
+    for _ in range(10):
+        time.sleep(1)
+        ele = driver.waiting(
+            ".tab-box .info:nth-child(3) .ant-col:nth-child(1) .item-sub:nth-child(2) b",
+            "discharge comormid",
+        ).text
+        if ele != "":
+            break
+    else:
+        _logger.debug("=> can't find discharge_comorbid")
+        return []
+    _logger.debug(f"discharge_comorbid={ele}")
+    return ele.split("; ")
+
+def get_discharge_diagnosis_detail(driver: Driver) -> str | None:
+    for _ in range(10):
+        time.sleep(1)
+        ele = driver.waiting(
+            ".tab-box .info:nth-child(3) .ant-col:nth-child(1) .item-sub:nth-child(3) b",
+            "discharge diagnosis detail",
+        ).text
+        if ele != "":
+            break
+    else:
+        _logger.debug("=> can't find discharge_diagnosis")
+        return None
+    _logger.debug(f"discharge_diagnosis_detail={ele}")
+    return ele
+
+def get_bloodtype(driver: Driver) -> str | None:
+    for _ in range(10):
+        time.sleep(1)
+        ele = driver.waiting(
+            ".tab-box .info:nth-child(1) .ant-col:nth-child(1) .item-sub:nth-child(6) b",
+            "bloodtype",
+        ).text
+        if ele != "":
+            break
+    else:
+        _logger.debug("=> can't find bloodtype")
+        return None
+    _logger.debug(f"bloodtype={ele}")
+    return ele
+

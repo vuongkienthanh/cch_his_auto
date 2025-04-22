@@ -5,7 +5,6 @@ from selenium.common import NoSuchElementException
 
 from cch_his_auto.driver import Driver
 from cch_his_auto.helper import tracing
-from cch_his_auto.tasks.chitietnguoibenhnoitru import get_admission_date
 from cch_his_auto.tasks.chitietnguoibenhnoitru import chitietthongtin
 from .phieusangloc import save_new_phieusangloc
 
@@ -75,9 +74,8 @@ def add_new(driver: Driver):
 
 
 @_trace
-def add_all_phieusanglocdinhduong(driver: Driver):
+def add_all_phieusanglocdinhduong(driver: Driver, admission_date: dt.date):
     "Complete all *Phiếu sàng lọc* from admission_date up til today"
-    admission_date = get_admission_date(driver)
     with chitietthongtin.session(driver):
         cannang = chitietthongtin.get_cannang(driver)
         if not cannang:

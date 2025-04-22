@@ -2,19 +2,22 @@ import logging
 import tkinter as tk
 from tkinter import messagebox
 
-from . import config
-from .patient_list import PatientFrame
-
-from cch_his_auto.driver import Driver
-from cch_his_auto.tasks.auth import session
-from cch_his_auto.tasks.todieutri import ingiayto as igt
-from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan
 
 from cch_his_auto.app import PROFILE_PATH
 from cch_his_auto.app.global_db import create_connection
 from cch_his_auto.app.common_ui.staff_info import UsernamePasswordFrame
 from cch_his_auto.app.common_ui.button_frame import ButtonFrame2, RunConfig, setLogLevel
 from cch_his_auto.app.common_tasks.signature import get_signature_from_elsewhere
+from . import config
+from .patient_list import PatientFrame
+
+
+from cch_his_auto.driver import Driver
+from cch_his_auto.tasks import auth
+from cch_his_auto.tasks.todieutri import ingiayto as igt
+from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan
+from cch_his_auto.tasks.chitietnguoibenhnoitru.hosobenhan import tab_hosokhamchuabenh
+
 
 TITLE = "Ký tờ điều trị hằng ngày"
 _logger = logging.getLogger().getChild("app")
@@ -96,14 +99,14 @@ def run(cfg: config.Config, run_cfg: RunConfig):
         bs, dd = config.is_bs_valid(cfg), config.is_dd_valid(cfg)
         match (bs, dd):
             case (True, True):
-                with session(
+                with auth.session(
                     driver,
                     cfg["bacsi"]["username"],
                     cfg["bacsi"]["password"],
                     cfg["department"],
                 ):
                     run_bs(driver, cfg)
-                with session(
+                with auth.session(
                     driver,
                     cfg["dieuduong"]["username"],
                     cfg["dieuduong"]["password"],
@@ -112,7 +115,7 @@ def run(cfg: config.Config, run_cfg: RunConfig):
                     run_dd(driver, cfg)
                     run_bn(driver, cfg)
             case (True, False):
-                with session(
+                with auth.session(
                     driver,
                     cfg["bacsi"]["username"],
                     cfg["bacsi"]["password"],
@@ -122,7 +125,7 @@ def run(cfg: config.Config, run_cfg: RunConfig):
                     run_bn(driver, cfg)
                 messagebox.showwarning(message="chưa nhập điều dưỡng")
             case (False, True):
-                with session(
+                with auth.session(
                     driver,
                     cfg["dieuduong"]["username"],
                     cfg["dieuduong"]["password"],
@@ -147,9 +150,10 @@ def run_bs(driver: Driver, cfg: config.Config):
             igt.sign_phieuchidinh(driver)
         if p["ky_ct"]:
             driver.clicking(".right button:nth-child(2)")
-            hosobenhan.open_dialog(driver)
-            hosobenhan.phieuCT_bschidinh(driver)
-            hosobenhan.close_dialog(driver)
+
+            with hosobenhan.session(driver):
+                tab_hosokhamchuabenh.phieuCT_bschidinh(driver)
+
             driver.goto(p["url"])
         if p["ky_todieutri"]:
             igt.sign_todieutri(driver)

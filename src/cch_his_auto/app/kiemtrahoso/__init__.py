@@ -1,16 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
 
-from . import config
-
-from cch_his_auto.driver import Driver
-from cch_his_auto.tasks.auth import session
-from cch_his_auto.tasks.chitietnguoibenhnoitru import (
-    hosobenhan,
-    sanglocdinhduong,
-    chitietthongtin,
-)
-from cch_his_auto.tasks import danhsachnguoibenhnoitru
 
 from cch_his_auto.app import PROFILE_PATH
 from cch_his_auto.app.global_db import create_connection
@@ -18,15 +8,38 @@ from cch_his_auto.app.common_ui.staff_info import UsernamePasswordDeptFrame
 from cch_his_auto.app.common_ui.button_frame import ButtonFrame, RunConfig, setLogLevel
 from cch_his_auto.app.common_tasks.navigation import first_patient, next_patient
 from cch_his_auto.app.common_tasks.signature import get_signature_from_ctnbnt
+from . import config
+
+
+from cch_his_auto.driver import Driver
+from cch_his_auto.tasks import auth, danhsachnguoibenhnoitru, chitietnguoibenhnoitru
+from cch_his_auto.tasks.chitietnguoibenhnoitru import (
+    get_admission_date,
+    get_discharge_date,
+    get_bloodtype,
+    hosobenhan,
+    sanglocdinhduong,
+    chitietthongtin,
+    thongtinravien,
+    thongtinvaovien,
+)
+from cch_his_auto.tasks.chitietnguoibenhnoitru.hosobenhan import (
+    tab_hosokhamchuabenh,
+    tab_mau,
+)
+
 
 TITLE = "Kiểm tra hồ sơ"
 APP_INTRO = """
     Chức năng hiện tại:
-        + Tờ bìa, mục A, mục B
-        + phiếu chỉ định, tờ điều trị
+        + Mục A, mục B
+        + Phiếu chỉ định, tờ điều trị
         + Phiếu CT, MRI
         + Phiếu giải phẫu bệnh
         + Phiếu sàng lọc dinh dưỡng
+        + Ký sơ kết 15n
+        - Tờ bìa, tờ điều trị XV
+
     """
 
 
@@ -120,7 +133,9 @@ def run(cfg: config.Config, run_cfg: RunConfig):
         process = process_normal_day
     try:
         with create_connection() as con:
-            with session(driver, cfg["username"], cfg["password"], cfg["department"]):
+            with auth.session(
+                driver, cfg["username"], cfg["password"], cfg["department"]
+            ):
                 if cfg["discharged"]:
                     danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
 
@@ -140,37 +155,63 @@ def run(cfg: config.Config, run_cfg: RunConfig):
 
 
 def process_normal_day(driver: Driver, signature: str | None):
-    sanglocdinhduong.add_all_phieusanglocdinhduong(driver)
+    admission_date = get_admission_date(driver)
+    discharge_date = get_discharge_date(driver)
+    sanglocdinhduong.add_all_phieusanglocdinhduong(driver, admission_date)
 
     with hosobenhan.session(driver):
-        hosobenhan.phieuchidinhxetnghiem(driver)
-        hosobenhan.todieutri(driver)
-        hosobenhan.phieuCT(driver, signature)
-        hosobenhan.phieuMRI(driver, signature)
-        hosobenhan.giaiphaubenh(driver)
-        hosobenhan.phieusanglocdinhduong(driver)
-        hosobenhan.phieuchidinhPTTT(driver)
-        hosobenhan.phieusoket15ngay(driver)
+        tab_hosokhamchuabenh.phieuchidinhxetnghiem(driver)
+        tab_hosokhamchuabenh.todieutri(driver, discharge_date)
+        tab_hosokhamchuabenh.phieuCT(driver, signature)
+        tab_hosokhamchuabenh.phieuMRI(driver, signature)
+        tab_hosokhamchuabenh.giaiphaubenh(driver)
+        tab_hosokhamchuabenh.phieusanglocdinhduong(driver)
+        tab_hosokhamchuabenh.phieuchidinhPTTT(driver)
+        tab_hosokhamchuabenh.phieusoket15ngay(driver)
 
 
 def process_final_day(driver: Driver, signature: str | None):
-    sanglocdinhduong.add_all_phieusanglocdinhduong(driver)
+    admission_date = get_admission_date(driver)
+    sanglocdinhduong.add_all_phieusanglocdinhduong(driver, admission_date)
+
+    discharge_date = get_discharge_date(driver)
+
+    # kiểm tra viết tắt
+    if discharge_date is not None:
+        detail = chitietnguoibenhnoitru.get_discharge_diagnosis_detail(driver)
+        if detail is not None:
+            detail = detail.lower()
+            if any([viettat in detail for viettat in ["hp", "nmc", "dmc"]]):
+                detail = detail.replace("hp", "hậu phẫu")
+                detail = detail.replace("nmc", "ngoài màng cứng")
+                detail = detail.replace("dmc", "dưới màng cứng")
+                with thongtinravien.session(driver):
+                    thongtinravien.set_discharge_diagnosis_detail(driver, detail)
+
+    # điền thông tin nhóm máu
+    bloodtype = get_bloodtype(driver)
+    if bloodtype is None:
+        with hosobenhan.session(driver, tab_mau.TAB_NUNMBER):
+            found_bloodtype = tab_mau.get_bloodtype(driver)
+        if found_bloodtype is not None:
+            with thongtinvaovien.session(driver):
+                thongtinvaovien.set_bloodtype(driver, found_bloodtype)
 
     with hosobenhan.session(driver):
-        hosobenhan.tobiabenhannhikhoa(driver)
-        hosobenhan.mucAbenhannhikhoa(driver)
-        hosobenhan.mucBtongketbenhan(driver)
-        hosobenhan.phieukhambenhvaovien(driver)
+        # tab_hosokhamchuabenh.tobiabenhannhikhoa(driver)
+        tab_hosokhamchuabenh.mucAbenhannhikhoa(driver)
+        tab_hosokhamchuabenh.mucBtongketbenhan(driver)
+        tab_hosokhamchuabenh.phieukhambenhvaovien(driver)
 
-        hosobenhan.phieuchidinhxetnghiem(driver)
-        hosobenhan.todieutri(driver)
-        hosobenhan.phieuCT(driver, signature)
-        hosobenhan.phieuMRI(driver, signature)
-        hosobenhan.giaiphaubenh(driver)
-        hosobenhan.phieusanglocdinhduong(driver)
-        hosobenhan.phieuchidinhPTTT(driver)
-        hosobenhan.phieusoket15ngay(driver)
-        hosobenhan.donthuoc(driver)
+        tab_hosokhamchuabenh.phieuchidinhxetnghiem(driver)
+        tab_hosokhamchuabenh.todieutri(driver, discharge_date)
+        tab_hosokhamchuabenh.phieuCT(driver, signature)
+        tab_hosokhamchuabenh.phieuMRI(driver, signature)
+        tab_hosokhamchuabenh.giaiphaubenh(driver)
+        tab_hosokhamchuabenh.phieusanglocdinhduong(driver)
+        tab_hosokhamchuabenh.phieuchidinhPTTT(driver)
+        tab_hosokhamchuabenh.phieusoket15ngay(driver)
+        tab_hosokhamchuabenh.donthuoc(driver)
 
 
 def run_check(cfg: config.Config, run_cfg: RunConfig):
@@ -180,34 +221,55 @@ def run_check(cfg: config.Config, run_cfg: RunConfig):
         return
 
     chieucao_cannang_missing = []
+    machanthuong_kemtheo_missing = []
 
     def check_chieucao_cannang(driver: Driver, ma_hs: int):
         with chitietthongtin.session(driver):
-            if not (
-                chitietthongtin.get_chieucao(driver)
-                and chitietthongtin.get_cannang(driver)
+            if (chitietthongtin.get_chieucao(driver) is not None) and (
+                chitietthongtin.get_cannang(driver) is not None
             ):
                 chieucao_cannang_missing.append(ma_hs)
+
+    def check_machanthuong_kemtheo(driver: Driver, ma_hs: int):
+        diagnosis = chitietnguoibenhnoitru.get_discharge_diagnosis(driver)
+        if diagnosis is not None:
+            if diagnosis.startswith("S") and any(
+                [
+                    d[0] not in "WYV"
+                    for d in chitietnguoibenhnoitru.get_discharge_comorbid(driver)
+                ]
+            ):
+                machanthuong_kemtheo_missing.append(ma_hs)
+
+    def check(driver: Driver, ma_hs: int):
+        check_chieucao_cannang(driver, ma_hs)
+        check_machanthuong_kemtheo(driver, ma_hs)
 
     setLogLevel(run_cfg)
     driver = Driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH)
     try:
         with create_connection() as con:
-            with session(driver, cfg["username"], cfg["password"], cfg["department"]):
+            with auth.session(
+                driver, cfg["username"], cfg["password"], cfg["department"]
+            ):
                 ma_hs = listing.pop()
                 first_patient(driver, con, ma_hs)
-                check_chieucao_cannang(driver, ma_hs)
+                check(driver, ma_hs)
                 while len(listing) > 0:
                     ma_hs = listing.pop()
                     next_patient(driver, con, ma_hs)
-                    check_chieucao_cannang(driver, ma_hs)
+                    check(driver, ma_hs)
 
     finally:
         driver.quit()
-        if len(chieucao_cannang_missing):
-            messagebox.showinfo(
-                message="Thiếu chiều cao nặng ở chi tiết thông tin:\n"
-                + ", ".join(chieucao_cannang_missing)
+        if len(chieucao_cannang_missing) > 0:
+            messagebox.showwarning(
+                message="Thiếu chiều cao cân nặng ở chi tiết thông tin:\n"
+                + "\n".join(chieucao_cannang_missing)
             )
-
+        if len(machanthuong_kemtheo_missing) > 0:
+            messagebox.showwarning(
+                message="Thiếu mã chấn thương kèm theo:\n"
+                + "\n".join(machanthuong_kemtheo_missing)
+            )
         messagebox.showinfo(message="finish")
