@@ -13,9 +13,6 @@ from . import config
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tasks import auth, danhsachnguoibenhnoitru, chitietnguoibenhnoitru
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
-    get_admission_date,
-    get_discharge_date,
-    get_bloodtype,
     hosobenhan,
     sanglocdinhduong,
     chitietthongtin,
@@ -154,8 +151,8 @@ def run(cfg: config.Config, run_cfg: RunConfig):
 
 
 def process_normal_day(driver: Driver, signature: str | None):
-    admission_date = get_admission_date(driver)
-    discharge_date = get_discharge_date(driver)
+    admission_date = chitietnguoibenhnoitru.get_admission_date(driver)
+    discharge_date = chitietnguoibenhnoitru.get_discharge_date(driver)
     sanglocdinhduong.add_all_phieusanglocdinhduong(driver, admission_date)
 
     with hosobenhan.session(driver):
@@ -170,11 +167,11 @@ def process_normal_day(driver: Driver, signature: str | None):
 
 
 def process_final_day(driver: Driver, signature: str | None):
-    admission_date = get_admission_date(driver)
+    admission_date = chitietnguoibenhnoitru.get_admission_date(driver)
     sanglocdinhduong.add_all_phieusanglocdinhduong(driver, admission_date)
 
     # kiểm tra ngày xuất viện
-    discharge_date = get_discharge_date(driver)
+    discharge_date = chitietnguoibenhnoitru.get_discharge_date(driver)
     if discharge_date is None:
         messagebox.showwarning("Chưa có ngày xuất viện")
         return
@@ -191,7 +188,7 @@ def process_final_day(driver: Driver, signature: str | None):
                 thongtinravien.set_discharge_diagnosis_detail(driver, detail)
 
     # điền thông tin nhóm máu
-    bloodtype = get_bloodtype(driver)
+    bloodtype = chitietnguoibenhnoitru.get_bloodtype(driver)
     if bloodtype is None:
         with hosobenhan.session(driver, tab_mau.TAB_NUNMBER):
             found_bloodtype = tab_mau.get_bloodtype(driver)
@@ -228,8 +225,8 @@ def run_check(cfg: config.Config, run_cfg: RunConfig):
 
     def check_chieucao_cannang(driver: Driver, ma_hs: int):
         with chitietthongtin.session(driver):
-            if (chitietthongtin.get_chieucao(driver) is not None) and (
-                chitietthongtin.get_cannang(driver) is not None
+            if (chitietthongtin.get_chieucao(driver) is None) or (
+                chitietthongtin.get_cannang(driver) is None
             ):
                 chieucao_cannang_missing.append(ma_hs)
 

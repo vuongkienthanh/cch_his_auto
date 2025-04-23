@@ -22,5 +22,5 @@ def get_bloodtype(driver: Driver) -> str | None:
             _logger.info(f"nhommau = {ele}")
             return ele
     except NoSuchElementException:
-        _logger.info(" can't find nhommau")
+        _logger.warning("-> can't find nhommau")
         return None

@@ -25,3 +25,7 @@ class MainApp(tk.Tk):
 
 def run():
     MainApp().mainloop()
+
+
+if __name__ == "__main__":
+    run()
