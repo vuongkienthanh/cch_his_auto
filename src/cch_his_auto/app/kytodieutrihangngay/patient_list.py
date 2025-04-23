@@ -2,7 +2,8 @@ import tkinter as tk
 from typing import cast
 
 from .config import Patient
-from ..common_ui.scrollable_frame import ScrollFrame
+
+from cch_his_auto.common_ui.scrollable_frame import ScrollFrame
 
 
 class PatientFrame(tk.Frame):
