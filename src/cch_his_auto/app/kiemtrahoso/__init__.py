@@ -115,7 +115,7 @@ class App(tk.Frame):
         button_frame.bind_save(save)
         button_frame.bind_run(lambda: run(get_config(), button_frame.get_config()))
         run_check_btn.configure(
-            command=lambda: run(get_config(), button_frame.get_config())
+            command=lambda: run_check(get_config(), button_frame.get_config())
         )
 
 
@@ -265,11 +265,11 @@ def run_check(cfg: config.Config, run_cfg: RunConfig):
         if len(chieucao_cannang_missing) > 0:
             messagebox.showwarning(
                 message="Thiếu chiều cao cân nặng ở chi tiết thông tin:\n"
-                + "\n".join(chieucao_cannang_missing)
+                + "\n".join([str(x) for x in chieucao_cannang_missing])
             )
         if len(machanthuong_kemtheo_missing) > 0:
             messagebox.showwarning(
                 message="Thiếu mã chấn thương kèm theo:\n"
-                + "\n".join(machanthuong_kemtheo_missing)
+                + "\n".join([str(x) for x in machanthuong_kemtheo_missing])
             )
         messagebox.showinfo(message="finish")

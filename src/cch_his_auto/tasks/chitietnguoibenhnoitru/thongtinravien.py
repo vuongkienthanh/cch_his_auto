@@ -26,7 +26,7 @@ def save(driver: Driver):
         f"{DIALOG_CSS} .bottom-action-right button:nth-child(2)",
         "save button",
     )
-    driver.wait_closing(DIALOG_CSS, "edit thongtinra vien dialog")
+    driver.wait_closing(DIALOG_CSS, "edit thongtinravien dialog")
 
 
 def set_discharge_diagnosis_detail(driver: Driver, value: str):

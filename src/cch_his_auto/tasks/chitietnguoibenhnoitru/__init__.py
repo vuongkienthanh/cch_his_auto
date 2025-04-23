@@ -66,7 +66,7 @@ def get_discharge_date(driver: Driver) -> dt.date | None:
         ele,
         "%d/%m/%Y %H:%M:%S",
     ).date()
-    _logger.debug(f"discharge_date={date}")
+    _logger.info(f"discharge_date={date}")
     return date
 
 
@@ -82,7 +82,7 @@ def get_discharge_diagnosis(driver: Driver) -> str | None:
     else:
         _logger.debug("=> can't find discharge_diagnosis")
         return None
-    _logger.debug(f"discharge_diagnosis={ele}")
+    _logger.info(f"discharge_diagnosis={ele}")
     return ele
 
 
@@ -98,7 +98,7 @@ def get_discharge_comorbid(driver: Driver) -> list[str]:
     else:
         _logger.debug("=> can't find discharge_comorbid")
         return []
-    _logger.debug(f"discharge_comorbid={ele}")
+    _logger.info(f"discharge_comorbid={ele}")
     return ele.split("; ")
 
 def get_discharge_diagnosis_detail(driver: Driver) -> str | None:
@@ -113,7 +113,7 @@ def get_discharge_diagnosis_detail(driver: Driver) -> str | None:
     else:
         _logger.debug("=> can't find discharge_diagnosis")
         return None
-    _logger.debug(f"discharge_diagnosis_detail={ele}")
+    _logger.info(f"discharge_diagnosis_detail={ele}")
     return ele
 
 def get_bloodtype(driver: Driver) -> str | None:
@@ -128,6 +128,6 @@ def get_bloodtype(driver: Driver) -> str | None:
     else:
         _logger.debug("=> can't find bloodtype")
         return None
-    _logger.debug(f"bloodtype={ele}")
+    _logger.info(f"bloodtype={ele}")
     return ele
 

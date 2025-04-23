@@ -55,7 +55,7 @@ def is_row(driver: Driver, idx: int, status: Status) -> bool:
         _logger.debug(f"checking status = {status}")
         return (
             driver.waiting(
-                f"{RIGHT_PANEL} .right-content tr:nth-child({idx}) td:nth-child(3)",
+                f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(3)",
                 f"row {idx} status",
             ).text.strip()
             == status
