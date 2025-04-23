@@ -221,6 +221,7 @@ def run_check(cfg: config.Config, run_cfg: RunConfig):
 
     chieucao_cannang_missing = []
     machanthuong_kemtheo_missing = []
+    discharge_date_is_sat_sun = []
 
     def check_chieucao_cannang(driver: Driver, ma_hs: int):
         with chitietthongtin.session(driver):
@@ -240,9 +241,16 @@ def run_check(cfg: config.Config, run_cfg: RunConfig):
             ):
                 machanthuong_kemtheo_missing.append(ma_hs)
 
+    def check_discharge_date_is_sat_sun(driver: Driver, ma_hs: int):
+        date = chitietnguoibenhnoitru.get_discharge_date(driver)
+        if date is not None:
+            if date.weekday() in [5, 6]:
+                discharge_date_is_sat_sun.append(ma_hs)
+
     def check(driver: Driver, ma_hs: int):
         check_chieucao_cannang(driver, ma_hs)
         check_machanthuong_kemtheo(driver, ma_hs)
+        check_discharge_date_is_sat_sun(driver, ma_hs)
 
     setLogLevel(run_cfg)
     driver = Driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH)
