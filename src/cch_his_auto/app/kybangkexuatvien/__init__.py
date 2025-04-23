@@ -2,19 +2,20 @@ import sqlite3
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
 
-
-from . import config
-
-from cch_his_auto.driver import Driver
-from cch_his_auto.tasks.auth import session
-from cch_his_auto.tasks.chitietnguoibenhnoitru.indieuduong import sign_bangkechiphiBHYT
-
 from cch_his_auto.app import PROFILE_PATH
 from cch_his_auto.app.global_db import create_connection
 from cch_his_auto.app.common_ui.staff_info import UsernamePasswordDeptFrame
 from cch_his_auto.app.common_ui.button_frame import ButtonFrame, RunConfig, setLogLevel
 from cch_his_auto.app.common_tasks.signature import get_signature_from_ctnbnt
 from cch_his_auto.app.common_tasks.navigation import first_patient, next_patient
+from . import config
+
+from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.tasks.auth import session
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.indieuduong import (
+    sign_bangkechiphiBHYT,
+)
+
 
 TITLE = "Ký bảng kê xuất viện"
 

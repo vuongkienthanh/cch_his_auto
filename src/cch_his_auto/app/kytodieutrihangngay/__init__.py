@@ -2,7 +2,6 @@ import logging
 import tkinter as tk
 from tkinter import messagebox
 
-
 from cch_his_auto.app import PROFILE_PATH
 from cch_his_auto.app.global_db import create_connection
 from cch_his_auto.app.common_ui.staff_info import UsernamePasswordFrame
@@ -11,12 +10,13 @@ from cch_his_auto.app.common_tasks.signature import get_signature_from_elsewhere
 from . import config
 from .patient_list import PatientFrame
 
-
-from cch_his_auto.driver import Driver
-from cch_his_auto.tasks import auth
-from cch_his_auto.tasks.todieutri import ingiayto as igt
-from cch_his_auto.tasks.chitietnguoibenhnoitru import hosobenhan
-from cch_his_auto.tasks.chitietnguoibenhnoitru.hosobenhan import tab_hosokhamchuabenh
+from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.tasks import auth
+from cch_his_auto_lib.tasks.todieutri import ingiayto as igt
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import hosobenhan
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.hosobenhan import (
+    tab_hosokhamchuabenh,
+)
 
 
 TITLE = "Ký tờ điều trị hằng ngày"

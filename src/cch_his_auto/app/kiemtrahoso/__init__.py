@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
 
-
 from cch_his_auto.app import PROFILE_PATH
 from cch_his_auto.app.global_db import create_connection
 from cch_his_auto.app.common_ui.staff_info import UsernamePasswordDeptFrame
@@ -10,10 +9,9 @@ from cch_his_auto.app.common_tasks.navigation import first_patient, next_patient
 from cch_his_auto.app.common_tasks.signature import get_signature_from_ctnbnt
 from . import config
 
-
-from cch_his_auto.driver import Driver
-from cch_his_auto.tasks import auth, danhsachnguoibenhnoitru, chitietnguoibenhnoitru
-from cch_his_auto.tasks.chitietnguoibenhnoitru import (
+from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.tasks import auth, danhsachnguoibenhnoitru, chitietnguoibenhnoitru
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
     get_admission_date,
     get_discharge_date,
     get_bloodtype,
@@ -23,7 +21,7 @@ from cch_his_auto.tasks.chitietnguoibenhnoitru import (
     thongtinravien,
     thongtinvaovien,
 )
-from cch_his_auto.tasks.chitietnguoibenhnoitru.hosobenhan import (
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.hosobenhan import (
     tab_hosokhamchuabenh,
     tab_mau,
 )

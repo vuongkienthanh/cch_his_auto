@@ -1,26 +1,27 @@
 [project]
 name = "cch_his_auto"
 version = "0.1.0"
-description = "Automate your HIS workflow at CCH "
+description = "Automate your HIS workflow at CCH"
 readme = "README.md"
 authors = [{ name = "vuongkienthanh", email = "thanhstardust@outlook.com" }]
 requires-python = ">=3.12"
-dependencies = [
-    "selenium>=4.29.0",
-    "validators>=0.34.0",
-]
+dependencies = ["cch_his_auto_lib", "validators>=0.34.0"]
+
+[dependency-groups]
+build = ["pyinstaller>=6.12.0"]
+
+[tool.uv.sources]
+cch_his_auto_lib = { workspace = true }
+
+[tool.uv.workspace]
+members = ["packages/*"]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
- 
+
 [tool.uv]
 package = true
 
-[dependency-groups]
-build = [
-    "pyinstaller>=6.12.0",
-]
-dev = [
-    "pdoc>=15.0.1",
-]
+[project.scripts]
+cch_his_auto = "cch_his_auto:run"

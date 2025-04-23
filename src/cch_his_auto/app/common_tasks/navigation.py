@@ -1,10 +1,12 @@
 from sqlite3 import Connection
 import logging
 
-from cch_his_auto.driver import Driver
-from cch_his_auto.tasks.chitietnguoibenhnoitru import danhsachnguoibenh
-from cch_his_auto.tasks import danhsachnguoibenhnoitru
+from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import danhsachnguoibenh
+from cch_his_auto_lib.tasks import danhsachnguoibenhnoitru
+
 from cch_his_auto.app.global_db import get_url_from_db
+
 
 _logger = logging.getLogger().getChild("app")
 

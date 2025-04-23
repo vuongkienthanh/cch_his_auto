@@ -1,10 +1,10 @@
 import sqlite3
 import logging
 
-from cch_his_auto.driver import Driver
+from cch_his_auto_lib.driver import Driver
 from cch_his_auto.app.global_db import save_db, get_signature_from_db
-from cch_his_auto.tasks.chitietnguoibenhnoitru import scrape_signature
-from cch_his_auto.tasks.danhsachnguoibenhnoitru import URL, goto_patient
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import scrape_signature
+from cch_his_auto_lib.tasks.danhsachnguoibenhnoitru import URL, goto_patient
 
 _logger = logging.getLogger().getChild("app")
 
