@@ -59,7 +59,7 @@ def login(driver: Driver, username: str, password: str):
 def logout(driver: Driver):
     "logout, then back to login page"
     time.sleep(5)  # wait for it to be dropdown-able
-    for i in range(120):
+    for i in range(3):
         time.sleep(1)
         _logger.debug(f"trying logout {i}...")
         driver.clicking(".header .header-icon:has(+.username)", "log menu drop down")

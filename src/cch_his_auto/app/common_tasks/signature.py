@@ -20,9 +20,6 @@ def get_signature_from_elsewhere(
         working_url = driver.current_url
         driver.goto(URL)
         goto_patient(driver, ma_hs)
-        driver.waiting(
-            ".patient-information .additional-item:nth-child(2) .info", "ma ho so"
-        )
         url = driver.current_url
         if signature := scrape_signature(driver):
             save_db(con, ma_hs, url, signature)
