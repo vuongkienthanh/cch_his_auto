@@ -173,19 +173,22 @@ def process_final_day(driver: Driver, signature: str | None):
     admission_date = get_admission_date(driver)
     sanglocdinhduong.add_all_phieusanglocdinhduong(driver, admission_date)
 
+    # kiểm tra ngày xuất viện
     discharge_date = get_discharge_date(driver)
+    if discharge_date is None:
+        messagebox.showwarning("Chưa có ngày xuất viện")
+        return
 
     # kiểm tra viết tắt
-    if discharge_date is not None:
-        detail = chitietnguoibenhnoitru.get_discharge_diagnosis_detail(driver)
-        if detail is not None:
-            detail = detail.lower()
-            if any([viettat in detail for viettat in ["hp", "nmc", "dmc"]]):
-                detail = detail.replace("hp", "hậu phẫu")
-                detail = detail.replace("nmc", "ngoài màng cứng")
-                detail = detail.replace("dmc", "dưới màng cứng")
-                with thongtinravien.session(driver):
-                    thongtinravien.set_discharge_diagnosis_detail(driver, detail)
+    detail = chitietnguoibenhnoitru.get_discharge_diagnosis_detail(driver)
+    if detail is not None:
+        detail = detail.lower()
+        if any([viettat in detail for viettat in ["hp", "nmc", "dmc"]]):
+            detail = detail.replace("hp", "hậu phẫu")
+            detail = detail.replace("nmc", "ngoài màng cứng")
+            detail = detail.replace("dmc", "dưới màng cứng")
+            with thongtinravien.session(driver):
+                thongtinravien.set_discharge_diagnosis_detail(driver, detail)
 
     # điền thông tin nhóm máu
     bloodtype = get_bloodtype(driver)
