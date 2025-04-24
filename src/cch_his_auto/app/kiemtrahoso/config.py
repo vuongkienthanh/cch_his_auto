@@ -16,10 +16,10 @@ class Config(TypedDict):
     is_final_day: bool
 
 
-def save(config: Config):
+def save(cfg: Config):
     os.makedirs(APP_PATH, exist_ok=True)
     with open(FILEPATH, "w") as f:
-        json.dump(config, f, indent=4)
+        json.dump(cfg, f, indent=4)
 
 
 def load() -> Config:
@@ -35,3 +35,12 @@ def load() -> Config:
             "discharged": False,
             "is_final_day": False,
         }
+
+
+def is_valid(cfg: Config) -> bool:
+    return (
+        cfg["username"] != ""
+        and cfg["password"] != ""
+        and cfg["department"] != ""
+        and len(cfg["listing"].strip().splitlines()) > 0
+    )

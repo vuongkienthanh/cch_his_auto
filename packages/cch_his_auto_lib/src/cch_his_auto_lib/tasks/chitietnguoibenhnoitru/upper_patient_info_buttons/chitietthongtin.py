@@ -5,7 +5,9 @@ from contextlib import contextmanager
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
+from . import ICON_CSS
 
+DIALOG_CSS = ".ant-modal:has(.avatar__image)"
 _logger = logging.getLogger().getChild("chitietthongtin")
 
 
@@ -20,18 +22,18 @@ def session(driver):
 
 def open_dialog(driver: Driver):
     driver.clicking(
-        ".thong-tin-benh-nhan .bunch-icon div:first-child",
+        f"{ICON_CSS}>div:first-child",
         "click Chi tiết thông tin button",
     )
-    driver.waiting(".avatar__image", "Chi tiết thông tin dialog")
+    driver.waiting(DIALOG_CSS, "Chi tiết thông tin dialog")
 
 
 def close_dialog(driver: Driver):
     driver.clicking(
-        ".ant-modal-close:has(~.ant-modal-body .avatar__image)",
+        f"{DIALOG_CSS} .ant-modal-close",
         "close Chi tiết thông tin dialog",
     )
-    driver.wait_closing(".ant-modal-body .avatar__image")
+    driver.wait_closing(DIALOG_CSS)
 
 
 def get_chieucao(driver: Driver) -> str | None:
@@ -39,7 +41,7 @@ def get_chieucao(driver: Driver) -> str | None:
         time.sleep(1)
         try:
             value = driver.find(
-                ".ant-modal:has( .avatar__image) div:nth-child(5) .ant-row div:nth-child(5) input"
+                f"{DIALOG_CSS} .ant-col:nth-child(5) .ant-row:nth-child(1) .ant-col:nth-child(5) input"
             ).get_attribute("value")
             if value == "":
                 continue
@@ -57,7 +59,7 @@ def get_cannang(driver: Driver) -> str | None:
         time.sleep(1)
         try:
             value = driver.find(
-                ".ant-modal:has( .avatar__image) div:nth-child(5) .ant-row div:nth-child(6) input"
+                f"{DIALOG_CSS} .ant-col:nth-child(5) .ant-row:nth-child(1) .ant-col:nth-child(6) input"
             ).get_attribute("value")
             if value == "":
                 continue

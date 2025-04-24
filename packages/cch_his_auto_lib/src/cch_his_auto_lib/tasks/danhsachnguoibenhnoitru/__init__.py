@@ -7,6 +7,7 @@ from selenium.webdriver import ActionChains
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.helper import tracing
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import wait_patient_page_loaded 
 
 _logger = logging.getLogger().getChild("danhsachnguoibenhnoitru")
 _trace = tracing(_logger)
@@ -102,8 +103,4 @@ def goto_patient(driver: Driver, ma_hs: int):
         ".ant-table-body tbody tr:nth-child(2) td:nth-child(30)",
         "first row",
     )
-    driver.waiting_to_be(
-        ".patient-information .ant-row span:nth-child(2) b",
-        str(ma_hs),
-        "patient id",
-    )
+    wait_patient_page_loaded(driver, ma_hs)

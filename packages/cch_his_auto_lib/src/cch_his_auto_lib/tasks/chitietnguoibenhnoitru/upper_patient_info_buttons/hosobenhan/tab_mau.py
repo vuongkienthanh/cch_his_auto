@@ -1,14 +1,12 @@
-import logging
-
 from selenium.common import NoSuchElementException
 
 
 from cch_his_auto_lib.driver import Driver
-from . import ACTIVE_PANE
+from . import ACTIVE_PANE, _logger
 
-_logger = logging.getLogger().getChild("hosobenhan")
+_logger = _logger.getChild("tab_mau")
 
-TAB_NUNMBER = 7
+TAB_NUMBER = 7
 
 
 def get_bloodtype(driver: Driver) -> str | None:
@@ -19,8 +17,8 @@ def get_bloodtype(driver: Driver) -> str | None:
         if ele == "":
             return None
         else:
-            _logger.info(f"nhommau = {ele}")
+            _logger.info(f"bloodtype = {ele}")
             return ele
     except NoSuchElementException:
-        _logger.warning("-> can't find nhommau")
+        _logger.warning("-> can't find bloodtype")
         return None

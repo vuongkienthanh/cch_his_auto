@@ -13,7 +13,7 @@ from . import config
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tasks.auth import session
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.indieuduong import (
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.lower_buttons.indieuduong import (
     sign_bangkechiphiBHYT,
 )
 

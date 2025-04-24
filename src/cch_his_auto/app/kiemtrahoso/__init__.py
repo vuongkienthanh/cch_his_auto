@@ -11,17 +11,24 @@ from cch_his_auto.common_tasks.signature import get_signature_from_ctnbnt
 from . import config
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.tasks import auth, danhsachnguoibenhnoitru, chitietnguoibenhnoitru
+from cch_his_auto_lib.tasks import auth, danhsachnguoibenhnoitru
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
-    hosobenhan,
-    sanglocdinhduong,
-    chitietthongtin,
-    thongtinravien,
-    thongtinvaovien,
+    tab_thongtinchung,
 )
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.hosobenhan import (
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.tab_thongtinchung import (
+    edit_thongtinvaovien,
+    edit_thongtinravien,
+)
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.upper_patient_info_buttons import (
+    chitietthongtin,
+    hosobenhan,
+)
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.upper_patient_info_buttons.hosobenhan import (
     tab_hosokhamchuabenh,
     tab_mau,
+)
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.lower_buttons import (
+    sanglocdinhduong,
 )
 
 
@@ -71,8 +78,6 @@ class App(tk.Frame):
             justify="left",
             anchor="w",
         ).grid(row=3, column=0, rowspan=4, sticky="SEW", padx=20)
-        run_check_btn = tk.Button(mainframe, text="Kiểm tra trước")
-        run_check_btn.grid(row=3, column=1, padx=20)
 
         button_frame = ButtonFrame(self)
         button_frame.grid(row=0, column=1, rowspan=2, padx=20, sticky="S", pady=(0, 20))
@@ -110,23 +115,26 @@ class App(tk.Frame):
         button_frame.bind_load(load)
         button_frame.bind_save(save)
         button_frame.bind_run(lambda: run(get_config(), button_frame.get_config()))
-        run_check_btn.configure(
-            command=lambda: run_check(get_config(), button_frame.get_config())
-        )
 
 
 def run(cfg: config.Config, run_cfg: RunConfig):
-    listing = [int(ma_hs) for ma_hs in cfg["listing"].strip().splitlines()]
-    if len(listing) == 0:
-        messagebox.showerror(message="không có bệnh nhân")
+    if not config.is_valid(cfg):
+        messagebox.showerror(message="chưa đủ thông tin")
         return
 
     setLogLevel(run_cfg)
     driver = Driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH)
+
+    listing = [int(ma_hs) for ma_hs in cfg["listing"].strip().splitlines()]
+
     if cfg["is_final_day"]:
+        if not pre_run_final_day_check(driver, listing, cfg):
+            driver.quit()
+            return
         process = process_final_day
     else:
         process = process_normal_day
+
     try:
         with create_connection() as con:
             with auth.session(
@@ -151,8 +159,8 @@ def run(cfg: config.Config, run_cfg: RunConfig):
 
 
 def process_normal_day(driver: Driver, signature: str | None):
-    admission_date = chitietnguoibenhnoitru.get_admission_date(driver)
-    discharge_date = chitietnguoibenhnoitru.get_discharge_date(driver)
+    admission_date = tab_thongtinchung.get_admission_date(driver)
+    discharge_date = tab_thongtinchung.get_discharge_date(driver)
     sanglocdinhduong.add_all_phieusanglocdinhduong(driver, admission_date)
 
     with hosobenhan.session(driver):
@@ -167,34 +175,29 @@ def process_normal_day(driver: Driver, signature: str | None):
 
 
 def process_final_day(driver: Driver, signature: str | None):
-    admission_date = chitietnguoibenhnoitru.get_admission_date(driver)
+    admission_date = tab_thongtinchung.get_admission_date(driver)
     sanglocdinhduong.add_all_phieusanglocdinhduong(driver, admission_date)
+    discharge_date = tab_thongtinchung.get_discharge_date(driver)
 
-    # kiểm tra ngày xuất viện
-    discharge_date = chitietnguoibenhnoitru.get_discharge_date(driver)
-    if discharge_date is None:
-        messagebox.showwarning("Chưa có ngày xuất viện")
-        return
-
-    # kiểm tra viết tắt
-    detail = chitietnguoibenhnoitru.get_discharge_diagnosis_detail(driver)
+    # mở rộng chữ viết tắt
+    detail = tab_thongtinchung.get_discharge_diagnosis_detail(driver)
     if detail is not None:
         detail = detail.lower()
         if any([viettat in detail for viettat in ["hp", "nmc", "dmc"]]):
             detail = detail.replace("hp", "hậu phẫu")
             detail = detail.replace("nmc", "ngoài màng cứng")
             detail = detail.replace("dmc", "dưới màng cứng")
-            with thongtinravien.session(driver):
-                thongtinravien.set_discharge_diagnosis_detail(driver, detail)
+            with edit_thongtinravien.session(driver):
+                edit_thongtinravien.set_discharge_diagnosis_detail(driver, detail)
 
     # điền thông tin nhóm máu
-    bloodtype = chitietnguoibenhnoitru.get_bloodtype(driver)
+    bloodtype = tab_thongtinchung.get_bloodtype(driver)
     if bloodtype is None:
-        with hosobenhan.session(driver, tab_mau.TAB_NUNMBER):
+        with hosobenhan.session(driver, tab_mau.TAB_NUMBER):
             found_bloodtype = tab_mau.get_bloodtype(driver)
         if found_bloodtype is not None:
-            with thongtinvaovien.session(driver):
-                thongtinvaovien.set_bloodtype(driver, found_bloodtype)
+            with edit_thongtinvaovien.session(driver):
+                edit_thongtinvaovien.set_bloodtype(driver, found_bloodtype)
 
     with hosobenhan.session(driver):
         # tab_hosokhamchuabenh.tobiabenhannhikhoa(driver)
@@ -213,15 +216,11 @@ def process_final_day(driver: Driver, signature: str | None):
         tab_hosokhamchuabenh.donthuoc(driver)
 
 
-def run_check(cfg: config.Config, run_cfg: RunConfig):
-    listing = [int(ma_hs) for ma_hs in cfg["listing"].strip().splitlines()]
-    if len(listing) == 0:
-        messagebox.showerror(message="không có bệnh nhân")
-        return
-
+def pre_run_final_day_check(driver: Driver, listing: list[int], cfg: config.Config):
     chieucao_cannang_missing = []
     machanthuong_kemtheo_missing = []
-    discharge_date_is_sat_sun = []
+    discharge_date_is_none = []
+    appointment_date_is_sat_sun = []
 
     def check_chieucao_cannang(driver: Driver, ma_hs: int):
         with chitietthongtin.session(driver):
@@ -231,52 +230,70 @@ def run_check(cfg: config.Config, run_cfg: RunConfig):
                 chieucao_cannang_missing.append(ma_hs)
 
     def check_machanthuong_kemtheo(driver: Driver, ma_hs: int):
-        diagnosis = chitietnguoibenhnoitru.get_discharge_diagnosis(driver)
+        diagnosis = tab_thongtinchung.get_discharge_diagnosis(driver)
         if diagnosis is not None:
             if diagnosis.startswith("S") and any(
                 [
                     d[0] not in "WYV"
-                    for d in chitietnguoibenhnoitru.get_discharge_comorbid(driver)
+                    for d in tab_thongtinchung.get_discharge_comorbid(driver)
                 ]
             ):
                 machanthuong_kemtheo_missing.append(ma_hs)
 
-    def check_discharge_date_is_sat_sun(driver: Driver, ma_hs: int):
-        date = chitietnguoibenhnoitru.get_discharge_date(driver)
+    def check_discharge_date(driver: Driver, ma_hs: int):
+        date = tab_thongtinchung.get_discharge_date(driver)
+        if date is None:
+            discharge_date_is_none.append(ma_hs)
+
+    def check_appointment_date(driver: Driver, ma_hs: int):
+        date = tab_thongtinchung.get_appointment_date(driver)
+        # is saturday / sunday
         if date is not None:
             if date.weekday() in [5, 6]:
-                discharge_date_is_sat_sun.append(ma_hs)
+                appointment_date_is_sat_sun.append(ma_hs)
 
     def check(driver: Driver, ma_hs: int):
         check_chieucao_cannang(driver, ma_hs)
         check_machanthuong_kemtheo(driver, ma_hs)
-        check_discharge_date_is_sat_sun(driver, ma_hs)
+        check_discharge_date(driver, ma_hs)
+        check_appointment_date(driver, ma_hs)
 
-    setLogLevel(run_cfg)
-    driver = Driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH)
     try:
         with create_connection() as con:
             with auth.session(
                 driver, cfg["username"], cfg["password"], cfg["department"]
             ):
-                ma_hs = listing.pop()
-                first_patient(driver, con, ma_hs)
-                check(driver, ma_hs)
-                while len(listing) > 0:
-                    ma_hs = listing.pop()
+                first_patient(driver, con, listing[0])
+                check(driver, listing[0])
+                for ma_hs in listing[1:]:
                     next_patient(driver, con, ma_hs)
                     check(driver, ma_hs)
 
     finally:
-        driver.quit()
+        is_ok = True
         if len(chieucao_cannang_missing) > 0:
             messagebox.showwarning(
                 message="Thiếu chiều cao cân nặng ở chi tiết thông tin:\n"
                 + "\n".join([str(x) for x in chieucao_cannang_missing])
             )
+            is_ok = False
         if len(machanthuong_kemtheo_missing) > 0:
             messagebox.showwarning(
                 message="Thiếu mã chấn thương kèm theo:\n"
                 + "\n".join([str(x) for x in machanthuong_kemtheo_missing])
             )
-        messagebox.showinfo(message="finish")
+            is_ok = False
+        if len(discharge_date_is_none) > 0:
+            messagebox.showwarning(
+                message="Thiếu ngày ra viện:\n"
+                + "\n".join([str(x) for x in discharge_date_is_none])
+            )
+            is_ok = False
+        if len(appointment_date_is_sat_sun) > 0:
+            messagebox.showwarning(
+                message="Ngày tái khám T7 CN:\n"
+                + "\n".join([str(x) for x in appointment_date_is_sat_sun])
+            )
+            is_ok = False
+
+        return is_ok

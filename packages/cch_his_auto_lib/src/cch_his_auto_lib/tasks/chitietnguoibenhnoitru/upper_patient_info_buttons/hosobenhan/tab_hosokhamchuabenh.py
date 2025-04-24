@@ -1,4 +1,3 @@
-import logging
 from enum import StrEnum
 import datetime as dt
 import time
@@ -10,10 +9,10 @@ from selenium.common import NoSuchElementException, StaleElementReferenceExcepti
 from cch_his_auto_lib.driver import Driver, DriverFn
 from cch_his_auto_lib.helper import tracing
 from cch_his_auto_lib.tasks.editor import sign_staff_name, sign_patient_name
-from . import ACTIVE_PANE
+from . import ACTIVE_PANE, _logger
 
 
-_logger = logging.getLogger().getChild("hosobenhan")
+_logger = _logger.getChild("tab_hosokhamchuabenh")
 _trace = tracing(_logger)
 
 TAB_NUMBER = 1
@@ -49,7 +48,7 @@ def filter(driver: Driver, name: str) -> bool:
         return False
 
 
-def is_row(driver: Driver, idx: int, status: Status) -> bool:
+def is_row_status(driver: Driver, idx: int, status: Status) -> bool:
     "Check if row at `idx` is `status`, first row is idx=2"
     try:
         _logger.debug(f"checking status = {status}")
@@ -61,7 +60,7 @@ def is_row(driver: Driver, idx: int, status: Status) -> bool:
             == status
         )
     except StaleElementReferenceException:
-        return is_row(driver, idx, status)
+        return is_row_status(driver, idx, status)
 
 
 def is_row_expandable(driver: Driver, idx: int) -> bool:
@@ -105,12 +104,12 @@ def filter_check_expand_sign(
     def check_and_sign(driver: Driver, i: int):
         name = driver.waiting(f"{RIGHT_PANEL} tr:nth-child({i}) td:nth-child(2)").text
         _logger.debug(f"checking {name}")
-        if is_row(driver, i, Status.CHUAKY):
+        if is_row_status(driver, i, Status.CHUAKY):
             _logger.info(f"row condition: not met: {name} -> {Status.CHUAKY}")
             driver.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
             chuaky_fn(driver, i)
             time.sleep(5)
-        elif is_row(driver, i, Status.DANGKY):
+        elif is_row_status(driver, i, Status.DANGKY):
             _logger.info(f"row condition: not met: {name} -> {Status.DANGKY}")
             dangky_fn(driver, i)
             time.sleep(5)

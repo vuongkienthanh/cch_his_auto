@@ -1,6 +1,8 @@
 import logging
 import tkinter as tk
 from tkinter import messagebox
+from typing import Callable
+import time
 
 from cch_his_auto.app import PROFILE_PATH
 from cch_his_auto.global_db import create_connection
@@ -14,10 +16,19 @@ from .patient_list import PatientFrame
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tasks import auth
 from cch_his_auto_lib.tasks.todieutri import ingiayto as igt
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import hosobenhan
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.hosobenhan import (
-    tab_hosokhamchuabenh,
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.upper_patient_info_buttons import (
+    hosobenhan,
 )
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.upper_patient_info_buttons.hosobenhan.tab_hosokhamchuabenh import (
+    filter,
+    Status,
+    RIGHT_PANEL,
+    is_row_status,
+    is_row_expandable,
+    expand_row,
+    sign_tab,
+)
+from cch_his_auto_lib.tasks.editor import sign_staff_name
 
 
 TITLE = "Ký tờ điều trị hằng ngày"
@@ -153,7 +164,13 @@ def run_bs(driver: Driver, cfg: config.Config):
             driver.clicking(".right button:nth-child(2)")
 
             with hosobenhan.session(driver):
-                tab_hosokhamchuabenh.phieuCT_bschidinh(driver)
+                filter_check_expand_sign_last_row(
+                    driver,
+                    name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
+                    fn=lambda driver, i: sign_tab(
+                        driver, i, sign_staff_name.phieuCT_bschidinh
+                    ),
+                )
 
             driver.goto(p["url"])
         if p["ky_todieutri"]:
@@ -186,3 +203,31 @@ def run_bn(driver: Driver, cfg: config.Config):
                     igt.sign_phieuthuchienylenh_bn(
                         driver, p["ky_3tra"]["benhnhan"], signature
                     )
+
+
+def filter_check_expand_sign_last_row(
+    driver: Driver,
+    name: str,
+    fn: Callable[[Driver, int], None],
+):
+    def check_and_sign(driver: Driver, i: int):
+        name = driver.waiting(f"{RIGHT_PANEL} tr:nth-child({i}) td:nth-child(2)").text
+        _logger.debug(f"checking {name}")
+        if is_row_status(driver, i, Status.CHUAKY):
+            _logger.info(f"row condition: not met: {name} -> {Status.CHUAKY}")
+            driver.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
+            fn(driver, i)
+            time.sleep(5)
+        else:
+            _logger.info("row condition: OK")
+
+    if filter(driver, name) and (
+        driver.waiting(f"{RIGHT_PANEL} tr:nth-child(2) td:nth-child(3)").text.strip()
+        != Status.HOANTHANH
+    ):
+        if is_row_expandable(driver, 2):
+            expand_row(driver, 2)
+            i = len(driver.find_all(f"{RIGHT_PANEL} .ant-table-row-level-1")) + 2
+            check_and_sign(driver, i)
+        else:
+            check_and_sign(driver, 2)
