@@ -244,6 +244,8 @@ def todieutri(driver: Driver, discharge_date: dt.date | None):
             ).date()
             if date < discharge_date:
                 sign_tab(driver, i, sign_staff_name.todieutri)
+            else:
+                _logger.info("date > discharge_date => skip")
         else:
             sign_tab(driver, i, sign_staff_name.todieutri)
 
