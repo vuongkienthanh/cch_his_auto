@@ -1,7 +1,3 @@
-"""
-### Tasks: sign staff name in editor pages
-"""
-
 import logging
 import time
 
@@ -220,6 +216,17 @@ def giaiphaubenh(driver: Driver):
         name="phieu giai phau benh",
         btn_css=".sign-image button",
         btn_txt="Xác nhận ký BÁC SĨ ĐIỀU TRỊ",
+        img_css=".sign-image img",
+    )
+
+
+def phieucamkettta5(driver: Driver):
+    "*Phiếu cam kết thủ thuật a5*"
+    _sign(
+        driver,
+        name="phieu cam ket thu thuat a5",
+        btn_css=".sign-image button",
+        btn_txt="Xác nhận ký Bác sĩ khám/ điều trị",
         img_css=".sign-image img",
     )
 

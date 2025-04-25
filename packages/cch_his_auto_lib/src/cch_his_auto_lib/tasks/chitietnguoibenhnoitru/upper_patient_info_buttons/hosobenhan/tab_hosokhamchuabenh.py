@@ -8,7 +8,11 @@ from selenium.common import NoSuchElementException, StaleElementReferenceExcepti
 
 from cch_his_auto_lib.driver import Driver, DriverFn
 from cch_his_auto_lib.helper import tracing
-from cch_his_auto_lib.tasks.editor import sign_staff_name, sign_patient_name
+from cch_his_auto_lib.tasks.editor import (
+    sign_staff_name,
+    sign_patient_name,
+    check_agreement,
+)
 from . import ACTIVE_PANE, _logger
 
 
@@ -368,10 +372,11 @@ def donthuoc(driver: Driver):
 
 @_trace
 def phieucamkettruyenmau(driver: Driver, signature: str | None):
-    "Filter and sign name: *Phiếu chỉ định chụp CT*"
+    "Filter and sign name: *Phiếu cam kết truyền máu*"
 
     def chuaky_fn(driver):
         if signature:
+            check_agreement.check_phieucamkettruyenmau(driver)
             sign_patient_name.phieucamkettruyenmau_bn(driver, signature)
 
     filter_check_expand_sign(
@@ -379,6 +384,27 @@ def phieucamkettruyenmau(driver: Driver, signature: str | None):
         name="Giấy cam đoan chấp nhận truyền máu và các chế phẩm của máu",
         chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
         dangky_fn=lambda *_: do_nothing(),
+    )
+
+
+@_trace
+def phieucamkettta5(driver: Driver, signature: str | None):
+    "Filter and sign name: *Phiếu cam kết thủ thuật a5*"
+
+    def chuaky_fn(driver):
+        check_agreement.check_phieucamkettta5(driver)
+        sign_staff_name.phieucamkettta5(driver)
+        dangky_fn(driver)
+
+    def dangky_fn(driver):
+        if signature:
+            sign_patient_name.phieucamkettta5(driver, signature)
+
+    filter_check_expand_sign(
+        driver,
+        name="Giấy cam đoan chấp nhận phẫu thuật, thủ thuật và gây mê hồi sức(của BN) (A5)",
+        chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
+        dangky_fn=lambda driver, i: sign_tab(driver, i, dangky_fn),
     )
 
 

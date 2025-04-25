@@ -1,7 +1,3 @@
-"""
-### Tasks: sign patient name in editor pages
-"""
-
 import logging
 import time
 
@@ -166,6 +162,18 @@ def phieucamkettruyenmau_bn(driver: Driver, signature: str):
         name="phieu cam ket truyen mau benh nhan",
         btn_css=".sign-image button",
         btn_txt="Ký",
+        img_css=".sign-image img",
+        signature=signature,
+    )
+
+
+def phieucamkettta5(driver: Driver, signature: str):
+    "*Phiếu cam kết thủ thuật a5 (bệnh nhân)*"
+    _sign(
+        driver,
+        name="phieu cam ket thu thuat a5",
+        btn_css=".sign-image button",
+        btn_txt='Ký',
         img_css=".sign-image img",
         signature=signature,
     )

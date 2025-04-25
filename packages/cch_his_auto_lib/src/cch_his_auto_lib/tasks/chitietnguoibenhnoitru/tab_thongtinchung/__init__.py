@@ -132,4 +132,6 @@ def get_bloodtype(driver: Driver) -> str | None:
         return None
     else:
         _logger.info(f"bloodtype={ele}")
+        if ele.strip() == "Chưa xác định":
+            return None
         return ele

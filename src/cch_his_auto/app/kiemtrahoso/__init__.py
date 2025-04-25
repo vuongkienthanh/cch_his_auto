@@ -178,6 +178,7 @@ def process_normal_day(driver: Driver, signature: str | None):
         tab_hosokhamchuabenh.phieuchidinhPTTT(driver)
         tab_hosokhamchuabenh.phieusoket15ngay(driver)
         tab_hosokhamchuabenh.phieucamkettruyenmau(driver, signature)
+        tab_hosokhamchuabenh.phieucamkettta5(driver, signature)
 
 
 def process_final_day(driver: Driver, signature: str | None):
@@ -231,6 +232,7 @@ def process_final_day(driver: Driver, signature: str | None):
         tab_hosokhamchuabenh.phieusoket15ngay(driver)
         tab_hosokhamchuabenh.donthuoc(driver)
         tab_hosokhamchuabenh.phieucamkettruyenmau(driver, signature)
+        tab_hosokhamchuabenh.phieucamkettta5(driver, signature)
 
 
 def pre_run_final_day_check(driver: Driver, listing: list[int]):
