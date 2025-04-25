@@ -16,7 +16,7 @@ def session(driver: Driver):
 
 
 def open_dialog(driver: Driver):
-    driver.clicking_svg(
+    driver.clicking2(
         f"{THONGTINRAVIEN_CSS} .title svg", "edit thongtinravien button"
     )
     driver.waiting(DIALOG_CSS, "edit thongtinravien dialog")
@@ -27,7 +27,7 @@ def save(driver: Driver):
         f"{DIALOG_CSS} .bottom-action-right button:nth-child(2)",
         "save button",
     )
-    driver.clicking_svg(
+    driver.clicking2(
         f"{DIALOG_CSS} .ant-modal-close",
         "close button",
     )

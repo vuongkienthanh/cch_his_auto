@@ -149,19 +149,19 @@ class Driver(webdriver.Chrome):
             else:
                 _logger.debug(f"-> done clicking {name or css}")
 
-    def clicking_svg(self, css: str, /, name: str = "") -> None:
+    def clicking2(self, css: str, /, name: str = "") -> None:
         """
-        Clicking svg element by `css`.
+        Clicking non-clickable element by `css`.
         You can also provide a `name` for logging
         """
         try:
-            _logger.debug(f"clicking svg {name or css}")
+            _logger.debug(f"clicking non-clickable {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         except TimeoutException:
             _logger.error(f"-> can't find {name or css}")
             raise NoSuchElementException(f"can't find {name or css}")
         except StaleElementReferenceException:
-            return self.clicking_svg(css, name)
+            return self.clicking2(css, name)
         else:
             try:
                 self.execute_script(f"""
@@ -170,10 +170,10 @@ class Driver(webdriver.Chrome):
                     document.querySelector('{css}').dispatchEvent(evt);
                 """)
             except Exception as e:
-                _logger.error(f"-> can't click svg {name or css}")
+                _logger.error(f"-> can't click non-clickable {name or css}")
                 raise e
             else:
-                _logger.debug(f"-> done clicking svg {name or css}")
+                _logger.debug(f"-> done clicking non-clickable {name or css}")
 
     def goto(self, url: str) -> None:
         "Go to `url`"

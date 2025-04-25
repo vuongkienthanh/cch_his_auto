@@ -18,7 +18,7 @@ def session(driver: Driver):
 
 
 def open_dialog(driver: Driver):
-    driver.clicking_svg(
+    driver.clicking2(
         f"{THONGTINVAOVIEN_CSS} .title svg", "edit thongtinvaovien button"
     )
     driver.waiting(DIALOG_CSS, "edit thongtinvaovien dialog")
