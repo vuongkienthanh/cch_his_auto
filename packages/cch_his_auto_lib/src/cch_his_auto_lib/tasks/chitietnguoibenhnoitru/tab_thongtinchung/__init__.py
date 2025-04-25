@@ -107,6 +107,19 @@ def get_discharge_diagnosis_detail(driver: Driver) -> str | None:
         _logger.info(f"discharge_diagnosis_detail={ele}")
         return ele
 
+def get_treatment(driver: Driver) -> str | None:
+    try:
+        ele = driver.waiting(
+            f"{THONGTINRAVIEN_CSS} .ant-col:nth-child(1) .item-sub:nth-child(4) b",
+            "discharge diagnosis detail",
+        ).text
+    except NoSuchElementException:
+        _logger.warning("=> can't find treatment")
+        return None
+    else:
+        _logger.info(f"treatment={ele}")
+        return ele
+
 
 def get_bloodtype(driver: Driver) -> str | None:
     try:

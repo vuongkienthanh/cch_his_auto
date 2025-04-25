@@ -5,7 +5,9 @@ from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.helper import tracing
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.upper_patient_info_buttons import chitietthongtin
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.upper_patient_info_buttons import (
+    chitietthongtin,
+)
 from .phieusangloc import save_new_phieusangloc
 
 URL = "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
@@ -23,9 +25,7 @@ def open_dialog(driver: Driver) -> bool:
         driver.waiting(".ant-modal-body .ant-table", "Sàng lọc dinh dưỡng dialog")
     except NoSuchElementException:
         _logger.info("-> can't find sàng lọc dinh dưỡng dialog")
-        if driver.current_url.startswith(
-            "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
-        ):
+        if driver.current_url.startswith(URL):
             _logger.info("-> found new phieu sàng lọc dinh dưỡng")
             return False
         else:

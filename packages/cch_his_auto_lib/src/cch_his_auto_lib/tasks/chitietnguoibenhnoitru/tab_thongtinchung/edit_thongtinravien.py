@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 
 from cch_his_auto_lib.driver import Driver
+from . import _logger, THONGTINRAVIEN_CSS
 
 DIALOG_CSS = ".ant-modal:has(.ant-row:first-child+.more-info)"
 
@@ -16,7 +17,7 @@ def session(driver: Driver):
 
 def open_dialog(driver: Driver):
     driver.clicking_svg(
-        ".tab-box .info:nth-child(3) .title svg", "edit thongtinravien button"
+        f"{THONGTINRAVIEN_CSS} .title svg", "edit thongtinravien button"
     )
     driver.waiting(DIALOG_CSS, "edit thongtinravien dialog")
 
@@ -26,6 +27,10 @@ def save(driver: Driver):
         f"{DIALOG_CSS} .bottom-action-right button:nth-child(2)",
         "save button",
     )
+    driver.clicking_svg(
+        f"{DIALOG_CSS} .ant-modal-close",
+        "close button",
+    )
     driver.wait_closing(DIALOG_CSS, "edit thongtinravien dialog")
 
 
@@ -33,3 +38,11 @@ def set_discharge_diagnosis_detail(driver: Driver, value: str):
     driver.clear_input(
         f"{DIALOG_CSS} .ant-row .ant-col:nth-child(1)>div:nth-child(3) textarea"
     ).send_keys(value)
+    _logger.info(f"set discharge_diagnosis_detail= {value}")
+
+
+def set_treatment(driver: Driver, value: str):
+    driver.clear_input(
+        f"{DIALOG_CSS} .ant-row .ant-col:nth-child(1)>div:nth-child(4)>div>div"
+    ).send_keys(value)
+    _logger.info(f"set treatment= {value}")

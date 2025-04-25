@@ -176,19 +176,26 @@ def process_final_day(driver: Driver, signature: str | None):
     discharge_date = tab_thongtinchung.get_discharge_date(driver)
 
     # mở rộng chữ viết tắt
-    detail = tab_thongtinchung.get_discharge_diagnosis_detail(driver)
     viettat_dict = {
         "hp": "hậu phẫu",
         "pt": "phẫu thuật",
         "nmc": "ngoài màng cứng",
         "dmc": "dưới màng cứng",
     }
+    detail = tab_thongtinchung.get_discharge_diagnosis_detail(driver)
     if detail is not None:
         detail = detail.lower()
-        for k, v in viettat_dict.values():
-            detail.replace(k, v)
+        for k, v in viettat_dict.items():
+            detail = detail.replace(k, v)
         with edit_thongtinravien.session(driver):
             edit_thongtinravien.set_discharge_diagnosis_detail(driver, detail)
+    treatment = tab_thongtinchung.get_treatment(driver)
+    if treatment is not None:
+        treatment = treatment.lower()
+        for k, v in viettat_dict.items():
+            treatment = treatment.replace(k, v)
+        with edit_thongtinravien.session(driver):
+            edit_thongtinravien.set_treatment(driver, treatment)
 
     # điền thông tin nhóm máu
     bloodtype = tab_thongtinchung.get_bloodtype(driver)
@@ -204,7 +211,6 @@ def process_final_day(driver: Driver, signature: str | None):
         tab_hosokhamchuabenh.mucAbenhannhikhoa(driver)
         tab_hosokhamchuabenh.mucBtongketbenhan(driver)
         tab_hosokhamchuabenh.phieukhambenhvaovien(driver)
-
         tab_hosokhamchuabenh.phieuchidinhxetnghiem(driver)
         tab_hosokhamchuabenh.todieutri(driver, discharge_date)
         tab_hosokhamchuabenh.phieuCT(driver, signature)

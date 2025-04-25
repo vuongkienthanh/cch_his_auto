@@ -3,6 +3,7 @@ from contextlib import contextmanager
 from selenium.webdriver import Keys
 
 from cch_his_auto_lib.driver import Driver
+from . import THONGTINVAOVIEN_CSS
 
 DIALOG_CSS = ".ant-modal:has(.ant-col:nth-child(6) textarea)"
 
@@ -18,7 +19,7 @@ def session(driver: Driver):
 
 def open_dialog(driver: Driver):
     driver.clicking_svg(
-        ".tab-box .info:nth-child(1) .title svg", "edit thongtinvaovien button"
+        f"{THONGTINVAOVIEN_CSS} .title svg", "edit thongtinvaovien button"
     )
     driver.waiting(DIALOG_CSS, "edit thongtinvaovien dialog")
 
