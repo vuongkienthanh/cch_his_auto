@@ -6,8 +6,8 @@ from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import _logger, ACTIVE_PANE
 
 TAB_NUMBER = 1
-THONGTINVAOVIEN_CSS = f"{ACTIVE_PANE} info:nth-child(1)"
-THONGTINRAVIEN_CSS = f"{ACTIVE_PANE} info:nth-child(3)"
+THONGTINVAOVIEN_CSS = f"{ACTIVE_PANE} .info:nth-child(1)"
+THONGTINRAVIEN_CSS = f"{ACTIVE_PANE} .info:nth-child(3)"
 
 _logger = _logger.getChild("tab_thongtinchung")
 
