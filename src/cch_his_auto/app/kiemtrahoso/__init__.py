@@ -126,36 +126,32 @@ def run(cfg: config.Config, run_cfg: RunConfig):
     driver = Driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH)
 
     listing = [int(ma_hs) for ma_hs in cfg["listing"].strip().splitlines()]
-    with auth.session(
-        driver, cfg["username"], cfg["password"], cfg["department"]
-    ):
 
-        if cfg["is_final_day"]:
-            if not pre_run_final_day_check(driver, listing):
-                driver.quit()
-                return
-            process = process_final_day
-        else:
-            process = process_normal_day
-
-        try:
+    try:
+        with auth.session(driver, cfg["username"], cfg["password"], cfg["department"]):
+            if cfg["is_final_day"]:
+                if not pre_run_final_day_check(driver, listing):
+                    return
+                process = process_final_day
+            else:
+                process = process_normal_day
             with create_connection() as con:
-                    if cfg["discharged"]:
-                        danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
+                if cfg["discharged"]:
+                    danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
 
+                ma_hs = listing.pop()
+                first_patient(driver, con, ma_hs)
+                signature = get_signature_from_ctnbnt(driver, con, ma_hs)
+                process(driver, signature)
+
+                while len(listing) > 0:
                     ma_hs = listing.pop()
-                    first_patient(driver, con, ma_hs)
+                    next_patient(driver, con, ma_hs)
                     signature = get_signature_from_ctnbnt(driver, con, ma_hs)
                     process(driver, signature)
-
-                    while len(listing) > 0:
-                        ma_hs = listing.pop()
-                        next_patient(driver, con, ma_hs)
-                        signature = get_signature_from_ctnbnt(driver, con, ma_hs)
-                        process(driver, signature)
-        finally:
-            driver.quit()
-            messagebox.showinfo(message="finish")
+    finally:
+        driver.quit()
+        messagebox.showinfo(message="finish")
 
 
 def process_normal_day(driver: Driver, signature: str | None):
@@ -181,14 +177,18 @@ def process_final_day(driver: Driver, signature: str | None):
 
     # mở rộng chữ viết tắt
     detail = tab_thongtinchung.get_discharge_diagnosis_detail(driver)
+    viettat_dict = {
+        "hp": "hậu phẫu",
+        "pt": "phẫu thuật",
+        "nmc": "ngoài màng cứng",
+        "dmc": "dưới màng cứng",
+    }
     if detail is not None:
         detail = detail.lower()
-        if any([viettat in detail for viettat in ["hp", "nmc", "dmc"]]):
-            detail = detail.replace("hp", "hậu phẫu")
-            detail = detail.replace("nmc", "ngoài màng cứng")
-            detail = detail.replace("dmc", "dưới màng cứng")
-            with edit_thongtinravien.session(driver):
-                edit_thongtinravien.set_discharge_diagnosis_detail(driver, detail)
+        for k, v in viettat_dict.values():
+            detail.replace(k, v)
+        with edit_thongtinravien.session(driver):
+            edit_thongtinravien.set_discharge_diagnosis_detail(driver, detail)
 
     # điền thông tin nhóm máu
     bloodtype = tab_thongtinchung.get_bloodtype(driver)
