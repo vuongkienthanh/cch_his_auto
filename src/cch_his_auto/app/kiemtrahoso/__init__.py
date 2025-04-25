@@ -159,6 +159,15 @@ def process_normal_day(driver: Driver, signature: str | None):
     discharge_date = tab_thongtinchung.get_discharge_date(driver)
     sanglocdinhduong.add_all_phieusanglocdinhduong(driver, admission_date)
 
+    # điền thông tin nhóm máu
+    bloodtype = tab_thongtinchung.get_bloodtype(driver)
+    if bloodtype is None:
+        with hosobenhan.session(driver, tab_mau.TAB_NUMBER):
+            found_bloodtype = tab_mau.get_bloodtype(driver)
+        if found_bloodtype is not None:
+            with edit_thongtinvaovien.session(driver):
+                edit_thongtinvaovien.set_bloodtype(driver, found_bloodtype)
+
     with hosobenhan.session(driver):
         tab_hosokhamchuabenh.phieuchidinhxetnghiem(driver)
         tab_hosokhamchuabenh.todieutri(driver, discharge_date)
@@ -168,6 +177,7 @@ def process_normal_day(driver: Driver, signature: str | None):
         tab_hosokhamchuabenh.phieusanglocdinhduong(driver)
         tab_hosokhamchuabenh.phieuchidinhPTTT(driver)
         tab_hosokhamchuabenh.phieusoket15ngay(driver)
+        tab_hosokhamchuabenh.phieucamkettruyenmau(driver, signature)
 
 
 def process_final_day(driver: Driver, signature: str | None):
@@ -220,6 +230,7 @@ def process_final_day(driver: Driver, signature: str | None):
         tab_hosokhamchuabenh.phieuchidinhPTTT(driver)
         tab_hosokhamchuabenh.phieusoket15ngay(driver)
         tab_hosokhamchuabenh.donthuoc(driver)
+        tab_hosokhamchuabenh.phieucamkettruyenmau(driver, signature)
 
 
 def pre_run_final_day_check(driver: Driver, listing: list[int]):

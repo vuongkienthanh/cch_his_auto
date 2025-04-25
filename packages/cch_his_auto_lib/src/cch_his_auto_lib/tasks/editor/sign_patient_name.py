@@ -157,3 +157,15 @@ def phieuMRI_bn(driver: Driver, signature: str):
         img_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(25)>div[data-type=block]:nth-child(2) .sign-image img",
         signature=signature,
     )
+
+
+def phieucamkettruyenmau_bn(driver: Driver, signature: str):
+    "*Phiếu cam kết truyền máu (bệnh nhân)*"
+    _sign(
+        driver,
+        name="phieu cam ket truyen mau benh nhan",
+        btn_css=".sign-image button",
+        btn_txt="Ký",
+        img_css=".sign-image img",
+        signature=signature,
+    )

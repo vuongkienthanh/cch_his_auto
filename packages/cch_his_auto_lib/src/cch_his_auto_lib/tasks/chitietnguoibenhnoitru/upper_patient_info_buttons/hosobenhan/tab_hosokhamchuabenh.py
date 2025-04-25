@@ -366,6 +366,22 @@ def donthuoc(driver: Driver):
     )
 
 
+@_trace
+def phieucamkettruyenmau(driver: Driver, signature: str | None):
+    "Filter and sign name: *Phiếu chỉ định chụp CT*"
+
+    def chuaky_fn(driver):
+        if signature:
+            sign_patient_name.phieucamkettruyenmau_bn(driver, signature)
+
+    filter_check_expand_sign(
+        driver,
+        name="Giấy cam đoan chấp nhận truyền máu và các chế phẩm của máu",
+        chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
+        dangky_fn=lambda *_: do_nothing(),
+    )
+
+
 # his bug
 # @_trace
 # def phieudutrucungcapmau(driver: Driver):
