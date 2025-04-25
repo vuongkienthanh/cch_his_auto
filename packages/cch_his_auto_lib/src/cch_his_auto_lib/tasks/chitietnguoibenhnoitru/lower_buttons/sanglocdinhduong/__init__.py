@@ -5,7 +5,7 @@ from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.helper import tracing
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import chitietthongtin
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.upper_patient_info_buttons import chitietthongtin
 from .phieusangloc import save_new_phieusangloc
 
 URL = "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"

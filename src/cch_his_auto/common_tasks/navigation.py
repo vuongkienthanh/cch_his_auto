@@ -4,7 +4,7 @@ import logging
 from cch_his_auto.global_db import get_url_from_db
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import danhsachnguoibenh
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.upper_patient_info_buttons import danhsachnguoibenh
 from cch_his_auto_lib.tasks import danhsachnguoibenhnoitru
 
 
