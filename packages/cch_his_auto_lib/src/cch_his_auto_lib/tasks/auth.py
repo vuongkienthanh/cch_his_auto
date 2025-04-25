@@ -49,7 +49,7 @@ def login(driver: Driver, username: str, password: str):
             inputs[1].send_keys(password)
             time.sleep(2)  # wait for js to load
             driver.clicking(".action>button", "submit button")
-            driver.waiting(".card", "main screen")
+            driver.wait_closing(".login-body", "login page")
             return
     else:
         raise EndOfLoop("can't log in")

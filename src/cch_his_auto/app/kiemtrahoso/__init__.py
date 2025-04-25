@@ -126,36 +126,36 @@ def run(cfg: config.Config, run_cfg: RunConfig):
     driver = Driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH)
 
     listing = [int(ma_hs) for ma_hs in cfg["listing"].strip().splitlines()]
+    with auth.session(
+        driver, cfg["username"], cfg["password"], cfg["department"]
+    ):
 
-    if cfg["is_final_day"]:
-        if not pre_run_final_day_check(driver, listing, cfg):
-            driver.quit()
-            return
-        process = process_final_day
-    else:
-        process = process_normal_day
+        if cfg["is_final_day"]:
+            if not pre_run_final_day_check(driver, listing):
+                driver.quit()
+                return
+            process = process_final_day
+        else:
+            process = process_normal_day
 
-    try:
-        with create_connection() as con:
-            with auth.session(
-                driver, cfg["username"], cfg["password"], cfg["department"]
-            ):
-                if cfg["discharged"]:
-                    danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
+        try:
+            with create_connection() as con:
+                    if cfg["discharged"]:
+                        danhsachnguoibenhnoitru.filter_trangthainguoibenh(driver, [10])
 
-                ma_hs = listing.pop()
-                first_patient(driver, con, ma_hs)
-                signature = get_signature_from_ctnbnt(driver, con, ma_hs)
-                process(driver, signature)
-
-                while len(listing) > 0:
                     ma_hs = listing.pop()
-                    next_patient(driver, con, ma_hs)
+                    first_patient(driver, con, ma_hs)
                     signature = get_signature_from_ctnbnt(driver, con, ma_hs)
                     process(driver, signature)
-    finally:
-        driver.quit()
-        messagebox.showinfo(message="finish")
+
+                    while len(listing) > 0:
+                        ma_hs = listing.pop()
+                        next_patient(driver, con, ma_hs)
+                        signature = get_signature_from_ctnbnt(driver, con, ma_hs)
+                        process(driver, signature)
+        finally:
+            driver.quit()
+            messagebox.showinfo(message="finish")
 
 
 def process_normal_day(driver: Driver, signature: str | None):
@@ -216,7 +216,7 @@ def process_final_day(driver: Driver, signature: str | None):
         tab_hosokhamchuabenh.donthuoc(driver)
 
 
-def pre_run_final_day_check(driver: Driver, listing: list[int], cfg: config.Config):
+def pre_run_final_day_check(driver: Driver, listing: list[int]):
     chieucao_cannang_missing = []
     machanthuong_kemtheo_missing = []
     discharge_date_is_none = []
@@ -260,14 +260,11 @@ def pre_run_final_day_check(driver: Driver, listing: list[int], cfg: config.Conf
 
     try:
         with create_connection() as con:
-            with auth.session(
-                driver, cfg["username"], cfg["password"], cfg["department"]
-            ):
-                first_patient(driver, con, listing[0])
-                check(driver, listing[0])
-                for ma_hs in listing[1:]:
-                    next_patient(driver, con, ma_hs)
-                    check(driver, ma_hs)
+            first_patient(driver, con, listing[0])
+            check(driver, listing[0])
+            for ma_hs in listing[1:]:
+                next_patient(driver, con, ma_hs)
+                check(driver, ma_hs)
 
     finally:
         is_ok = True
