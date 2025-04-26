@@ -18,7 +18,6 @@ def first_patient(driver: Driver, con: Connection, ma_hs: int):
         _logger.info(f"found {ma_hs} in db")
         driver.goto(url)
     else:
-        driver.goto(danhsachnguoibenhnoitru.URL)
         danhsachnguoibenhnoitru.goto_patient(driver, ma_hs)
         _logger.info(f"patient url is {driver.current_url}")
     _logger.info(f"************ ma_hs= {ma_hs} ************")

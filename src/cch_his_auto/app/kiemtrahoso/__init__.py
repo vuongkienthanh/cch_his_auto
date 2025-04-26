@@ -251,9 +251,9 @@ def pre_run_final_day_check(driver: Driver, listing: list[int]):
     def check_machanthuong_kemtheo(driver: Driver, ma_hs: int):
         diagnosis = tab_thongtinchung.get_discharge_diagnosis(driver)
         if diagnosis is not None:
-            if diagnosis.startswith("S") and any(
+            if diagnosis.startswith("S") and not any(
                 [
-                    d[0] not in "WYV"
+                    d[0] in "WYV"
                     for d in tab_thongtinchung.get_discharge_comorbid(driver)
                 ]
             ):
@@ -311,5 +311,5 @@ def pre_run_final_day_check(driver: Driver, listing: list[int]):
                 + "\n".join([str(x) for x in appointment_date_is_sat_sun])
             )
             is_ok = False
-
+        driver.goto(danhsachnguoibenhnoitru.URL)
         return is_ok
