@@ -5,7 +5,7 @@ from selenium.webdriver import Keys
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.helper import tracing
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import wait_patient_page_loaded
-from . import ICON_CSS 
+from .. import TOP_BTN_CSS
 
 
 DRAWER_CSS = ".ant-drawer-body"
@@ -16,7 +16,7 @@ _trace = tracing(_logger)
 @_trace
 def open_dialog(driver: Driver):
     driver.clicking(
-        f"{ICON_CSS}>div:last-child",
+        f"{TOP_BTN_CSS}>div:last-child",
         "click Danh sách người bệnh button",
     )
     driver.waiting(DRAWER_CSS, "Danh sách người bệnh panel")

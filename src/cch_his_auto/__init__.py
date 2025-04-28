@@ -1,3 +1,1 @@
-from .main import run
-
-__all__ = ["run"]
+from .main import run as run

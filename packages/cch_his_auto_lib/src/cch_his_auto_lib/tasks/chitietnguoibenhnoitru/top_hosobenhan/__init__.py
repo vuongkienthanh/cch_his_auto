@@ -4,9 +4,7 @@ import logging
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.upper_patient_info_buttons import (
-    ICON_CSS,
-)
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import TOP_BTN_CSS
 
 DIALOG_CSS = ".ant-modal:has(.img-avatar)"
 NAV_CSS = f"{DIALOG_CSS} .ant-tabs-nav-list"
@@ -29,7 +27,7 @@ def session(driver: Driver, tab: int = 1):
 
 
 def open_dialog(driver: Driver):
-    driver.clicking(f"{ICON_CSS}>div:nth-child(3)", "xem ho so benh an")
+    driver.clicking(f"{TOP_BTN_CSS}>div:nth-child(3)", "xem ho so benh an")
     driver.waiting(
         f"{DIALOG_CSS} .right-content tbody tr:nth-child(2)",
         "Danh sách phiếu first item",

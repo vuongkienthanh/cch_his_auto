@@ -1,11 +1,9 @@
-import logging
 import time
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.helper import tracing, EndOfLoop
+from cch_his_auto_lib.helper import EndOfLoop
+from . import _logger
 
-_logger = logging.getLogger().getChild("tasks.ingiayto")
-_trace = tracing(_logger)
 
 
 def open_menu(driver: Driver):
@@ -13,7 +11,6 @@ def open_menu(driver: Driver):
     driver.clicking(".footer-btn .right button:nth-child(1)", "open menu In giấy tờ")
 
 
-@_trace
 def goto(driver: Driver, name: str):
     "After `open_menu`, click `name`"
     _logger.info(f"goto name={name}")

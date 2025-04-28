@@ -12,23 +12,23 @@ from . import config
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tasks import auth, danhsachnguoibenhnoitru
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
-    tab_thongtinchung,
-)
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.tab_thongtinchung import (
     edit_thongtinvaovien,
     edit_thongtinravien,
 )
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.upper_patient_info_buttons import (
-    chitietthongtin,
-    hosobenhan,
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
+    tab_thongtinchung,
+    top_chitietthongtin,
+    top_hosobenhan,
 )
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.upper_patient_info_buttons.hosobenhan import (
-    tab_hosokhamchuabenh,
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.top_hosobenhan import (
     tab_mau,
 )
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.lower_buttons import (
-    sanglocdinhduong,
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.top_hosobenhan.tab_hosokhamchuabenh import (
+    job as hskcbjob,
+)
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.bot_sanglocdinhduong.job import (
+    add_all_phieusanglocdinhduong,
 )
 
 
@@ -157,33 +157,33 @@ def run(cfg: config.Config, run_cfg: RunConfig):
 def process_normal_day(driver: Driver, signature: str | None):
     admission_date = tab_thongtinchung.get_admission_date(driver)
     discharge_date = tab_thongtinchung.get_discharge_date(driver)
-    sanglocdinhduong.add_all_phieusanglocdinhduong(driver, admission_date)
+    add_all_phieusanglocdinhduong(driver, admission_date)
 
     # điền thông tin nhóm máu
     bloodtype = tab_thongtinchung.get_bloodtype(driver)
     if bloodtype is None:
-        with hosobenhan.session(driver, tab_mau.TAB_NUMBER):
+        with top_hosobenhan.session(driver, tab_mau.TAB_NUMBER):
             found_bloodtype = tab_mau.get_bloodtype(driver)
         if found_bloodtype is not None:
             with edit_thongtinvaovien.session(driver):
                 edit_thongtinvaovien.set_bloodtype(driver, found_bloodtype)
 
-    with hosobenhan.session(driver):
-        tab_hosokhamchuabenh.phieuchidinhxetnghiem(driver)
-        tab_hosokhamchuabenh.todieutri(driver, discharge_date)
-        tab_hosokhamchuabenh.phieuCT(driver, signature)
-        tab_hosokhamchuabenh.phieuMRI(driver, signature)
-        tab_hosokhamchuabenh.giaiphaubenh(driver)
-        tab_hosokhamchuabenh.phieusanglocdinhduong(driver)
-        tab_hosokhamchuabenh.phieuchidinhPTTT(driver)
-        tab_hosokhamchuabenh.phieusoket15ngay(driver)
-        tab_hosokhamchuabenh.phieucamkettruyenmau(driver, signature)
-        tab_hosokhamchuabenh.phieucamkettta5(driver, signature)
+    with top_hosobenhan.session(driver):
+        hskcbjob.phieuchidinhxetnghiem(driver)
+        hskcbjob.todieutri(driver, discharge_date)
+        hskcbjob.phieuCT(driver, signature)
+        hskcbjob.phieuMRI(driver, signature)
+        hskcbjob.giaiphaubenh(driver)
+        hskcbjob.phieusanglocdinhduong(driver)
+        hskcbjob.phieuchidinhPTTT(driver)
+        hskcbjob.phieusoket15ngay(driver)
+        hskcbjob.phieucamkettruyenmau(driver, signature)
+        hskcbjob.phieucamkettta5(driver, signature)
 
 
 def process_final_day(driver: Driver, signature: str | None):
     admission_date = tab_thongtinchung.get_admission_date(driver)
-    sanglocdinhduong.add_all_phieusanglocdinhduong(driver, admission_date)
+    add_all_phieusanglocdinhduong(driver, admission_date)
     discharge_date = tab_thongtinchung.get_discharge_date(driver)
 
     # mở rộng chữ viết tắt
@@ -211,28 +211,28 @@ def process_final_day(driver: Driver, signature: str | None):
     # điền thông tin nhóm máu
     bloodtype = tab_thongtinchung.get_bloodtype(driver)
     if bloodtype is None:
-        with hosobenhan.session(driver, tab_mau.TAB_NUMBER):
+        with top_hosobenhan.session(driver, tab_mau.TAB_NUMBER):
             found_bloodtype = tab_mau.get_bloodtype(driver)
         if found_bloodtype is not None:
             with edit_thongtinvaovien.session(driver):
                 edit_thongtinvaovien.set_bloodtype(driver, found_bloodtype)
 
-    with hosobenhan.session(driver):
-        # tab_hosokhamchuabenh.tobiabenhannhikhoa(driver)
-        tab_hosokhamchuabenh.mucAbenhannhikhoa(driver)
-        tab_hosokhamchuabenh.mucBtongketbenhan(driver)
-        tab_hosokhamchuabenh.phieukhambenhvaovien(driver)
-        tab_hosokhamchuabenh.phieuchidinhxetnghiem(driver)
-        tab_hosokhamchuabenh.todieutri(driver, discharge_date)
-        tab_hosokhamchuabenh.phieuCT(driver, signature)
-        tab_hosokhamchuabenh.phieuMRI(driver, signature)
-        tab_hosokhamchuabenh.giaiphaubenh(driver)
-        tab_hosokhamchuabenh.phieusanglocdinhduong(driver)
-        tab_hosokhamchuabenh.phieuchidinhPTTT(driver)
-        tab_hosokhamchuabenh.phieusoket15ngay(driver)
-        tab_hosokhamchuabenh.donthuoc(driver)
-        tab_hosokhamchuabenh.phieucamkettruyenmau(driver, signature)
-        tab_hosokhamchuabenh.phieucamkettta5(driver, signature)
+    with top_hosobenhan.session(driver):
+        # hskcbjob.tobiabenhannhikhoa(driver)
+        hskcbjob.mucAbenhannhikhoa(driver)
+        hskcbjob.mucBtongketbenhan(driver)
+        hskcbjob.phieukhambenhvaovien(driver)
+        hskcbjob.phieuchidinhxetnghiem(driver)
+        hskcbjob.todieutri(driver, discharge_date)
+        hskcbjob.phieuCT(driver, signature)
+        hskcbjob.phieuMRI(driver, signature)
+        hskcbjob.giaiphaubenh(driver)
+        hskcbjob.phieusanglocdinhduong(driver)
+        hskcbjob.phieuchidinhPTTT(driver)
+        hskcbjob.phieusoket15ngay(driver)
+        hskcbjob.donthuoc(driver)
+        hskcbjob.phieucamkettruyenmau(driver, signature)
+        hskcbjob.phieucamkettta5(driver, signature)
 
 
 def pre_run_final_day_check(driver: Driver, listing: list[int]):
@@ -242,9 +242,9 @@ def pre_run_final_day_check(driver: Driver, listing: list[int]):
     appointment_date_is_sat_sun = []
 
     def check_chieucao_cannang(driver: Driver, ma_hs: int):
-        with chitietthongtin.session(driver):
-            if (chitietthongtin.get_chieucao(driver) is None) or (
-                chitietthongtin.get_cannang(driver) is None
+        with top_chitietthongtin.session(driver):
+            if (top_chitietthongtin.get_chieucao(driver) is None) or (
+                top_chitietthongtin.get_cannang(driver) is None
             ):
                 chieucao_cannang_missing.append(ma_hs)
 

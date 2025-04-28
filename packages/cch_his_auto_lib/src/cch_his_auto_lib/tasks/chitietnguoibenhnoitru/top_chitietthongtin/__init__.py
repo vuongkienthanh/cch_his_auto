@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from . import ICON_CSS
+from .. import TOP_BTN_CSS
 
 DIALOG_CSS = ".ant-modal:has(.avatar__image)"
 _logger = logging.getLogger().getChild("chitietthongtin")
@@ -22,7 +22,7 @@ def session(driver):
 
 def open_dialog(driver: Driver):
     driver.clicking(
-        f"{ICON_CSS}>div:first-child",
+        f"{TOP_BTN_CSS}>div:first-child",
         "click Chi tiết thông tin button",
     )
     driver.waiting(DIALOG_CSS, "Chi tiết thông tin dialog")

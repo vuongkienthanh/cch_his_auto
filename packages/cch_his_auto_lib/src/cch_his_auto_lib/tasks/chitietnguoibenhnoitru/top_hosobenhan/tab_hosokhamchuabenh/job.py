@@ -1,175 +1,23 @@
-from enum import StrEnum
 import datetime as dt
-import time
-from typing import Callable
 
-from selenium.webdriver import Keys
-from selenium.common import NoSuchElementException, StaleElementReferenceException
-
-from cch_his_auto_lib.driver import Driver, DriverFn
+from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.helper import tracing
+
 from cch_his_auto_lib.tasks.editor import (
     sign_staff_name,
     sign_patient_name,
     check_agreement,
 )
-from . import ACTIVE_PANE, _logger
+from . import _logger
+from .helper import (
+    filter_check_expand_sign,
+    sign_tab,
+    sign_current,
+    sign_current2,
+    sign_current_both,
+)
 
-
-_logger = _logger.getChild("tab_hosokhamchuabenh")
 _trace = tracing(_logger)
-
-TAB_NUMBER = 1
-RIGHT_PANEL = f"{ACTIVE_PANE} .right-content"
-
-
-class Status(StrEnum):
-    "Possible status for each document"
-
-    CHUAKY = "Chưa ký"
-    DANGKY = "Đang ký"
-    HOANTHANH = "Hoàn thành"
-
-
-def filter(driver: Driver, name: str) -> bool:
-    "Filter document based on `name`"
-    _logger.debug(f"name={name}")
-    ele = driver.clear_input(f"{RIGHT_PANEL} input")
-    _logger.debug("+++++ typing name")
-    ele.send_keys(name)
-    ele.send_keys(Keys.ENTER)
-    for _ in range(60):  # 120 is too long
-        time.sleep(1)
-        try:
-            ele = driver.find(f"{RIGHT_PANEL} tr:nth-child(2) td:nth-child(2) div")
-            if ele.text.strip().startswith(name):
-                _logger.info(f"-> found {name}")
-                return True
-        except NoSuchElementException:
-            ...
-    else:
-        _logger.warning(f"-> filtered {name} with no result")
-        return False
-
-
-def is_row_status(driver: Driver, idx: int, status: Status) -> bool:
-    "Check if row at `idx` is `status`, first row is idx=2"
-    try:
-        _logger.debug(f"checking status = {status}")
-        return (
-            driver.waiting(
-                f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(3)",
-                f"row {idx} status",
-            ).text.strip()
-            == status
-        )
-    except StaleElementReferenceException:
-        return is_row_status(driver, idx, status)
-
-
-def is_row_expandable(driver: Driver, idx: int) -> bool:
-    "Check if row at `idx` is expandable, first row is idx=2"
-    name = driver.waiting(
-        f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(2)", f"row {idx}"
-    ).text
-    _logger.debug(f"checking {name}: expandable")
-    for _ in range(5):
-        time.sleep(1)
-        try:
-            ele = driver.find(
-                f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(1) button"
-            )
-            class_list = ele.get_attribute("class")
-            assert class_list is not None
-            return "ant-table-row-expand-icon-collapsed" in class_list
-        except (NoSuchElementException, StaleElementReferenceException):
-            continue
-    else:
-        return False
-
-
-def expand_row(driver: Driver, idx: int):
-    "Expand row at `idx`, first row is idx=2"
-    name = driver.waiting(
-        f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(2)", f"row {idx}"
-    ).text
-    _logger.info(f"expanding {name}")
-    driver.clicking(f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(1) button")
-
-
-def filter_check_expand_sign(
-    driver: Driver,
-    name: str,
-    chuaky_fn: Callable[[Driver, int], None],
-    dangky_fn: Callable[[Driver, int], None],
-):
-    "filter `name`, expand it if possible, then call `fn` respectively bases on status"
-
-    def check_and_sign(driver: Driver, i: int):
-        name = driver.waiting(f"{RIGHT_PANEL} tr:nth-child({i}) td:nth-child(2)").text
-        _logger.debug(f"checking {name}")
-        if is_row_status(driver, i, Status.CHUAKY):
-            _logger.info(f"row condition: not met: {name} -> {Status.CHUAKY}")
-            driver.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
-            chuaky_fn(driver, i)
-            time.sleep(5)
-        elif is_row_status(driver, i, Status.DANGKY):
-            _logger.info(f"row condition: not met: {name} -> {Status.DANGKY}")
-            dangky_fn(driver, i)
-            time.sleep(5)
-        else:
-            _logger.info("row condition: OK")
-
-    if filter(driver, name) and (
-        driver.waiting(f"{RIGHT_PANEL} tr:nth-child(2) td:nth-child(3)").text.strip()
-        != Status.HOANTHANH
-    ):
-        if is_row_expandable(driver, 2):
-            expand_row(driver, 2)
-            for i in range(
-                3, len(driver.find_all(f"{RIGHT_PANEL} .ant-table-row-level-1")) + 3
-            ):
-                check_and_sign(driver, i)
-        else:
-            check_and_sign(driver, 2)
-
-
-def do_nothing():
-    "@private"
-    _logger.warning("should not be called")
-
-
-def sign_current(driver: Driver):
-    "@private"
-    driver.clicking(
-        f"{RIGHT_PANEL} .__action button:nth-child(2)", "clicking Ký tên BS dieu tri"
-    )
-
-
-def sign_current2(driver: Driver):
-    "@private"
-    driver.clicking(
-        f"{RIGHT_PANEL} .__action button:nth-child(3)", "clicking Ký tên BS truong khoa"
-    )
-
-
-def sign_current_both(driver: Driver):
-    "@private"
-    sign_current(driver)
-    sign_current2(driver)
-
-
-def sign_tab(driver: Driver, idx: int, sign_fn: DriverFn):
-    "@private"
-    tab0 = driver.current_window_handle
-    datakey = driver.find(f"{RIGHT_PANEL} tr:nth-child({idx})").get_attribute(
-        "data-row-key"
-    )
-    _logger.debug(f"data row key = {datakey}")
-    driver.clicking(f"{RIGHT_PANEL} tr:nth-child({idx})", f"row {idx - 1}")
-    time.sleep(2)
-    driver.clicking(f"a[data-key='{datakey}'] button", f"edit button {idx - 1}")
-    driver.goto_newtab_do_smth_then_goback(tab0, sign_fn)
 
 
 @_trace
@@ -181,7 +29,6 @@ def tobiabenhannhikhoa(driver: Driver):
         chuaky_fn=lambda driver, i: sign_tab(
             driver, i, sign_staff_name.tobiabenhannhikhoa
         ),
-        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -194,7 +41,6 @@ def mucAbenhannhikhoa(driver: Driver):
         chuaky_fn=lambda driver, i: sign_tab(
             driver, i, sign_staff_name.mucAbenhannhikhoa
         ),
-        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -207,7 +53,6 @@ def mucBtongketbenhan(driver: Driver):
         chuaky_fn=lambda driver, i: sign_tab(
             driver, i, sign_staff_name.mucBtongketbenhan
         ),
-        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -218,7 +63,6 @@ def phieukhambenhvaovien(driver: Driver):
         driver,
         name="Phiếu khám bệnh vào viện",
         chuaky_fn=lambda driver, _: sign_current(driver),
-        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -229,7 +73,6 @@ def phieuchidinhxetnghiem(driver: Driver):
         driver,
         name="Phiếu chỉ định xét nghiệm",
         chuaky_fn=lambda driver, _: sign_current(driver),
-        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -256,7 +99,6 @@ def todieutri(driver: Driver, discharge_date: dt.date | None):
         driver,
         name="Tờ điều trị",
         chuaky_fn=lambda driver, i: chuaky_fn(driver, i),
-        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -267,7 +109,6 @@ def phieuchidinhPTTT(driver: Driver):
         driver,
         name="Phiếu chỉ định PTTT",
         chuaky_fn=lambda driver, _: sign_current(driver),
-        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -280,7 +121,6 @@ def phieuCT_bschidinh(driver: Driver):
         driver,
         name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
         chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
-        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -333,7 +173,6 @@ def giaiphaubenh(driver: Driver):
         driver,
         name="Phiếu xét nghiệm giải phẫu bệnh sinh thiết",
         chuaky_fn=lambda driver, i: sign_tab(driver, i, sign_staff_name.giaiphaubenh),
-        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -344,7 +183,6 @@ def phieusanglocdinhduong(driver: Driver):
         driver,
         name="Phiếu sàng lọc dinh dưỡng - Bệnh nhi nội trú",
         chuaky_fn=lambda driver, _: sign_current(driver),
-        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -366,7 +204,6 @@ def donthuoc(driver: Driver):
         driver,
         name="Đơn thuốc",
         chuaky_fn=lambda driver, _: sign_current(driver),
-        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -383,7 +220,6 @@ def phieucamkettruyenmau(driver: Driver, signature: str | None):
         driver,
         name="Giấy cam đoan chấp nhận truyền máu và các chế phẩm của máu",
         chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
-        dangky_fn=lambda *_: do_nothing(),
     )
 
 
@@ -406,15 +242,3 @@ def phieucamkettta5(driver: Driver, signature: str | None):
         chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
         dangky_fn=lambda driver, i: sign_tab(driver, i, dangky_fn),
     )
-
-
-# his bug
-# @_trace
-# def phieudutrucungcapmau(driver: Driver):
-#     "Filter and sign name: *Phiếu dự trù và cung cấp máu*"
-#     filter_check_expand_sign(
-#         driver,
-#         name="Phiếu dự trù và cung cấp máu",
-#         chuaky_fn=lambda driver, i: sign_tab(driver,i,),
-#         dangky_fn=lambda *_: do_nothing(),
-#     )
