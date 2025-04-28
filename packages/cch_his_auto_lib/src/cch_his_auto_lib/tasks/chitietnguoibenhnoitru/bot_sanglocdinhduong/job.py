@@ -8,6 +8,7 @@ from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
 
 from . import (
     _logger,
+    back,
     open_dialog,
     close_dialog,
     get_last_date,
@@ -33,6 +34,7 @@ def save_new_phieusangloc(
     set_chieucao(driver, chieucao)
     set_machedo(driver, machedo)
     save(driver)
+    back(driver)
 
 
 def from_age_in_month_to_machedo(age_in_month: int) -> str:
@@ -65,11 +67,11 @@ def add_all_phieusanglocdinhduong(driver: Driver, admission_date: dt.date):
             return
 
     today = dt.date.today()
-    _logger.info(f"today is {today}")
 
     if open_dialog(driver):
         next_date = get_last_date(driver) + dt.timedelta(days=7)
         if next_date <= today:
+            _logger.info(f"add new phieu sang loc for {next_date}")
             add_new(driver)
         else:
             close_dialog(driver)
@@ -83,6 +85,7 @@ def add_all_phieusanglocdinhduong(driver: Driver, admission_date: dt.date):
     next_date = next_date + dt.timedelta(days=7)
 
     while next_date <= today:
+        _logger.info(f"add new phieu sang loc for {next_date}")
         open_dialog(driver)
         add_new(driver)
         save_new_phieusangloc(

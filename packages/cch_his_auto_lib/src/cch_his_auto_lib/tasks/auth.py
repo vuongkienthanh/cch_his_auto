@@ -59,20 +59,13 @@ def login(driver: Driver, username: str, password: str):
 @_trace
 def logout(driver: Driver):
     "logout, then back to login page"
-    time.sleep(5)  # wait for it to be dropdown-able
-    for i in range(3):
-        time.sleep(1)
-        _logger.debug(f"trying logout {i}...")
-        driver.clicking(".header .header-icon:has(+.username)", "log menu drop down")
-        try:
-            driver.clicking(".ant-popover .item-action:last-child", "logout")
-        except NoSuchElementException:
-            continue
-        else:
-            driver.waiting(".login-body")
-            return
-    else:
-        raise EndOfLoop("can't log out")
+    URL = "http://emr.ndtp.org/logout"
+    driver.goto(URL)
+    try:
+        driver.waiting(".login-body")
+        return
+    except NoSuchElementException:
+        logout(driver)
 
 
 @_trace

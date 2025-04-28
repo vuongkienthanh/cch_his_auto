@@ -90,14 +90,14 @@ def get_age_in_month(driver: Driver) -> int:
                 assert value is not None
                 _logger.info(f"-> found age={value}")
                 a = value.strip().split(" ")
-                if len(a) < 4:
+                if len(a) == 1:
+                    return int(a[0]) * 12
+                if len(a) == 2:
                     if a[1] == "tháng":
                         return int(a[0])
-                    elif a[1] == "tuổi":
-                        return int(a[0]) * 12
                     else:
                         return 0
-                else:
+                if len(a) == 4:
                     return int(a[0]) * 12 + int(a[2])
 
         except NoSuchElementException:
