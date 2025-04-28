@@ -15,7 +15,7 @@ RIGHT_PANEL = f"{ACTIVE_PANE} .right-content"
 
 
 def do_nothing(*_):
-    _logger.warning("should not be called")
+    _logger.warning("do nothing")
 
 
 def sign_current(driver: Driver):

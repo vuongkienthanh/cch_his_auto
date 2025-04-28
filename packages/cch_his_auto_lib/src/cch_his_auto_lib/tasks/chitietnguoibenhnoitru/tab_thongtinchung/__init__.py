@@ -101,7 +101,7 @@ def get_discharge_diagnosis_detail(driver: Driver) -> str | None:
             "discharge diagnosis detail",
         ).text
     except NoSuchElementException:
-        _logger.warning("=> can't find discharge_diagnosis")
+        _logger.warning("=> can't find discharge_diagnosis_detail")
         return None
     else:
         _logger.info(f"discharge_diagnosis_detail={ele}")

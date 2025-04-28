@@ -19,8 +19,19 @@ def first_patient(driver: Driver, con: Connection, ma_hs: int):
         driver.goto(url)
     else:
         danhsachnguoibenhnoitru.goto_patient(driver, ma_hs)
-        _logger.info(f"patient url is {driver.current_url}")
-    _logger.info(f"************ ma_hs= {ma_hs} ************")
+    _logger.info(
+        "\n".join(
+            [
+                "",
+                "",
+                "~" * 50,
+                f"patient: {driver.waiting('.name span').text}",
+                f"url: {driver.current_url}",
+                f"ma_hs: {ma_hs}",
+                "~" * 50,
+            ]
+        )
+    )
 
 
 def next_patient(driver: Driver, con: Connection, ma_hs: int):
@@ -30,5 +41,16 @@ def next_patient(driver: Driver, con: Connection, ma_hs: int):
     else:
         top_danhsachnguoibenh.open_dialog(driver)
         top_danhsachnguoibenh.goto_patient(driver, ma_hs)
-        _logger.info(f"patient url is {driver.current_url}")
-    _logger.info(f"************ ma_hs= {ma_hs} ************")
+    _logger.info(
+        "\n".join(
+            [
+                "",
+                "",
+                "~" * 50,
+                f"patient: {driver.waiting('.name span').text}",
+                f"url: {driver.current_url}",
+                f"ma_hs: {ma_hs}",
+                "~" * 50,
+            ]
+        )
+    )

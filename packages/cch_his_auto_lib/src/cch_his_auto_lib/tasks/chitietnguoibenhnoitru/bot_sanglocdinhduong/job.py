@@ -65,6 +65,7 @@ def add_all_phieusanglocdinhduong(driver: Driver, admission_date: dt.date):
             return
 
     today = dt.date.today()
+    _logger.info(f"today is {today}")
 
     if open_dialog(driver):
         next_date = get_last_date(driver) + dt.timedelta(days=7)

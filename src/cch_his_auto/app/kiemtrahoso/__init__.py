@@ -1,3 +1,4 @@
+import logging
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
 
@@ -45,6 +46,7 @@ APP_INTRO = """
 
     """
 
+_logger = logging.getLogger("app")
 
 class App(tk.Frame):
     def __init__(self):
@@ -132,6 +134,7 @@ def run(cfg: config.Config, run_cfg: RunConfig):
             if cfg["is_final_day"]:
                 if not pre_run_final_day_check(driver, listing):
                     return
+                driver.goto(danhsachnguoibenhnoitru.URL)
                 process = process_final_day
             else:
                 process = process_normal_day
@@ -236,6 +239,7 @@ def process_final_day(driver: Driver, signature: str | None):
 
 
 def pre_run_final_day_check(driver: Driver, listing: list[int]):
+    _logger.info("START PRE_RUN_CHECK")
     chieucao_cannang_missing = []
     machanthuong_kemtheo_missing = []
     discharge_date_is_none = []
@@ -311,5 +315,5 @@ def pre_run_final_day_check(driver: Driver, listing: list[int]):
                 + "\n".join([str(x) for x in appointment_date_is_sat_sun])
             )
             is_ok = False
-        driver.goto(danhsachnguoibenhnoitru.URL)
+        _logger.info("END PRE_RUN_CHECK")
         return is_ok
