@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.helper import EndOfLoop
 from .. import TOP_BTN_CSS
 
 DIALOG_CSS = ".ant-modal:has(.avatar__image)"
@@ -46,11 +47,13 @@ def get_chieucao(driver: Driver) -> str | None:
             if value == "":
                 continue
             else:
+                assert value is not None
                 _logger.info(f"-> found chieucao={value}")
                 return value
         except NoSuchElementException:
-            _logger.debug("-> can't find chieucao")
+            ...
     else:
+        _logger.warning(f"-> can't found chieucao")
         return None
 
 
@@ -64,9 +67,39 @@ def get_cannang(driver: Driver) -> str | None:
             if value == "":
                 continue
             else:
+                assert value is not None
                 _logger.info(f"-> found cannang={value}")
                 return value
         except NoSuchElementException:
-            _logger.debug("-> can't find cannang")
+            ...
     else:
+        _logger.warning(f"-> can't found cannang")
         return None
+
+
+def get_age_in_month(driver: Driver) -> int:
+    for _ in range(30):
+        time.sleep(1)
+        try:
+            value = driver.find(
+                f"{DIALOG_CSS} .ant-col:nth-child(2) .ant-row .ant-col:nth-child(4) input"
+            ).get_attribute("value")
+            if value == "":
+                continue
+            else:
+                assert value is not None
+                _logger.info(f"-> found age={value}")
+                a = value.strip().split(" ")
+                if len(a) == 2:
+                    if a[1] == "tháng":
+                        return int(a[0])
+                    else:
+                        return int(a[0]) * 12
+                else:
+                    return int(a[0]) * 12 + int(a[2])
+
+        except NoSuchElementException:
+            ...
+    else:
+        _logger.error(f"-> can't find age")
+        raise EndOfLoop("-> can't find age")

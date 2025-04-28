@@ -92,5 +92,12 @@ def set_chieucao(driver: Driver, value: str):
     _logger.debug(f"set chieucao to {value}")
 
 
+def set_machedo(driver: Driver, value: str):
+    driver.clear_input(
+        "#dsDuongNuoiAn>.ant-row>.ant-col:last-child>div>input"
+    ).send_keys(value)
+    _logger.debug(f"set machedo to {value}")
+
+
 def save(driver: Driver):
     driver.clicking(".right button:nth-child(2)", "save phieusangloc")
