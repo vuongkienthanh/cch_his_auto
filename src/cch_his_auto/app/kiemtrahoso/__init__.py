@@ -6,7 +6,7 @@ from cch_his_auto.global_db import create_connection
 from cch_his_auto.common_ui.staff_info import UsernamePasswordDeptFrame
 from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig, setLogLevel
 from cch_his_auto.common_tasks.navigation import first_patient, next_patient
-from cch_his_auto.common_tasks.signature import get_signature_from_ctnbnt
+from cch_his_auto.common_tasks.signature import try_get_signature
 
 from . import config
 
@@ -141,13 +141,13 @@ def run(cfg: config.Config, run_cfg: RunConfig):
 
                 ma_hs = listing.pop()
                 first_patient(driver, con, ma_hs)
-                signature = get_signature_from_ctnbnt(driver, con, ma_hs)
+                signature = try_get_signature(driver, con, ma_hs)
                 process(driver, signature)
 
                 while len(listing) > 0:
                     ma_hs = listing.pop()
                     next_patient(driver, con, ma_hs)
-                    signature = get_signature_from_ctnbnt(driver, con, ma_hs)
+                    signature = try_get_signature(driver, con, ma_hs)
                     process(driver, signature)
     finally:
         driver.quit()

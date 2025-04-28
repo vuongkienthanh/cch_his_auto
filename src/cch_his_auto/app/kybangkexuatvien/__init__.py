@@ -6,14 +6,14 @@ from cch_his_auto.app import PROFILE_PATH
 from cch_his_auto.global_db import create_connection
 from cch_his_auto.common_ui.staff_info import UsernamePasswordDeptFrame
 from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig, setLogLevel
-from cch_his_auto.common_tasks.signature import get_signature_from_ctnbnt
+from cch_his_auto.common_tasks.signature import try_get_signature
 from cch_his_auto.common_tasks.navigation import first_patient, next_patient
 
 from . import config
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tasks.auth import session
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.bot_indieuduong.job import (
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.bot_indieuduong.bangkechiphiBHYT import (
     sign_bangkechiphiBHYT_both,
 )
 
@@ -99,5 +99,5 @@ def run(cf: config.Config, run_cfg: RunConfig):
 
 
 def process(driver: Driver, con: sqlite3.Connection, ma_hs: int):
-    if signature := get_signature_from_ctnbnt(driver, con, ma_hs):
+    if signature := try_get_signature(driver, con, ma_hs):
         sign_bangkechiphiBHYT_both(driver, signature)

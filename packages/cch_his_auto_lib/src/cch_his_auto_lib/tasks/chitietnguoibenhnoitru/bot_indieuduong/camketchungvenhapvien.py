@@ -1,19 +1,18 @@
-import time
-
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from . import bot_indieuduong as idd
+from cch_his_auto_lib.helper import tracing
 
-from . import _logger
+from . import open_menu, goto, _logger
+
+_trace = tracing(_logger)
 
 
-def scrape_signature(driver: Driver) -> str | None:
-    "try getting signature of the current patient"
-    _logger.debug("+++ start scrape_signature")
+@_trace
+def get_signature(driver: Driver) -> str | None:
     main_tab = driver.current_window_handle
-    idd.open_menu(driver)
-    idd.goto(driver, "cam kết chung về nhập viện")
+    open_menu(driver)
+    goto(driver, "cam kết chung về nhập viện")
     driver.goto_newtab(main_tab)
     try:
         ele = driver.waiting(".layout-line-item:nth-child(43) img", "patient signature")
@@ -26,4 +25,3 @@ def scrape_signature(driver: Driver) -> str | None:
     finally:
         driver.close()
         driver.switch_to.window(main_tab)
-        time.sleep(5)

@@ -7,7 +7,7 @@ from cch_his_auto.app import PROFILE_PATH
 from cch_his_auto.global_db import create_connection
 from cch_his_auto.common_ui.staff_info import UsernamePasswordFrame
 from cch_his_auto.common_ui.button_frame import ButtonFrame2, RunConfig, setLogLevel
-from cch_his_auto.common_tasks.signature import get_signature_from_elsewhere
+from cch_his_auto.common_tasks.signature import try_get_signature
 
 from . import config
 from .patient_list import PatientFrame
@@ -226,7 +226,7 @@ def run_bn(driver: Driver, cfg: config.Config):
                     "ma ho so",
                 ).text
             )
-            if signature := get_signature_from_elsewhere(driver, con, ma_hs):
+            if signature := try_get_signature(driver, con, ma_hs):
                 if any(p["ky_3tra"]["benhnhan"]):
                     sign_phieuthuchienylenh_bn(
                         driver, p["ky_3tra"]["benhnhan"], signature
