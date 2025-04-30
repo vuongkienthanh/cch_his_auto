@@ -6,16 +6,6 @@ from .config import Patient
 from cch_his_auto.common_ui.scrollable_frame import ScrollFrame
 
 
-def columnconfigure(w: tk.Widget):
-    w.columnconfigure(0, weight=1, minsize=200)
-    w.columnconfigure(1, minsize=120)
-    w.columnconfigure(2, minsize=120)
-    w.columnconfigure(3, minsize=120)
-    w.columnconfigure(4, minsize=120)
-    w.columnconfigure(5, minsize=180)
-    w.columnconfigure(6, minsize=80)
-
-
 class PatientFrame(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -26,7 +16,7 @@ class PatientFrame(tk.Frame):
         header.grid(row=0, column=0, sticky="WE", padx=(0, 15))
 
         for i, h in enumerate(
-            ["url", "XN", "CT", "MRI", "tờ ĐT", "Vị trí ký 3tra", "Xóa"]
+            ["url", "XN", "CT", "MRI", "BBHC", "tờ ĐT", "Vị trí ký 3tra", "Xóa"]
         ):
             w = tk.Label(header, text=h, relief="raised", anchor="center")
             w.grid(row=0, column=i, sticky="NSEW")
@@ -75,27 +65,33 @@ class Line(tk.Frame):
         columnconfigure(self)
         self.url_var = tk.StringVar()
         self.note_var = tk.StringVar()
+
+        info_frame = tk.Frame(self)
+        info_frame.grid(row=0, column=0, sticky="WE")
+        info_frame.columnconfigure(1, weight=1)
+        tk.Entry(info_frame, textvariable=self.url_var).grid(
+            row=0, column=0, sticky="WE", columnspan=2
+        )
+        tk.Label(info_frame, text="note").grid(row=1, column=0)
+        tk.Entry(info_frame, textvariable=self.note_var).grid(
+            row=1, column=1, sticky="WE"
+        )
+
         self.xn_var = tk.BooleanVar()
         self.ct_var = tk.BooleanVar()
         self.mri_var = tk.BooleanVar()
+        self.bbhc_var = tk.BooleanVar()
         self.tdt_var = tk.BooleanVar()
 
-        info_frame = tk.Frame(self)
-        info_frame.columnconfigure(1, weight=1)
-        url_entry = tk.Entry(info_frame, textvariable=self.url_var)
-        note_label = tk.Label(info_frame, text="note")
-        note_entry = tk.Entry(info_frame, textvariable=self.note_var)
-        url_entry.grid(row=0, column=0, sticky="WE", columnspan=2)
-        note_label.grid(row=1, column=0)
-        note_entry.grid(row=1, column=1, sticky="WE")
+        for i, v in enumerate(
+            [self.xn_var, self.ct_var, self.mri_var, self.bbhc_var, self.tdt_var], 1
+        ):
+            tk.Checkbutton(self, variable=v).grid(row=0, column=i)
 
-        xn_checkbox = tk.Checkbutton(self, variable=self.xn_var)
-        ct_checkbox = tk.Checkbutton(self, variable=self.ct_var)
-        mri_checkbox = tk.Checkbutton(self, variable=self.mri_var)
-        tdt_checkbox = tk.Checkbutton(self, variable=self.tdt_var)
-        tdt_checkbox.select()
+        self.tdt_var.set(True)
 
         k3t = tk.Frame(self, borderwidth=10)
+        k3t.grid(row=0, column=6)
         self.k3t_bs = Ky3Tra(k3t, text="Bác sĩ")
         self.k3t_dd = Ky3Tra(k3t, text="Điều dưỡng")
         self.k3t_bn = Ky3Tra(k3t, text="Bệnh nhân")
@@ -104,14 +100,7 @@ class Line(tk.Frame):
         self.k3t_bn.grid(row=2, column=0)
 
         del_btn = tk.Button(self, text="Xóa", command=self.destroy)
-
-        info_frame.grid(row=0, column=0, sticky="WE")
-        xn_checkbox.grid(row=0, column=1)
-        ct_checkbox.grid(row=0, column=2)
-        mri_checkbox.grid(row=0, column=3)
-        tdt_checkbox.grid(row=0, column=4)
-        k3t.grid(row=0, column=5)
-        del_btn.grid(row=0, column=6)
+        del_btn.grid(row=0, column=7)
 
     def set_patient(self, patient: Patient):
         self.url_var.set(patient["url"])
@@ -119,6 +108,7 @@ class Line(tk.Frame):
         self.xn_var.set(patient["ky_xetnghiem"])
         self.ct_var.set(patient["ky_ct"])
         self.mri_var.set(patient["ky_mri"])
+        self.bbhc_var.set(patient["ky_bbhc"])
         self.tdt_var.set(patient["ky_todieutri"])
         self.k3t_bs.set_vitri(patient["ky_3tra"]["bacsi"])
         self.k3t_dd.set_vitri(patient["ky_3tra"]["dieuduong"])
@@ -131,6 +121,7 @@ class Line(tk.Frame):
             "ky_xetnghiem": self.xn_var.get(),
             "ky_ct": self.ct_var.get(),
             "ky_mri": self.mri_var.get(),
+            "ky_bbhc": self.bbhc_var.get(),
             "ky_todieutri": self.tdt_var.get(),
             "ky_3tra": {
                 "bacsi": self.k3t_bs.get_vitri(),
@@ -166,3 +157,14 @@ class Ky3Tra(tk.LabelFrame):
         self.v2.set(v[2])
         self.v3.set(v[3])
         self.v4.set(v[4])
+
+
+def columnconfigure(w: tk.Widget):
+    w.columnconfigure(0, weight=1, minsize=200)
+    w.columnconfigure(1, minsize=80)
+    w.columnconfigure(2, minsize=80)
+    w.columnconfigure(3, minsize=80)
+    w.columnconfigure(4, minsize=80)
+    w.columnconfigure(5, minsize=80)
+    w.columnconfigure(6, minsize=180)
+    w.columnconfigure(7, minsize=80)

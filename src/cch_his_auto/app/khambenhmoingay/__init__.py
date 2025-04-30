@@ -176,7 +176,11 @@ def run_bs(driver: Driver, cfg: config.Config):
 
         if p["ky_xetnghiem"]:
             sign_phieuchidinh(driver)
-        if p["ky_ct"] or p["ky_mri"]:
+        if p["ky_todieutri"]:
+            sign_todieutri(driver)
+        if any(p["ky_3tra"]["bacsi"]):
+            sign_phieuthuchienylenh_bs(driver, p["ky_3tra"]["bacsi"])
+        if p["ky_ct"] or p["ky_mri"] or p["ky_bbhc"]:
             with top_hosobenhan.session(driver):
                 if p["ky_ct"]:
                     filter_check_expand_sign(
@@ -197,18 +201,15 @@ def run_bs(driver: Driver, cfg: config.Config):
                         ),
                         date=dt.date.today(),
                     )
-                filter_check_expand_sign(
-                    driver,
-                    name="Biên bản hội chẩn",
-                    chuaky_fn=lambda driver, i: sign_tab(
-                        driver, i, sign_staff_name.phieuCT_bschidinh
-                    ),
-                    date=dt.date.today(),
-                )
-        if p["ky_todieutri"]:
-            sign_todieutri(driver)
-        if any(p["ky_3tra"]["bacsi"]):
-            sign_phieuthuchienylenh_bs(driver, p["ky_3tra"]["bacsi"])
+                if p["ky_bbhc"]:
+                    filter_check_expand_sign(
+                        driver,
+                        name="Biên bản hội chẩn",
+                        chuaky_fn=lambda driver, i: sign_tab(
+                            driver, i, sign_staff_name.phieuCT_bschidinh
+                        ),
+                        date=dt.date.today(),
+                    )
 
 
 def run_dd(driver: Driver, cfg: config.Config):
@@ -239,7 +240,7 @@ def run_bn(driver: Driver, cfg: config.Config):
 
 def run_tk(driver: Driver, cfg: config.Config):
     for p in cfg["patients"]:
-        if p["ky_ct"] or p["ky_mri"]:
+        if p["ky_bbhc"]:
             driver.goto(p["url"])
             log_patient_name(driver.waiting(".name span").text)
             with top_hosobenhan.session(driver):

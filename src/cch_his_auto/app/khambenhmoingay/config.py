@@ -27,6 +27,7 @@ class Patient(TypedDict):
     ky_xetnghiem: bool
     ky_ct: bool
     ky_mri: bool
+    ky_bbhc: bool
     ky_todieutri: bool
     ky_3tra: Ky_3tra
 
