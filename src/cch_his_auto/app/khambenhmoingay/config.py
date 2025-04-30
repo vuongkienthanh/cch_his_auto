@@ -1,4 +1,4 @@
-from typing import TypedDict
+from typing import Literal, TypedDict
 import json
 import os.path
 import os
@@ -26,14 +26,16 @@ class Patient(TypedDict):
     note: str
     ky_xetnghiem: bool
     ky_ct: bool
+    ky_mri: bool
     ky_todieutri: bool
     ky_3tra: Ky_3tra
 
 
 class Config(TypedDict):
     bacsi: LogInfo
-    department: str
     dieuduong: LogInfo
+    truongkhoa: LogInfo
+    department: str
     patients: list[Patient]
 
 
@@ -49,7 +51,6 @@ def load() -> Config:
             return json.load(f)
     except Exception as _:
         return {
-            "department": "",
             "bacsi": {
                 "username": "",
                 "password": "",
@@ -58,6 +59,11 @@ def load() -> Config:
                 "username": "",
                 "password": "",
             },
+            "truongkhoa": {
+                "username": "",
+                "password": "",
+            },
+            "department": "",
             "patients": [],
         }
 
@@ -71,13 +77,5 @@ def is_patient_list_valid(config: Config) -> bool:
     )
 
 
-def is_bs_valid(config: Config) -> bool:
-    return (len(config["bacsi"]["username"]) > 0) & (
-        len(config["bacsi"]["password"]) > 0
-    )
-
-
-def is_dd_valid(config: Config) -> bool:
-    return (len(config["dieuduong"]["username"]) > 0) & (
-        len(config["dieuduong"]["password"]) > 0
-    )
+def is_valid(config: Config, kind: Literal["bacsi", "dieuduong", "truongkhoa"]) -> bool:
+    return config[kind]["username"] != "" and config[kind]["password"] != ""

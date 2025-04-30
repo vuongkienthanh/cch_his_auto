@@ -229,6 +229,28 @@ def phieucamkettta5(driver: Driver):
     )
 
 
+def bienbanhoichan_thuky(driver: Driver):
+    "*Biên bản hội chẩn (thư ký)*"
+    _sign(
+        driver,
+        name="bien ban hoi chan (thu ky)",
+        btn_css=".layout-line-item .layout-line-item:nth-child(39)>div:nth-child(3) .sign-image button",
+        btn_txt="Xác nhận ký Thư ký",
+        img_css=".layout-line-item .layout-line-item:nth-child(39)>div:nth-child(3) .sign-image img",
+    )
+
+
+def bienbanhoichan_truongkhoa(driver: Driver):
+    "*Biên bản hội chẩn (trưởng khoa)*"
+    _sign(
+        driver,
+        name="bien ban hoi chan (truong khoa)",
+        btn_css=".layout-line-item .layout-line-item:nth-child(39)>div:nth-child(2) .sign-image button",
+        btn_txt="Xác nhận ký Trưởng khoa",
+        img_css=".layout-line-item .layout-line-item:nth-child(39)>div:nth-child(2) .sign-image img",
+    )
+
+
 ###
 # HIS BUG
 # Sometimes, an wrong bugged signature is presented when status = chuaky
