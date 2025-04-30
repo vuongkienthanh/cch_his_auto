@@ -1,4 +1,3 @@
-import logging
 import time
 
 from selenium.common import (
@@ -10,8 +9,7 @@ from selenium.webdriver import ActionChains
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.helper import EndOfLoop
-
-_logger = logging.getLogger().getChild("editor")
+from . import _logger
 
 
 def _sign(driver: Driver, name: str, btn_css: str, btn_txt: str, img_css: str):
@@ -231,7 +229,10 @@ def phieucamkettta5(driver: Driver):
     )
 
 
-# his bug
+###
+# HIS BUG
+# Sometimes, an wrong bugged signature is presented when status = chuaky
+###
 # def phieudutrucungcapmau(driver: Driver):
 #     "*Phiếu dự trù và cung cấp máu*"
 #     _sign(

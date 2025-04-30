@@ -1,6 +1,6 @@
+import logging
 import datetime as dt
 
-from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.webelement import WebElement
 
 from cch_his_auto_lib.driver import Driver
@@ -8,7 +8,7 @@ from cch_his_auto_lib.helper import EndOfLoop, tracing
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import _logger, ACTIVE_PANE
 
 TAB_NUMBER = 3
-_logger = _logger.getChild("tab_todieutri")
+_logger = logging.getLogger("tab_todieutri")
 _trace = tracing(_logger)
 
 
@@ -45,7 +45,7 @@ def get_all_todieutri_at_date(driver: Driver, date: dt.date) -> list[WebElement]
 
 
 @_trace
-def click_nearest_todieutri_to_datetime(driver: Driver, _dt: dt.datetime):
+def open_nearest_todieutri_to_datetime(driver: Driver, _dt: dt.datetime):
     def timeval(time: dt.time) -> int:
         return time.hour * 24 + time.minute * 60
 
@@ -57,13 +57,7 @@ def click_nearest_todieutri_to_datetime(driver: Driver, _dt: dt.datetime):
         key=lambda ele: abs(
             time - timeval(dt.datetime.strptime(ele.text.strip(), "%H:%M:%S").time())
         ),
-    )
-    ActionChains(driver).click(min_ele).perform()
+    ).click()
     driver.waiting(f"{ACTIVE_PANE} .ant-collapse-item .actived")
-
-
-@_trace
-def open_nearest_todieutri_to_datetime(driver: Driver, _dt: dt.datetime):
-    click_nearest_todieutri_to_datetime(driver, _dt)
     driver.clicking2(f"{ACTIVE_PANE} .ant-collapse-item .actived .right svg:last-child")
     driver.wait_closing(f"{ACTIVE_PANE} .ant-collapse-item .actived")

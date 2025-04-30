@@ -13,8 +13,8 @@ from . import config
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tasks.auth import session
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.bot_indieuduong.bangkechiphiBHYT import (
-    sign_bangkechiphiBHYT_both,
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.bot_indieuduong import (
+    sign_bangkechiphiBHYT,
 )
 
 
@@ -100,4 +100,4 @@ def run(cf: config.Config, run_cfg: RunConfig):
 
 def process(driver: Driver, con: sqlite3.Connection, ma_hs: int):
     if signature := try_get_signature(driver, con, ma_hs):
-        sign_bangkechiphiBHYT_both(driver, signature)
+        sign_bangkechiphiBHYT(driver, True, signature)

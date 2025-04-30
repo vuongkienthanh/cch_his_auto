@@ -14,9 +14,9 @@ from .patient_list import PatientFrame
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tasks import auth
-from cch_his_auto_lib.tasks.todieutri.ingiayto.job import (
-    sign_phieuchidinh,
+from cch_his_auto_lib.tasks.todieutri.bot_ingiayto import (
     sign_todieutri,
+    sign_phieuchidinh,
     sign_phieuthuchienylenh_bn,
     sign_phieuthuchienylenh_bs,
     sign_phieuthuchienylenh_dd,

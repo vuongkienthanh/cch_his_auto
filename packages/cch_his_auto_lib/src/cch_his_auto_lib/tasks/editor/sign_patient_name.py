@@ -1,4 +1,3 @@
-import logging
 import time
 
 from selenium.common import (
@@ -10,8 +9,7 @@ from selenium.webdriver import ActionChains
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.helper import EndOfLoop
-
-_logger = logging.getLogger().getChild("editor")
+from . import _logger
 
 
 def sign_canvas(driver: Driver, signature: str):
@@ -173,7 +171,7 @@ def phieucamkettta5(driver: Driver, signature: str):
         driver,
         name="phieu cam ket thu thuat a5",
         btn_css=".sign-image button",
-        btn_txt='Ký',
+        btn_txt="Ký",
         img_css=".sign-image img",
         signature=signature,
     )

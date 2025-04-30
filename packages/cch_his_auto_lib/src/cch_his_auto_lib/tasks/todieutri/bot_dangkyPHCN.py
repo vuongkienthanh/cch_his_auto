@@ -1,4 +1,3 @@
-import logging
 import time
 from enum import StrEnum
 
@@ -6,10 +5,8 @@ from selenium.common import StaleElementReferenceException, NoSuchElementExcepti
 from selenium.webdriver import ActionChains, Keys
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.helper import tracing, EndOfLoop
-
-_logger = logging.getLogger().getChild("PHCN")
-_trace = tracing(_logger)
+from cch_his_auto_lib.helper import EndOfLoop
+from . import _logger, _trace
 
 
 class _State(StrEnum):

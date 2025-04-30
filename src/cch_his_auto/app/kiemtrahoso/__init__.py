@@ -24,11 +24,9 @@ from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
 )
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.top_hosobenhan import (
     tab_mau,
+    tab_hosokhamchuabenh,
 )
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.top_hosobenhan.tab_hosokhamchuabenh import (
-    job as hskcbjob,
-)
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.bot_sanglocdinhduong.job import (
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.bot_sanglocdinhduong import (
     add_all_phieusanglocdinhduong,
 )
 
@@ -47,6 +45,7 @@ APP_INTRO = """
     """
 
 _logger = logging.getLogger("app")
+
 
 class App(tk.Frame):
     def __init__(self):
@@ -172,16 +171,16 @@ def process_normal_day(driver: Driver, signature: str | None):
                 edit_thongtinvaovien.set_bloodtype(driver, found_bloodtype)
 
     with top_hosobenhan.session(driver):
-        hskcbjob.phieuchidinhxetnghiem(driver)
-        hskcbjob.todieutri(driver, discharge_date)
-        hskcbjob.phieuCT(driver, signature)
-        hskcbjob.phieuMRI(driver, signature)
-        hskcbjob.giaiphaubenh(driver)
-        hskcbjob.phieusanglocdinhduong(driver)
-        hskcbjob.phieuchidinhPTTT(driver)
-        hskcbjob.phieusoket15ngay(driver)
-        hskcbjob.phieucamkettruyenmau(driver, signature)
-        hskcbjob.phieucamkettta5(driver, signature)
+        tab_hosokhamchuabenh.phieuchidinhxetnghiem(driver)
+        tab_hosokhamchuabenh.todieutri(driver, discharge_date)
+        tab_hosokhamchuabenh.phieuCT(driver, signature)
+        tab_hosokhamchuabenh.phieuMRI(driver, signature)
+        tab_hosokhamchuabenh.giaiphaubenh(driver)
+        tab_hosokhamchuabenh.phieusanglocdinhduong(driver)
+        tab_hosokhamchuabenh.phieuchidinhPTTT(driver)
+        tab_hosokhamchuabenh.phieusoket15ngay(driver)
+        tab_hosokhamchuabenh.phieucamkettruyenmau(driver, signature)
+        tab_hosokhamchuabenh.phieucamkettta5(driver, signature)
 
 
 def process_final_day(driver: Driver, signature: str | None):
@@ -221,21 +220,21 @@ def process_final_day(driver: Driver, signature: str | None):
                 edit_thongtinvaovien.set_bloodtype(driver, found_bloodtype)
 
     with top_hosobenhan.session(driver):
-        # hskcbjob.tobiabenhannhikhoa(driver)
-        hskcbjob.mucAbenhannhikhoa(driver)
-        hskcbjob.mucBtongketbenhan(driver)
-        hskcbjob.phieukhambenhvaovien(driver)
-        hskcbjob.phieuchidinhxetnghiem(driver)
-        hskcbjob.todieutri(driver, discharge_date)
-        hskcbjob.phieuCT(driver, signature)
-        hskcbjob.phieuMRI(driver, signature)
-        hskcbjob.giaiphaubenh(driver)
-        hskcbjob.phieusanglocdinhduong(driver)
-        hskcbjob.phieuchidinhPTTT(driver)
-        hskcbjob.phieusoket15ngay(driver)
-        hskcbjob.donthuoc(driver)
-        hskcbjob.phieucamkettruyenmau(driver, signature)
-        hskcbjob.phieucamkettta5(driver, signature)
+        # tab_hosokhamchuabenh.tobiabenhannhikhoa(driver)
+        tab_hosokhamchuabenh.mucAbenhannhikhoa(driver)
+        tab_hosokhamchuabenh.mucBtongketbenhan(driver)
+        tab_hosokhamchuabenh.phieukhambenhvaovien(driver)
+        tab_hosokhamchuabenh.phieuchidinhxetnghiem(driver)
+        tab_hosokhamchuabenh.todieutri(driver, discharge_date)
+        tab_hosokhamchuabenh.phieuCT(driver, signature)
+        tab_hosokhamchuabenh.phieuMRI(driver, signature)
+        tab_hosokhamchuabenh.giaiphaubenh(driver)
+        tab_hosokhamchuabenh.phieusanglocdinhduong(driver)
+        tab_hosokhamchuabenh.phieuchidinhPTTT(driver)
+        tab_hosokhamchuabenh.phieusoket15ngay(driver)
+        tab_hosokhamchuabenh.donthuoc(driver)
+        tab_hosokhamchuabenh.phieucamkettruyenmau(driver, signature)
+        tab_hosokhamchuabenh.phieucamkettta5(driver, signature)
 
 
 def pre_run_final_day_check(driver: Driver, listing: list[int]):

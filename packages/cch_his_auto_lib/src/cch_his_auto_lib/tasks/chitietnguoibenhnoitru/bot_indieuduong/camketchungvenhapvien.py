@@ -1,17 +1,12 @@
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.helper import tracing
-
-from . import open_menu, goto, _logger
-
-_trace = tracing(_logger)
+from . import goto, _logger, _trace
 
 
 @_trace
 def get_signature(driver: Driver) -> str | None:
     main_tab = driver.current_window_handle
-    open_menu(driver)
     goto(driver, "cam kết chung về nhập viện")
     driver.goto_newtab(main_tab)
     try:

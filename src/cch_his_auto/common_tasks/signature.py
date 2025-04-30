@@ -4,7 +4,7 @@ import logging
 from cch_his_auto.global_db import save_db, get_signature_from_db
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.bot_indieuduong.camketchungvenhapvien import (
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.bot_indieuduong import (
     get_signature,
 )
 from cch_his_auto_lib.tasks.danhsachnguoibenhnoitru import (

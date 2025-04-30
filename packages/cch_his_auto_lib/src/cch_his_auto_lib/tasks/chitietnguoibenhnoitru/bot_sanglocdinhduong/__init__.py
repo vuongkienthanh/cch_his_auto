@@ -1,13 +1,20 @@
 import datetime as dt
-import time
 import logging
 
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.helper import tracing
+from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
+    top_chitietthongtin,
+)
 
 URL = "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
-_logger = logging.getLogger().getChild("sanglocdinhduong")
+_logger = logging.getLogger("bot_sanglocdinhduong")
+_trace = tracing(_logger)
+
+from .helper import build_machedo
+from .phieusangloc import save_new_phieusangloc
 
 
 def open_dialog(driver: Driver) -> bool:
@@ -60,44 +67,53 @@ def get_last_date(driver: Driver) -> dt.date:
 
 
 def add_new(driver: Driver):
-    "Add new *Phiếu sàng lọc*, goto `phieusangloc` submodule for more tasks"
+    "Add new *Phiếu sàng lọc*"
     driver.clicking(
         ".ant-modal:has(table) .ant-modal-title button", "add new phiếu sàng lọc"
     )
 
 
-###################################
-# Phiếu sàng lọc
-###################################
+@_trace
+def add_all_phieusanglocdinhduong(driver: Driver, admission_date: dt.date):
+    "Complete all *Phiếu sàng lọc* from admission_date up til today"
+    with top_chitietthongtin.session(driver):
+        cannang = top_chitietthongtin.get_cannang(driver)
+        age_in_month = top_chitietthongtin.get_age_in_month(driver)
+        if not cannang:
+            _logger.warning("cannang is empty -> skip Sàng lọc dinh dưỡng")
+            return
+        chieucao = top_chitietthongtin.get_chieucao(driver)
+        if not chieucao:
+            _logger.warning("chieucao is empty -> skip Sàng lọc dinh dưỡng")
+            return
 
+    today = dt.date.today()
 
-def back(driver: Driver):
-    driver.clicking(".footer-btn .left button", "go back button")
-    driver.waiting(".thong-tin-benh-nhan", "chi tiết bệnh nhân")
-    time.sleep(5)
+    if open_dialog(driver):
+        next_date = get_last_date(driver) + dt.timedelta(days=7)
+        if next_date <= today:
+            _logger.info(f"add new phieu sang loc for {next_date}")
+            add_new(driver)
+        else:
+            close_dialog(driver)
+            return
+    else:
+        next_date = admission_date
 
+    save_new_phieusangloc(
+        driver, next_date, cannang, chieucao, build_machedo(age_in_month)
+    )
+    next_date = next_date + dt.timedelta(days=7)
 
-def set_date(driver: Driver, date: dt.date):
-    driver.clear_input(".input-date").send_keys(date.strftime("%d/%m/%Y"))
-    _logger.debug(f"set date to {date}")
-
-
-def set_cannang(driver: Driver, value: str):
-    driver.clear_input("#canNang").send_keys(value)
-    _logger.debug(f"set cannang to {value}")
-
-
-def set_chieucao(driver: Driver, value: str):
-    driver.clear_input("#chieuCao").send_keys(value)
-    _logger.debug(f"set chieucao to {value}")
-
-
-def set_machedo(driver: Driver, value: str):
-    driver.clear_input(
-        "#dsDuongNuoiAn>.ant-row>.ant-col:last-child>div>input"
-    ).send_keys(value)
-    _logger.debug(f"set machedo to {value}")
-
-
-def save(driver: Driver):
-    driver.clicking(".right button:nth-child(2)", "save phieusangloc")
+    while next_date <= today:
+        _logger.info(f"add new phieu sang loc for {next_date}")
+        open_dialog(driver)
+        add_new(driver)
+        save_new_phieusangloc(
+            driver,
+            next_date,
+            cannang,
+            chieucao,
+            build_machedo(age_in_month),
+        )
+        next_date = next_date + dt.timedelta(days=7)

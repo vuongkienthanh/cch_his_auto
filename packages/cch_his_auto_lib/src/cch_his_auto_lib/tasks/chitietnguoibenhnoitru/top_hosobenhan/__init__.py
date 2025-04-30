@@ -10,7 +10,7 @@ DIALOG_CSS = ".ant-modal:has(.img-avatar)"
 NAV_CSS = f"{DIALOG_CSS} .ant-tabs-nav-list"
 ACTIVE_PANE = f"{DIALOG_CSS} .ant-tabs-tabpane-active"
 
-_logger = logging.getLogger().getChild("hosobenhan")
+_logger = logging.getLogger("top_hosobenhan")
 
 
 @contextmanager

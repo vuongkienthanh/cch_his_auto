@@ -1,0 +1,47 @@
+import time
+from enum import StrEnum
+
+from selenium.common import StaleElementReferenceException
+
+from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.helper import EndOfLoop
+from . import _logger, _trace, goto
+
+
+class State(StrEnum):
+    Sign = "Ký Bác sĩ"
+    Cancel = "Hủy ký Bác sĩ"
+
+
+@_trace
+def sign_phieuchidinh(driver: Driver):
+    "Inside *tờ điều trị*, try to sign *phiếu chỉ định* in sequence"
+
+    def close_dialog():
+        driver.clicking(
+            ".ant-modal-close:has(~.ant-modal-body .__list)",
+            "close dialog button",
+        )
+        driver.wait_closing(".ant-modal-body .__list", "phieu chi dinh dialog")
+
+    goto(driver, name="Phiếu chỉ định")
+    for i in range(120):
+        time.sleep(1)
+        _logger.debug(f"checking button state {i}...")
+        for ele in driver.find_all(".__button button"):
+            try:
+                if ele.text == State.Cancel:
+                    _logger.debug(f"button state is {State.Cancel}")
+                    close_dialog()
+                    return
+                elif ele.text == "Ký Bác sĩ":
+                    _logger.debug(f"button state is {State.Sign} -> click")
+                    ele.click()
+                    time.sleep(5)
+                    close_dialog()
+                    return
+            except StaleElementReferenceException as e:
+                _logger.warning(f"get {e}")
+    else:
+        close_dialog()
+        raise EndOfLoop("can't sign phieuchidinh while in dialog")

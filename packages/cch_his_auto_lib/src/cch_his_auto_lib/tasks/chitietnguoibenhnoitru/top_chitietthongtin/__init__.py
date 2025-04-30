@@ -9,7 +9,7 @@ from cch_his_auto_lib.helper import EndOfLoop
 from .. import TOP_BTN_CSS
 
 DIALOG_CSS = ".ant-modal:has(.avatar__image)"
-_logger = logging.getLogger().getChild("chitietthongtin")
+_logger = logging.getLogger("top_chitietthongtin")
 
 
 @contextmanager

@@ -1,3 +1,4 @@
+import logging
 import datetime as dt
 
 from selenium.common import NoSuchElementException
@@ -9,7 +10,7 @@ TAB_NUMBER = 1
 THONGTINVAOVIEN_CSS = f"{ACTIVE_PANE} .info:nth-child(1)"
 THONGTINRAVIEN_CSS = f"{ACTIVE_PANE} .info:nth-child(3)"
 
-_logger = _logger.getChild("tab_thongtinchung")
+_logger = logging.getLogger("tab_thongtinchung")
 
 
 def get_admission_date(driver: Driver) -> dt.date:

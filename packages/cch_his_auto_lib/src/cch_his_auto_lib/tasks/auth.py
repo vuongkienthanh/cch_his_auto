@@ -11,6 +11,7 @@ from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tasks import danhsachnguoibenhnoitru
 from cch_his_auto_lib.helper import tracing, EndOfLoop
 
+LOGIN_PANE_CSS = ".login-body"
 DEPT_DIALOG_CSS = ".ant-modal:has(.ant-modal-body>div>div>div>.ant-select)"
 _logger = logging.getLogger().getChild("auth")
 _trace = tracing(_logger)
@@ -27,7 +28,7 @@ def login(driver: Driver, username: str, password: str):
         time.sleep(1)
         try:
             _logger.debug(f"waiting login page {i}...")
-            driver.find(".login-body")
+            driver.find(LOGIN_PANE_CSS)
         except NoSuchElementException:
             try:
                 _logger.debug("checking whether any user is logged in")
@@ -50,7 +51,7 @@ def login(driver: Driver, username: str, password: str):
             inputs[1].send_keys(password)
             time.sleep(2)  # wait for js to load
             driver.clicking(".action>button", "submit button")
-            driver.wait_closing(".login-body", "login page")
+            driver.wait_closing(LOGIN_PANE_CSS, "login page")
             return
     else:
         raise EndOfLoop("can't log in")
@@ -62,7 +63,7 @@ def logout(driver: Driver):
     URL = "http://emr.ndtp.org/logout"
     driver.goto(URL)
     try:
-        driver.waiting(".login-body")
+        driver.waiting(LOGIN_PANE_CSS)
         return
     except NoSuchElementException:
         logout(driver)

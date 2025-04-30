@@ -3,12 +3,9 @@ import time
 from selenium.common import NoSuchElementException, TimeoutException
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.helper import tracing, iframe
+from cch_his_auto_lib.helper import iframe
 from cch_his_auto_lib.tasks.editor.sign_patient_name import sign_canvas
-
-from . import open_menu, goto, _logger
-
-_trace = tracing(_logger)
+from . import goto, _trace
 
 
 def _sign_bangkechiphiBHYT_staff(driver: Driver):
@@ -39,12 +36,15 @@ def _sign_bangkechiphiBHYT_patient(driver: Driver, signature: str):
 
 
 @_trace
-def sign_bangkechiphiBHYT_both(driver: Driver, signature: str):
+def sign_bangkechiphiBHYT(
+    driver: Driver, staff: bool = True, patient_signature: str | None = None
+):
     "Sign both staff and patient in *Bảng kê chi phí BHYT*"
-    open_menu(driver)
     goto(driver, "Bảng kê chi phí BHYT")
     with iframe(driver, ".ant-modal iframe"):
-        _sign_bangkechiphiBHYT_staff(driver)
-        _sign_bangkechiphiBHYT_patient(driver, signature)
+        if staff:
+            _sign_bangkechiphiBHYT_staff(driver)
+        if patient_signature:
+            _sign_bangkechiphiBHYT_patient(driver, patient_signature)
     driver.find(".ant-modal-close:has(~.ant-modal-body iframe)").click()
     driver.wait_closing(".ant-modal-body iframe")

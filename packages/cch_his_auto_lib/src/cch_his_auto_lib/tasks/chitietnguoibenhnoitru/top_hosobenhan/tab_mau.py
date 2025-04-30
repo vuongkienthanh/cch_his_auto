@@ -1,12 +1,10 @@
 from selenium.common import NoSuchElementException
 
-
 from cch_his_auto_lib.driver import Driver
 from . import ACTIVE_PANE, _logger
 
-_logger = _logger.getChild("tab_mau")
-
 TAB_NUMBER = 7
+_logger = _logger.getChild("tab_mau")
 
 
 def get_bloodtype(driver: Driver) -> str | None:

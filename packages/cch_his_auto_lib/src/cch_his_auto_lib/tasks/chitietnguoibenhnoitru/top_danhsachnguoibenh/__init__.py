@@ -9,7 +9,7 @@ from .. import TOP_BTN_CSS
 
 
 DRAWER_CSS = ".ant-drawer-body"
-_logger = logging.getLogger().getChild("danhsachnguoibenh")
+_logger = logging.getLogger("top_danhsachnguoibenh")
 _trace = tracing(_logger)
 
 

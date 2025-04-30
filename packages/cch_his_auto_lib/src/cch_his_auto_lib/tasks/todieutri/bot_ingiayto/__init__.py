@@ -1,18 +1,15 @@
 import time
-
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.helper import EndOfLoop
-from . import _logger
+from cch_his_auto_lib.helper import tracing, EndOfLoop
+from .. import _logger
 
-
-
-def open_menu(driver: Driver):
-    "Open menu *In giấy tờ*"
-    driver.clicking(".footer-btn .right button:nth-child(1)", "open menu In giấy tờ")
+_logger = _logger.getChild("ingiayto")
+_trace = tracing(_logger)
 
 
 def goto(driver: Driver, name: str):
-    "After `open_menu`, click `name`"
+    "Open menu *In giấy tờ*, click `name`"
+    driver.clicking(".footer-btn .right button:nth-child(1)", "open menu In giấy tờ")
     _logger.info(f"goto name={name}")
     for i in range(120):
         time.sleep(1)
@@ -28,3 +25,21 @@ def goto(driver: Driver, name: str):
             ".footer-btn .right button:nth-child(1)", "close menu In giấy tờ"
         )
         raise EndOfLoop(f"can't goto {name}")
+
+
+from .todieutri import sign_todieutri
+from .phieuchidinh import sign_phieuchidinh
+from .phieuthuchienylenh import (
+    sign_phieuthuchienylenh_bs,
+    sign_phieuthuchienylenh_dd,
+    sign_phieuthuchienylenh_bn,
+)
+
+__all__ = [
+    "goto",
+    "sign_todieutri",
+    "sign_phieuchidinh",
+    "sign_phieuthuchienylenh_bs",
+    "sign_phieuthuchienylenh_dd",
+    "sign_phieuthuchienylenh_bn",
+]
