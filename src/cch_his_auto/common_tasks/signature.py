@@ -7,14 +7,9 @@ from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.bot_indieuduong import (
     get_signature,
 )
-from cch_his_auto_lib.tasks.danhsachnguoibenhnoitru import (
-    URL as DSNBNT_URL,
-    goto_patient,
-)
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import URL as CTNBNT_URL
+from cch_his_auto_lib.tasks import danhsachnguoibenhnoitru
 
-
-_logger = logging.getLogger().getChild("app")
+_logger = logging.getLogger("app")
 
 
 def try_get_signature(
@@ -26,15 +21,14 @@ def try_get_signature(
     else:
         _logger.info("***** patient signature not found in db")
         working_url = driver.current_url
-        if not working_url.startswith(CTNBNT_URL):
-            driver.goto(DSNBNT_URL)
-            goto_patient(driver, ma_hs)
-        if signature := get_signature(driver):
-            url = driver.current_url
-            save_db(con, ma_hs, url, signature)
-            _logger.info("patient signature saved")
-            if not working_url.startswith(CTNBNT_URL):
-                driver.goto(working_url)
-            return signature
-        else:
-            return None
+        driver.goto(danhsachnguoibenhnoitru.URL)
+        danhsachnguoibenhnoitru.goto_patient(driver, ma_hs)
+        try:
+            if signature := get_signature(driver):
+                save_db(con, ma_hs, driver.current_url, signature)
+                _logger.info("patient signature saved")
+                return signature
+            else:
+                return None
+        finally:
+            driver.goto(working_url)

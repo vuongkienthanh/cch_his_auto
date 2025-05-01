@@ -10,7 +10,7 @@ from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
 from cch_his_auto_lib.tasks import danhsachnguoibenhnoitru
 
 
-_logger = logging.getLogger().getChild("app")
+_logger = logging.getLogger("app")
 
 
 def first_patient(driver: Driver, con: Connection, ma_hs: int):

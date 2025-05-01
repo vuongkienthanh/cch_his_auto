@@ -32,7 +32,7 @@ from cch_his_auto_lib.tasks.editor import sign_staff_name
 
 
 TITLE = "Khám bệnh mỗi ngày"
-_logger = logging.getLogger().getChild("app")
+_logger = logging.getLogger("app")
 
 
 class App(tk.Frame):
