@@ -16,6 +16,10 @@ URL = "http://emr.ndtp.org/quan-ly-noi-tru/danh-sach-nguoi-benh-noi-tru"
 _FMT = "%Y-%m-%d"
 
 
+def get_khoalamviec(driver: Driver) -> str:
+    return driver.waiting(".khoaLamViec div span", "khoa lam viec").text.strip()
+
+
 @_trace
 def filter_trangthainguoibenh(driver: Driver, indexes: list[int]):
     """

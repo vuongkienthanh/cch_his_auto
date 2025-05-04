@@ -13,24 +13,32 @@ from cch_his_auto_lib.tasks import danhsachnguoibenhnoitru
 _logger = logging.getLogger("app")
 
 
-def first_patient(driver: Driver, con: Connection, ma_hs: int):
-    if url := get_url_from_db(con, ma_hs):
-        _logger.info(f"found {ma_hs} in db")
-        driver.goto(url)
-    else:
-        danhsachnguoibenhnoitru.goto_patient(driver, ma_hs)
+def log_patient(name: str, url: str, ma_hs: str):
     _logger.info(
         "\n".join(
             [
                 "",
                 "",
                 "~" * 50,
-                f"patient: {driver.waiting('.name span').text}",
-                f"url: {driver.current_url}",
+                f"patient: {name}",
+                f"url: {url}",
                 f"ma_hs: {ma_hs}",
                 "~" * 50,
             ]
         )
+    )
+
+
+def first_patient(driver: Driver, con: Connection, ma_hs: int):
+    if url := get_url_from_db(con, ma_hs):
+        _logger.info(f"found {ma_hs} in db")
+        driver.goto(url)
+    else:
+        danhsachnguoibenhnoitru.goto_patient(driver, ma_hs)
+    log_patient(
+        driver.waiting(".name span").text,
+        driver.current_url,
+        str(ma_hs),
     )
 
 
@@ -41,16 +49,8 @@ def next_patient(driver: Driver, con: Connection, ma_hs: int):
     else:
         top_danhsachnguoibenh.open_dialog(driver)
         top_danhsachnguoibenh.goto_patient(driver, ma_hs)
-    _logger.info(
-        "\n".join(
-            [
-                "",
-                "",
-                "~" * 50,
-                f"patient: {driver.waiting('.name span').text}",
-                f"url: {driver.current_url}",
-                f"ma_hs: {ma_hs}",
-                "~" * 50,
-            ]
-        )
+    log_patient(
+        driver.waiting(".name span").text,
+        driver.current_url,
+        str(ma_hs),
     )
