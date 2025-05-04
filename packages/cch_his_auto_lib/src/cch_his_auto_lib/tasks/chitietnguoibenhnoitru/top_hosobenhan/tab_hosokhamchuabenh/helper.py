@@ -159,6 +159,7 @@ def filter_check_expand_sign(
                 time.sleep(5)
             elif is_row_status(driver, i, Status.DANGKY):
                 _logger.info(f"row condition: not met: {name} -> {Status.DANGKY}")
+                driver.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
                 dangky_fn(driver, i)
                 time.sleep(5)
             else:
