@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.tasks import danhsachnguoibenhnoitru, search_dialog, dropdown_menu
+from cch_his_auto_lib.tasks import danhsachnguoibenhnoitru, search_dialog
 from cch_his_auto_lib.helper import tracing, EndOfLoop
 
 LOGIN_PANE_CSS = ".login-body"
@@ -73,7 +73,7 @@ def set_dept(driver: Driver, dept: str):
 
     def _set_dept_in_dialog():
         search_dialog.filter(driver, dept)
-        dropdown_menu.select_item_dropdown(driver, 0)
+        search_dialog.select_item_dropdown(driver, 0)
         search_dialog.save(driver)
 
     for i in range(120):
