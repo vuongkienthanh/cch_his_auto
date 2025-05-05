@@ -24,7 +24,7 @@ class Ky_3tra(TypedDict):
 class Patient(TypedDict):
     url: str
     note: str
-    ky_xetnghiem: bool
+    ky_xn: bool
     ky_ct: bool
     ky_mri: bool
     ky_bbhc: bool

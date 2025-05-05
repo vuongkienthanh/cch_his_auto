@@ -115,48 +115,50 @@ def run(cfg: config.Config, run_cfg: RunConfig):
 
     setLogLevel(run_cfg)
     driver = Driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH)
+
     try:
-        bs, dd = config.is_valid(cfg, "bacsi"), config.is_valid(cfg, "dieuduong")
-        match (bs, dd):
-            case (True, True):
-                with auth.session(
-                    driver,
-                    cfg["bacsi"]["username"],
-                    cfg["bacsi"]["password"],
-                    cfg["department"],
-                ):
-                    run_bs(driver, cfg)
-                with auth.session(
-                    driver,
-                    cfg["dieuduong"]["username"],
-                    cfg["dieuduong"]["password"],
-                    cfg["department"],
-                ):
-                    run_dd(driver, cfg)
-                    run_bn(driver, cfg)
-            case (True, False):
-                with auth.session(
-                    driver,
-                    cfg["bacsi"]["username"],
-                    cfg["bacsi"]["password"],
-                    cfg["department"],
-                ):
-                    run_bs(driver, cfg)
-                    run_bn(driver, cfg)
-                messagebox.showwarning(message="chưa nhập điều dưỡng")
-            case (False, True):
-                with auth.session(
-                    driver,
-                    cfg["dieuduong"]["username"],
-                    cfg["dieuduong"]["password"],
-                    cfg["department"],
-                ):
-                    run_dd(driver, cfg)
-                    run_bn(driver, cfg)
-                messagebox.showwarning(message="chưa nhập bác sĩ")
-            case _:
-                messagebox.showwarning(message="chưa nhập bác sĩ, điều dưỡng")
-        if config.is_valid(cfg, "truongkhoa"):
+        if config.is_valid(cfg, "bacsi") and any(
+            p["ky_todieutri"]
+            or p["ky_xn"]
+            or p["ky_ct"]
+            or p["ky_mri"]
+            or any(p["ky_3tra"]["bacsi"])
+            or p["ky_bbhc"]
+            for p in cfg["patients"]
+        ):
+            with auth.session(
+                driver,
+                cfg["bacsi"]["username"],
+                cfg["bacsi"]["password"],
+                cfg["department"],
+            ):
+                run_bs(driver, cfg)
+
+        if config.is_valid(cfg, "dieuduong") and any(
+            p["ky_3tra"]["dieuduong"] for p in cfg["patients"]
+        ):
+            with auth.session(
+                driver,
+                cfg["dieuduong"]["username"],
+                cfg["dieuduong"]["password"],
+                cfg["department"],
+            ):
+                run_dd(driver, cfg)
+
+        if any(p["ky_3tra"]["benhnhan"] for p in cfg["patients"]):
+            for user in ["bacsi", "dieuduong"]:
+                if config.is_valid(cfg, "bacsi"):
+                    with auth.session(
+                        driver,
+                        cfg[user]["username"],
+                        cfg[user]["password"],
+                        cfg["department"],
+                    ):
+                        run_bn(driver, cfg)
+                    break
+        if config.is_valid(cfg, "truongkhoa") and any(
+            p["ky_bbhc"] for p in cfg["patients"]
+        ):
             with auth.session(
                 driver,
                 cfg["truongkhoa"]["username"],
@@ -174,7 +176,7 @@ def run_bs(driver: Driver, cfg: config.Config):
         driver.goto(p["url"])
         log_patient_name(driver.waiting(".name span").text)
 
-        if p["ky_xetnghiem"]:
+        if p["ky_xn"]:
             sign_phieuchidinh(driver)
         if p["ky_todieutri"]:
             sign_todieutri(driver)
