@@ -88,7 +88,7 @@ def get_age_in_month(driver: Driver) -> int:
                 continue
             else:
                 assert value is not None
-                _logger.info(f"-> found age={value}")
+                _logger.info(f"-> found age={value} tuổi")
                 a = value.strip().split(" ")
                 if len(a) == 1:
                     return int(a[0]) * 12
