@@ -1,4 +1,5 @@
 import logging
+import datetime as dt
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
 
@@ -158,7 +159,6 @@ def run(cfg: config.Config, run_cfg: RunConfig):
 
 def process_normal_day(driver: Driver, signature: str | None):
     admission_date = tab_thongtinchung.get_admission_date(driver)
-    discharge_date = tab_thongtinchung.get_discharge_date(driver)
     add_all_phieusanglocdinhduong(driver, admission_date)
 
     # điền thông tin nhóm máu
@@ -172,7 +172,7 @@ def process_normal_day(driver: Driver, signature: str | None):
 
     with top_hosobenhan.session(driver):
         tab_hosokhamchuabenh.phieuchidinhxetnghiem(driver)
-        tab_hosokhamchuabenh.todieutri(driver, discharge_date)
+        tab_hosokhamchuabenh.todieutri(driver, dt.date.today() + dt.timedelta(days=1))
         tab_hosokhamchuabenh.phieuCT(driver, signature)
         tab_hosokhamchuabenh.phieuMRI(driver, signature)
         tab_hosokhamchuabenh.giaiphaubenh(driver)
