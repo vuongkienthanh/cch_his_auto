@@ -208,7 +208,7 @@ def run_bs(driver: Driver, cfg: config.Config):
                         driver,
                         name="Biên bản hội chẩn",
                         chuaky_fn=lambda driver, i: sign_tab(
-                            driver, i, sign_staff_name.phieuCT_bschidinh
+                            driver, i, sign_staff_name.bienbanhoichan_thuky
                         ),
                         date=dt.date.today(),
                     )
