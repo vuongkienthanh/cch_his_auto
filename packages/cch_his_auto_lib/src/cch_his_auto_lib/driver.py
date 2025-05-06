@@ -203,11 +203,13 @@ class Driver(webdriver.Chrome):
         - `main_tab`: you can can this using `driver.current_window_handle`
         """
         self.goto_newtab(main_tab)
-        fn(self)
-        _logger.info("---going back to main tab")
-        self.close()
-        self.switch_to.window(main_tab)
-        time.sleep(2)
+        try:
+            fn(self)
+        finally:
+            _logger.info("---going back to main tab")
+            self.close()
+            self.switch_to.window(main_tab)
+            time.sleep(2)
 
     def clear_input(self, css: str) -> WebElement:
         "Find element by `css` then clear it"

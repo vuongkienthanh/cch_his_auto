@@ -8,15 +8,20 @@ _logger = _logger.getChild("tab_mau")
 
 
 def get_bloodtype(driver: Driver) -> str | None:
-    try:
-        ele = driver.waiting(
-            f"{ACTIVE_PANE} tr:nth-child(2) td:nth-child(11)"
-        ).text.strip()
-        if ele == "":
+    for i in range(2, 10):
+        try:
+            ele = driver.waiting(
+                f"{ACTIVE_PANE} tr:nth-child({i}) td:nth-child(12)"
+            ).text.strip()
+        except NoSuchElementException:
+            _logger.warning("-> can't find bloodtype")
             return None
         else:
-            _logger.info(f"bloodtype = {ele}")
-            return ele
-    except NoSuchElementException:
+            if ele == "Chưa xác định":
+                continue
+            else:
+                _logger.info(f"bloodtype = {ele}")
+                return ele
+    else:
         _logger.warning("-> can't find bloodtype")
         return None
