@@ -11,7 +11,7 @@ def get_bloodtype(driver: Driver) -> str | None:
     for i in range(2, 10):
         try:
             ele = driver.waiting(
-                f"{ACTIVE_PANE} tr:nth-child({i}) td:nth-child(12)"
+                f"{ACTIVE_PANE} tr:nth-child({i}) td:nth-child(12)", "nhóm máu phát"
             ).text.strip()
         except NoSuchElementException:
             _logger.warning("-> can't find bloodtype")
