@@ -105,7 +105,7 @@ class Line(tk.Frame):
     def set_patient(self, patient: Patient):
         self.url_var.set(patient["url"])
         self.note_var.set(patient["note"])
-        self.xn_var.set(patient["ky_xetnghiem"])
+        self.xn_var.set(patient["ky_xn"])
         self.ct_var.set(patient["ky_ct"])
         self.mri_var.set(patient["ky_mri"])
         self.bbhc_var.set(patient["ky_bbhc"])
@@ -118,7 +118,7 @@ class Line(tk.Frame):
         return {
             "url": self.url_var.get(),
             "note": self.note_var.get(),
-            "ky_xetnghiem": self.xn_var.get(),
+            "ky_xn": self.xn_var.get(),
             "ky_ct": self.ct_var.get(),
             "ky_mri": self.mri_var.get(),
             "ky_bbhc": self.bbhc_var.get(),
