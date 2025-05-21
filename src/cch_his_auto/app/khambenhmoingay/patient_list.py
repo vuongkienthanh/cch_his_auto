@@ -1,65 +1,46 @@
 import tkinter as tk
-from typing import cast
 
 from .config import Patient
 
-from cch_his_auto.common_ui.scrollable_frame import ScrollFrame
+from cch_his_auto.common_ui.item_listframe import ScrollList, ScrollItem
 
 
-class PatientFrame(tk.Frame):
+class PatientFrame(tk.LabelFrame):
+    type Item = Patient
+
     def __init__(self, parent):
-        super().__init__(parent)
+        super().__init__(parent, text="Tờ điều trị")
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
         header = tk.Frame(self)
         columnconfigure(header)
-        header.grid(row=0, column=0, sticky="WE", padx=(0, 15))
-
-        for i, h in enumerate(
-            ["url", "XN", "CT", "MRI", "BBHC", "tờ ĐT", "Vị trí ký 3tra", "Xóa"]
-        ):
+        header.grid(row=0, column=0, sticky="WE", padx=(0, 15), pady=(15, 0))
+        headers = ["url", "XN", "CT", "MRI", "tờ ĐT", "Vị trí ký 3tra", "Xóa"]
+        for i, h in enumerate(headers):
             w = tk.Label(header, text=h, relief="raised", anchor="center")
             w.grid(row=0, column=i, sticky="NSEW")
 
-        self.listframe = PatientList(self)
+        w = tk.Button(self, text="+", command=self.add_new, background="#d4a5ab")
+        w.grid(row=0, column=1, sticky="NSEW")
+
+        self.listframe = ScrollList(self)
         self.listframe.grid(row=1, column=0, sticky="NSEW")
 
     def add_new(self):
-        self.listframe.add_new()
+        self.listframe.add_new(Line)
 
-    def add_patient(self, patient: Patient):
-        self.listframe.add_patient(patient)
+    def add_item(self, item: Item):
+        line = self.listframe.add_new(Line)
+        line.set_item(item)
 
-    def get_patients(self) -> list[Patient]:
-        return self.listframe.get_patients()
+    def get_items(self) -> list[Item]:
+        return self.listframe.get_items()
 
     def clear(self):
         self.listframe.clear()
 
 
-class PatientList(ScrollFrame):
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.viewPort.columnconfigure(0, weight=1)
-
-    def add_new(self):
-        line = Line(self.viewPort)
-        line.grid(row=len(self.viewPort.grid_slaves()), column=0, sticky="EW")
-
-    def add_patient(self, patient: Patient):
-        line = Line(self.viewPort)
-        line.set_patient(patient)
-        line.grid(row=len(self.viewPort.grid_slaves()), column=0, sticky="EW")
-
-    def get_patients(self) -> list[Patient]:
-        return [cast(Line, p).get_patient() for p in self.viewPort.grid_slaves()[::-1]]
-
-    def clear(self):
-        for w in self.viewPort.grid_slaves():
-            w.destroy()
-
-
-class Line(tk.Frame):
+class Line(ScrollItem):
     def __init__(self, parent):
         super().__init__(parent)
         columnconfigure(self)
@@ -80,18 +61,17 @@ class Line(tk.Frame):
         self.xn_var = tk.BooleanVar()
         self.ct_var = tk.BooleanVar()
         self.mri_var = tk.BooleanVar()
-        self.bbhc_var = tk.BooleanVar()
         self.tdt_var = tk.BooleanVar()
 
         for i, v in enumerate(
-            [self.xn_var, self.ct_var, self.mri_var, self.bbhc_var, self.tdt_var], 1
+            [self.xn_var, self.ct_var, self.mri_var, self.tdt_var], 1
         ):
             tk.Checkbutton(self, variable=v).grid(row=0, column=i)
 
         self.tdt_var.set(True)
 
         k3t = tk.Frame(self, borderwidth=10)
-        k3t.grid(row=0, column=6)
+        k3t.grid(row=0, column=5)
         self.k3t_bs = Ky3Tra(k3t, text="Bác sĩ")
         self.k3t_dd = Ky3Tra(k3t, text="Điều dưỡng")
         self.k3t_bn = Ky3Tra(k3t, text="Bệnh nhân")
@@ -100,28 +80,26 @@ class Line(tk.Frame):
         self.k3t_bn.grid(row=2, column=0)
 
         del_btn = tk.Button(self, text="Xóa", command=self.destroy)
-        del_btn.grid(row=0, column=7)
+        del_btn.grid(row=0, column=6)
 
-    def set_patient(self, patient: Patient):
-        self.url_var.set(patient["url"])
-        self.note_var.set(patient["note"])
-        self.xn_var.set(patient["ky_xn"])
-        self.ct_var.set(patient["ky_ct"])
-        self.mri_var.set(patient["ky_mri"])
-        self.bbhc_var.set(patient["ky_bbhc"])
-        self.tdt_var.set(patient["ky_todieutri"])
-        self.k3t_bs.set_vitri(patient["ky_3tra"]["bacsi"])
-        self.k3t_dd.set_vitri(patient["ky_3tra"]["dieuduong"])
-        self.k3t_bn.set_vitri(patient["ky_3tra"]["benhnhan"])
+    def set_item(self, item: Patient):
+        self.url_var.set(item["url"])
+        self.note_var.set(item["note"])
+        self.xn_var.set(item["ky_xn"])
+        self.ct_var.set(item["ky_ct"])
+        self.mri_var.set(item["ky_mri"])
+        self.tdt_var.set(item["ky_todieutri"])
+        self.k3t_bs.set_vitri(item["ky_3tra"]["bacsi"])
+        self.k3t_dd.set_vitri(item["ky_3tra"]["dieuduong"])
+        self.k3t_bn.set_vitri(item["ky_3tra"]["benhnhan"])
 
-    def get_patient(self) -> Patient:
+    def get_item(self) -> Patient:
         return {
             "url": self.url_var.get(),
             "note": self.note_var.get(),
             "ky_xn": self.xn_var.get(),
             "ky_ct": self.ct_var.get(),
             "ky_mri": self.mri_var.get(),
-            "ky_bbhc": self.bbhc_var.get(),
             "ky_todieutri": self.tdt_var.get(),
             "ky_3tra": {
                 "bacsi": self.k3t_bs.get_vitri(),
@@ -161,10 +139,6 @@ class Ky3Tra(tk.LabelFrame):
 
 def columnconfigure(w: tk.Widget):
     w.columnconfigure(0, weight=1, minsize=200)
-    w.columnconfigure(1, minsize=80)
-    w.columnconfigure(2, minsize=80)
-    w.columnconfigure(3, minsize=80)
-    w.columnconfigure(4, minsize=80)
-    w.columnconfigure(5, minsize=80)
-    w.columnconfigure(6, minsize=180)
-    w.columnconfigure(7, minsize=80)
+    for i in range(1, 7):
+        w.columnconfigure(i, minsize=80)
+    w.columnconfigure(5, minsize=180)

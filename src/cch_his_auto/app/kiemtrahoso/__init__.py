@@ -33,17 +33,6 @@ from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.bot_sanglocdinhduong import (
 
 
 TITLE = "Kiểm tra hồ sơ"
-APP_INTRO = """
-    Chức năng hiện tại:
-        + Mục A, mục B
-        + Phiếu chỉ định, tờ điều trị
-        + Phiếu CT, MRI
-        + Phiếu giải phẫu bệnh
-        + Phiếu sàng lọc dinh dưỡng
-        + Ký sơ kết 15n
-        - Tờ bìa, tờ điều trị XV
-
-    """
 
 _logger = logging.getLogger("app")
 
@@ -74,12 +63,6 @@ class App(tk.Frame):
         )
         listing = scrolledtext.ScrolledText(mainframe)
         listing.grid(row=2, column=0, padx=20, sticky="NSEW", columnspan=2)
-        tk.Label(
-            mainframe,
-            text=APP_INTRO,
-            justify="left",
-            anchor="w",
-        ).grid(row=3, column=0, rowspan=4, sticky="SEW", padx=20)
 
         button_frame = ButtonFrame(self)
         button_frame.grid(row=0, column=1, rowspan=2, padx=20, sticky="S", pady=(0, 20))
@@ -172,7 +155,7 @@ def process_normal_day(driver: Driver, signature: str | None):
 
     with top_hosobenhan.session(driver):
         tab_hosokhamchuabenh.phieuchidinhxetnghiem(driver)
-        tab_hosokhamchuabenh.todieutri(driver, dt.date.today() + dt.timedelta(days=1))
+        tab_hosokhamchuabenh.todieutri(driver, dt.date.today())
         tab_hosokhamchuabenh.phieuCT(driver, signature)
         tab_hosokhamchuabenh.phieuMRI(driver, signature)
         tab_hosokhamchuabenh.giaiphaubenh(driver)

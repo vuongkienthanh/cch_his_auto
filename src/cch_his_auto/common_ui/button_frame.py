@@ -82,13 +82,3 @@ class ButtonFrame(tk.Frame):
 
         self.headless.set(cfg["headless"])
         self.debug.set(cfg["debug"])
-
-
-class ButtonFrame2(ButtonFrame):
-    def __init__(self, parent, custom_text: str):
-        super().__init__(parent)
-        self.custom_btn = tk.Button(self, text=custom_text, width=10)
-        self.custom_btn.grid(row=2, column=0, pady=5)
-
-    def bind_custom(self, f):
-        self.custom_btn.configure(command=f)

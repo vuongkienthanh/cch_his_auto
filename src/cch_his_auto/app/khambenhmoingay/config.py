@@ -27,9 +27,28 @@ class Patient(TypedDict):
     ky_xn: bool
     ky_ct: bool
     ky_mri: bool
-    ky_bbhc: bool
     ky_todieutri: bool
     ky_3tra: Ky_3tra
+
+
+class DutruMau(TypedDict):
+    url: str
+    note: str
+    duphongphauthuat: bool
+    nhom1: bool
+    date: str
+    datruyenmau: bool
+    khangthebatthuong: bool
+    phanungtruyenmau: bool
+    hcthientai: str
+    truyenmaucochieuxa: bool
+    cungnhom: bool
+
+
+class BBHC(TypedDict):
+    url: str
+    note: str
+    khac: str # phân loại PT, ks dự phòng,...
 
 
 class Config(TypedDict):
@@ -38,6 +57,8 @@ class Config(TypedDict):
     truongkhoa: LogInfo
     department: str
     patients: list[Patient]
+    dutrumau: list[DutruMau]
+    bbhc: list[BBHC]
 
 
 def save(config: Config):
@@ -66,15 +87,27 @@ def load() -> Config:
             },
             "department": "",
             "patients": [],
+            "dutrumau": [],
+            "bbhc": [],
         }
 
 
 def is_patient_list_valid(config: Config) -> bool:
-    return (len(config["patients"]) > 0) & all(
-        [
-            url(p["url"]) and ("chi-tiet-nguoi-benh-noi-tru/to-dieu-tri/" in p["url"])
-            for p in config["patients"]
-        ]
+    return ((len(config["patients"]) + len(config["dutrumau"])) > 0) & (
+        all(
+            [
+                url(p["url"])
+                and ("chi-tiet-nguoi-benh-noi-tru/to-dieu-tri/" in p["url"])
+                for p in config["patients"]
+            ]
+        )
+        & (
+            all(
+                url(p["url"])
+                and ("chi-tiet-nguoi-benh-noi-tru/to-dieu-tri/" in p["url"])
+                for p in config["dutrumau"]
+            )
+        )
     )
 
 

@@ -81,21 +81,21 @@ def phieuchidinhxetnghiem(driver: Driver):
 
 
 @_trace
-def todieutri(driver: Driver, discharge_date: dt.date | None):
+def todieutri(driver: Driver, _dt: dt.date | None):
     "Filter and sign name: *Tờ điều trị*"
 
     def chuaky_fn(driver: Driver, i: int):
-        if discharge_date:
+        if _dt:
             date = dt.datetime.strptime(
                 driver.find(f".ant-table-tbody tr:nth-child({i}) td:nth-child(2)").text[
                     :10
                 ],
                 "%d/%m/%Y",
             ).date()
-            if date < discharge_date:
+            if date <= _dt:
                 sign_tab(driver, i, sign_staff_name.todieutri)
             else:
-                _logger.info("date >= discharge_date => skip")
+                _logger.info("=> skip this date")
         else:
             sign_tab(driver, i, sign_staff_name.todieutri)
 
@@ -113,18 +113,6 @@ def phieuchidinhPTTT(driver: Driver):
         driver,
         name="Phiếu chỉ định PTTT",
         chuaky_fn=lambda driver, _: sign_current(driver),
-    )
-
-
-@_trace
-def phieuCT_bschidinh(driver: Driver):
-    def chuaky_fn(driver):
-        sign_staff_name.phieuCT_bschidinh(driver)
-
-    filter_check_expand_sign(
-        driver,
-        name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
-        chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
     )
 
 
@@ -147,6 +135,8 @@ def phieuCT(driver: Driver, signature: str | None):
         chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
         dangky_fn=lambda driver, i: sign_tab(driver, i, dangky_fn),
     )
+
+
 
 
 @_trace

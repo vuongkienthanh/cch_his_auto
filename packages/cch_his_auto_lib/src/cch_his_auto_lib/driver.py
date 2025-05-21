@@ -211,6 +211,16 @@ class Driver(webdriver.Chrome):
             self.switch_to.window(main_tab)
             time.sleep(2)
 
+    def duplicate_tab(self) -> str:
+        """
+        Duplicate and return the current tab
+        """
+        current_tab = self.current_window_handle
+        url = self.current_url
+        self.switch_to.new_window("tab")
+        self.goto(url)
+        return current_tab
+
     def clear_input(self, css: str) -> WebElement:
         "Find element by `css` then clear it"
         _logger.debug("clearing input")

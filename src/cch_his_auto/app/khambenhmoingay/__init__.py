@@ -6,11 +6,13 @@ import datetime as dt
 from cch_his_auto.app import PROFILE_PATH
 from cch_his_auto.global_db import create_connection
 from cch_his_auto.common_ui.staff_info import UsernamePasswordFrame
-from cch_his_auto.common_ui.button_frame import ButtonFrame2, RunConfig, setLogLevel
+from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig, setLogLevel
 from cch_his_auto.common_tasks.signature import try_get_signature
 
 from . import config
 from .patient_list import PatientFrame
+from .dutrumau_list import DutruMauFrame
+from .bbhc_list import BBHCFrame
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tasks import auth
@@ -40,6 +42,8 @@ class App(tk.Frame):
         super().__init__()
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
+        self.rowconfigure(2, weight=5)
+        self.rowconfigure(3, weight=5)
 
         info = tk.LabelFrame(self, text="Thông tin đăng nhập")
         bacsi = UsernamePasswordFrame(info, text="Bác sĩ")
@@ -55,11 +59,15 @@ class App(tk.Frame):
         tk.Entry(info, textvariable=dept_var).grid(row=1, column=1, sticky="W")
         info.grid(row=0, column=0, sticky="N", pady=20)
 
-        mainframe = PatientFrame(self)
-        mainframe.grid(row=1, column=0, sticky="NSEW")
+        patient_frame = PatientFrame(self)
+        patient_frame.grid(row=1, column=0, sticky="NSEW")
+        dutrumau_frame = DutruMauFrame(self)
+        dutrumau_frame.grid(row=2, column=0, sticky="NSEW")
+        bbhc_frame = BBHCFrame(self)
+        bbhc_frame.grid(row=3, column=0, sticky="NSEW")
 
-        button_frame = ButtonFrame2(self, custom_text="Add")
-        button_frame.grid(row=0, column=1, rowspan=2, padx=20, sticky="S", pady=(0, 20))
+        button_frame = ButtonFrame(self)
+        button_frame.grid(row=0, column=1, rowspan=4, padx=20, sticky="S", pady=(0, 20))
 
         def load():
             cfg = config.load()
@@ -72,9 +80,13 @@ class App(tk.Frame):
             truongkhoa.set_password(cfg["truongkhoa"]["password"])
             dept_var.set(cfg["department"])
 
-            mainframe.clear()
-            for p in cfg["patients"]:
-                mainframe.add_patient(p)
+            for f, n in zip(
+                [patient_frame, dutrumau_frame, bbhc_frame],
+                ["patients", "dutrumau", "bbhc"],
+            ):
+                f.clear()
+                for p in cfg[n]:
+                    f.add_item(p)
 
             button_frame.load_config()
 
@@ -89,11 +101,13 @@ class App(tk.Frame):
                     "password": dieuduong.get_password(),
                 },
                 "truongkhoa": {
-                    "username": truongkhoa.get_username(),
-                    "password": truongkhoa.get_password(),
+                    "username": dieuduong.get_username(),
+                    "password": dieuduong.get_password(),
                 },
                 "department": dept_var.get(),
-                "patients": mainframe.get_patients(),
+                "patients": patient_frame.get_items(),
+                "dutrumau": dutrumau_frame.get_items(),
+                "bbhc": bbhc_frame.get_items(),
             }
 
         def save():
@@ -104,7 +118,6 @@ class App(tk.Frame):
 
         button_frame.bind_load(load)
         button_frame.bind_save(save)
-        button_frame.bind_custom(mainframe.add_new)
         button_frame.bind_run(lambda: run(get_config(), button_frame.get_config()))
 
 
@@ -123,7 +136,6 @@ def run(cfg: config.Config, run_cfg: RunConfig):
             or p["ky_ct"]
             or p["ky_mri"]
             or any(p["ky_3tra"]["bacsi"])
-            or p["ky_bbhc"]
             for p in cfg["patients"]
         ):
             with auth.session(
@@ -156,22 +168,13 @@ def run(cfg: config.Config, run_cfg: RunConfig):
                     ):
                         run_bn(driver, cfg)
                     break
-        if config.is_valid(cfg, "truongkhoa") and any(
-            p["ky_bbhc"] for p in cfg["patients"]
-        ):
-            with auth.session(
-                driver,
-                cfg["truongkhoa"]["username"],
-                cfg["truongkhoa"]["password"],
-                cfg["department"],
-            ):
-                run_tk(driver, cfg)
     finally:
         driver.quit()
         messagebox.showinfo(message="finish")
 
 
 def run_bs(driver: Driver, cfg: config.Config):
+    d = dt.date.today()
     for p in cfg["patients"]:
         driver.goto(p["url"])
         log_patient_name(driver.waiting(".name span").text)
@@ -182,7 +185,7 @@ def run_bs(driver: Driver, cfg: config.Config):
             sign_todieutri(driver)
         if any(p["ky_3tra"]["bacsi"]):
             sign_phieuthuchienylenh_bs(driver, p["ky_3tra"]["bacsi"])
-        if p["ky_ct"] or p["ky_mri"] or p["ky_bbhc"]:
+        if any([p["ky_ct"], p["ky_mri"]]):
             with top_hosobenhan.session(driver):
                 if p["ky_ct"]:
                     filter_check_expand_sign(
@@ -191,9 +194,8 @@ def run_bs(driver: Driver, cfg: config.Config):
                         chuaky_fn=lambda driver, i: sign_tab(
                             driver, i, sign_staff_name.phieuCT_bschidinh
                         ),
-                        date=dt.date.today(),
+                        date=d,
                     )
-
                 if p["ky_mri"]:
                     filter_check_expand_sign(
                         driver,
@@ -201,16 +203,7 @@ def run_bs(driver: Driver, cfg: config.Config):
                         chuaky_fn=lambda driver, i: sign_tab(
                             driver, i, sign_staff_name.phieuMRI_bschidinh
                         ),
-                        date=dt.date.today(),
-                    )
-                if p["ky_bbhc"]:
-                    filter_check_expand_sign(
-                        driver,
-                        name="Biên bản hội chẩn",
-                        chuaky_fn=lambda driver, i: sign_tab(
-                            driver, i, sign_staff_name.bienbanhoichan_thuky
-                        ),
-                        date=dt.date.today(),
+                        date=d,
                     )
 
 
@@ -238,22 +231,6 @@ def run_bn(driver: Driver, cfg: config.Config):
                     sign_phieuthuchienylenh_bn(
                         driver, p["ky_3tra"]["benhnhan"], signature
                     )
-
-
-def run_tk(driver: Driver, cfg: config.Config):
-    for p in cfg["patients"]:
-        if p["ky_bbhc"]:
-            driver.goto(p["url"])
-            log_patient_name(driver.waiting(".name span").text)
-            with top_hosobenhan.session(driver):
-                filter_check_expand_sign(
-                    driver,
-                    name="Biên bản hội chẩn",
-                    dangky_fn=lambda driver, i: sign_tab(
-                        driver, i, sign_staff_name.bienbanhoichan_truongkhoa
-                    ),
-                    date=dt.date.today(),
-                )
 
 
 def log_patient_name(name: str):
