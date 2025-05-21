@@ -2,6 +2,7 @@ from typing import Literal, TypedDict
 import json
 import os.path
 import os
+import datetime as dt
 
 from validators import url
 
@@ -48,7 +49,7 @@ class DutruMau(TypedDict):
 class BBHC(TypedDict):
     url: str
     note: str
-    khac: str # phân loại PT, ks dự phòng,...
+    khac: str  # phân loại PT, ks dự phòng,...
 
 
 class Config(TypedDict):
@@ -93,6 +94,13 @@ def load() -> Config:
 
 
 def is_patient_list_valid(config: Config) -> bool:
+    def value_error_to_bool(fn, *args):
+        try:
+            fn(*args)
+            return True
+        except ValueError:
+            return False
+
     return ((len(config["patients"]) + len(config["dutrumau"])) > 0) & (
         all(
             [
@@ -105,6 +113,7 @@ def is_patient_list_valid(config: Config) -> bool:
             all(
                 url(p["url"])
                 and ("chi-tiet-nguoi-benh-noi-tru/to-dieu-tri/" in p["url"])
+                and value_error_to_bool(dt.datetime.strptime, p["date"], "%d/%m/%Y")
                 for p in config["dutrumau"]
             )
         )

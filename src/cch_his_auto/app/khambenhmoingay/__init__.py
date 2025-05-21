@@ -2,6 +2,7 @@ import logging
 import tkinter as tk
 from tkinter import messagebox
 import datetime as dt
+from typing import Literal, get_args
 
 from cch_his_auto.app import PROFILE_PATH
 from cch_his_auto.global_db import create_connection
@@ -72,21 +73,22 @@ class App(tk.Frame):
         def load():
             cfg = config.load()
 
-            bacsi.set_username(cfg["bacsi"]["username"])
-            bacsi.set_password(cfg["bacsi"]["password"])
-            dieuduong.set_username(cfg["dieuduong"]["username"])
-            dieuduong.set_password(cfg["dieuduong"]["password"])
-            truongkhoa.set_username(cfg["truongkhoa"]["username"])
-            truongkhoa.set_password(cfg["truongkhoa"]["password"])
+            for w, name in zip(
+                [bacsi, dieuduong, truongkhoa],  # widgets
+                ["bacsi", "dieuduong", "truongkhoa"],  # dict names
+            ):
+                w.set_username(cfg[name]["username"])
+                w.set_password(cfg[name]["password"])
+
             dept_var.set(cfg["department"])
 
-            for f, n in zip(
+            for w, name in zip(
                 [patient_frame, dutrumau_frame, bbhc_frame],
                 ["patients", "dutrumau", "bbhc"],
             ):
-                f.clear()
-                for p in cfg[n]:
-                    f.add_item(p)
+                w.clear()
+                for p in cfg[name]:
+                    w.add_item(p)
 
             button_frame.load_config()
 
@@ -123,21 +125,14 @@ class App(tk.Frame):
 
 def run(cfg: config.Config, run_cfg: RunConfig):
     if not config.is_patient_list_valid(cfg):
-        messagebox.showerror(message="không có bệnh nhân")
+        messagebox.showerror(message="Sai data đầu vào")
         return
 
     setLogLevel(run_cfg)
     driver = Driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH)
 
     try:
-        if config.is_valid(cfg, "bacsi") and any(
-            p["ky_todieutri"]
-            or p["ky_xn"]
-            or p["ky_ct"]
-            or p["ky_mri"]
-            or any(p["ky_3tra"]["bacsi"])
-            for p in cfg["patients"]
-        ):
+        if config.is_valid(cfg, "bacsi"):
             with auth.session(
                 driver,
                 cfg["bacsi"]["username"],
@@ -146,9 +141,7 @@ def run(cfg: config.Config, run_cfg: RunConfig):
             ):
                 run_bs(driver, cfg)
 
-        if config.is_valid(cfg, "dieuduong") and any(
-            p["ky_3tra"]["dieuduong"] for p in cfg["patients"]
-        ):
+        if config.is_valid(cfg, "dieuduong"):
             with auth.session(
                 driver,
                 cfg["dieuduong"]["username"],
@@ -158,8 +151,8 @@ def run(cfg: config.Config, run_cfg: RunConfig):
                 run_dd(driver, cfg)
 
         if any(p["ky_3tra"]["benhnhan"] for p in cfg["patients"]):
-            for user in ["bacsi", "dieuduong"]:
-                if config.is_valid(cfg, "bacsi"):
+            for user in get_args(Literal["bacsi", "dieuduong"]):
+                if config.is_valid(cfg, user):
                     with auth.session(
                         driver,
                         cfg[user]["username"],
