@@ -22,7 +22,7 @@ class Ky_3tra(TypedDict):
     benhnhan: tuple[bool, bool, bool, bool, bool]
 
 
-class Patient(TypedDict):
+class Todieutri(TypedDict):
     url: str
     note: str
     ky_xn: bool
@@ -57,7 +57,7 @@ class Config(TypedDict):
     dieuduong: LogInfo
     truongkhoa: LogInfo
     department: str
-    patients: list[Patient]
+    todieutri: list[Todieutri]
     dutrumau: list[DutruMau]
     bbhc: list[BBHC]
 
@@ -87,7 +87,7 @@ def load() -> Config:
                 "password": "",
             },
             "department": "",
-            "patients": [],
+            "todieutri": [],
             "dutrumau": [],
             "bbhc": [],
         }
@@ -101,12 +101,12 @@ def is_patient_list_valid(config: Config) -> bool:
         except ValueError:
             return False
 
-    return ((len(config["patients"]) + len(config["dutrumau"])) > 0) & (
+    return ((len(config["todieutri"]) + len(config["dutrumau"])) > 0) & (
         all(
             [
                 url(p["url"])
                 and ("chi-tiet-nguoi-benh-noi-tru/to-dieu-tri/" in p["url"])
-                for p in config["patients"]
+                for p in config["todieutri"]
             ]
         )
         & (

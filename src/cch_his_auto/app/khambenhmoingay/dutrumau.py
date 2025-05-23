@@ -3,61 +3,53 @@ from typing import cast
 
 from .config import DutruMau
 
-from cch_his_auto.common_ui.item_listframe import ScrollList, ScrollItem
+from cch_his_auto.common_ui.item_listframe import ListItem, ListFrame
+
+HEADERS_STATS = [
+    ("url", 200, 1),
+    ("dppt", 80, 0),
+    ("nhom1", 100, 0),
+    ("date", 80, 0),
+    ("đã TM", 80, 0),
+    ("KT BT", 80, 0),
+    ("PỨ TM", 80, 0),
+    ("HCT", 80, 0),
+    ("CX", 80, 0),
+    ("cùng nhóm", 80, 0),
+    ("Xóa", 80, 0),
+]
+type Item = DutruMau
+type Size = int
+type Weight = int
 
 
-class DutruMauFrame(tk.LabelFrame):
-    type Item = DutruMau
-
-    def __init__(self, parent):
-        super().__init__(parent, text="Dự trù máu")
-        self.rowconfigure(1, weight=1)
-        self.columnconfigure(0, weight=1)
-        header = tk.Frame(self)
-        columnconfigure(header)
-        header.grid(row=0, column=0, sticky="WE", padx=(0, 15), pady=(15, 0))
-        headers = [
-            "url",
-            "dppt",
-            "nhom1",
-            "date",
-            "đã TM",
-            "KT BT",
-            "PỨ TM",
-            "HCT",
-            "CX",
-            "cùng nhóm",
-            "Xóa",
-        ]
-        for i, h in enumerate(headers):
-            w = tk.Label(header, text=h, relief="raised", anchor="center")
-            w.grid(row=0, column=i, sticky="NSEW")
-
-        w = tk.Button(self, text="+", command=self.add_new, background="#d4a5ab")
-        w.grid(row=0, column=1, sticky="NSEW")
-        self.listframe = ScrollList(self)
-        self.listframe.grid_propagate(False)
-        self.listframe.configure(height=100)
-        self.listframe.grid(row=1, column=0, sticky="NSEW")
+class Frame(ListFrame):
+    def get_sizes(self) -> list[tuple[str, Size, Weight]]:
+        return HEADERS_STATS
 
     def add_new(self):
-        self.listframe.add_new(Line)
+        self.add(Line)
+        self.change_tab_text()
 
     def add_item(self, item: Item):
-        line = self.listframe.add_new(Line)
+        line = self.add(Line)
         line.set_item(item)
-
-    def get_items(self) -> list[Item]:
-        return self.listframe.get_items()
+        self.change_tab_text()
 
     def clear(self):
-        self.listframe.clear()
+        super().clear()
+        self.change_tab_text()
+
+    def get_title(self) -> str:
+        return f"Dự trù máu ({self.count()})"
+
+    def change_tab_text(self):
+        self.master.nametowidget("kcb_nb").tab(0, text=self.get_title())
 
 
-class Line(ScrollItem):
+class Line(ListItem):
     def __init__(self, parent):
         super().__init__(parent)
-        columnconfigure(self)
         self.url_var = tk.StringVar()
         self.note_var = tk.StringVar()
 
@@ -105,10 +97,18 @@ class Line(ScrollItem):
         self.nhom1.set(True)
         self.cungnhom.set(True)
 
-        del_btn = tk.Button(self, text="Xóa", command=self.destroy)
+        del_btn = tk.Button(self, text="Xóa", command=self.on_del)
         del_btn.grid(row=0, column=10)
 
-    def set_item(self, item: DutruMau):
+    def get_sizes(self) -> list[tuple[Size, Weight]]:
+        return list(map(lambda x: (x[1], x[2]), HEADERS_STATS))
+
+    def on_del(self):
+        tab_frame = self.master.master.master.master  # pyright: ignore
+        self.destroy()
+        cast(Frame, tab_frame).change_tab_text()
+
+    def set_item(self, item: Item):
         self.url_var.set(item["url"])
         self.note_var.set(item["note"])
         self.duphongphauthuat.set(item["duphongphauthuat"])
@@ -121,7 +121,7 @@ class Line(ScrollItem):
         self.truyenmaucochieuxa.set(item["truyenmaucochieuxa"])
         self.cungnhom.set(item["cungnhom"])
 
-    def get_item(self) -> DutruMau:
+    def get_item(self) -> Item:
         return {
             "url": self.url_var.get(),
             "note": self.note_var.get(),
@@ -135,10 +135,3 @@ class Line(ScrollItem):
             "truyenmaucochieuxa": self.truyenmaucochieuxa.get(),
             "cungnhom": self.cungnhom.get(),
         }
-
-
-def columnconfigure(w: tk.Widget):
-    w.columnconfigure(0, weight=1, minsize=200)
-    for i in [1, 2, 4, 5, 6, 7, 8, 9, 10]:
-        w.columnconfigure(i, minsize=80)
-    w.columnconfigure(3, minsize=100)

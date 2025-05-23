@@ -1,6 +1,6 @@
 import logging
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 import datetime as dt
 from typing import Literal, get_args
 
@@ -10,10 +10,7 @@ from cch_his_auto.common_ui.staff_info import UsernamePasswordFrame
 from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig, setLogLevel
 from cch_his_auto.common_tasks.signature import try_get_signature
 
-from . import config
-from .patient_list import PatientFrame
-from .dutrumau_list import DutruMauFrame
-from .bbhc_list import BBHCFrame
+from . import config, todieutri, dutrumau, bbhc
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tasks import auth
@@ -43,8 +40,6 @@ class App(tk.Frame):
         super().__init__()
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
-        self.rowconfigure(2, weight=5)
-        self.rowconfigure(3, weight=5)
 
         info = tk.LabelFrame(self, text="Thông tin đăng nhập")
         bacsi = UsernamePasswordFrame(info, text="Bác sĩ")
@@ -60,15 +55,18 @@ class App(tk.Frame):
         tk.Entry(info, textvariable=dept_var).grid(row=1, column=1, sticky="W")
         info.grid(row=0, column=0, sticky="N", pady=20)
 
-        patient_frame = PatientFrame(self)
-        patient_frame.grid(row=1, column=0, sticky="NSEW")
-        dutrumau_frame = DutruMauFrame(self)
-        dutrumau_frame.grid(row=2, column=0, sticky="NSEW")
-        bbhc_frame = BBHCFrame(self)
-        bbhc_frame.grid(row=3, column=0, sticky="NSEW")
+        nb = ttk.Notebook(self, name="kcb_nb")
+        nb.grid(row=1, column=0, sticky="NSEW")
+
+        todieutri_frame = todieutri.Frame(self)
+        dutrumau_frame = dutrumau.Frame(self)
+        bbhc_frame = bbhc.Frame(self)
+
+        for t in [todieutri_frame, dutrumau_frame, bbhc_frame]:
+            nb.add(t, text=t.get_title(), sticky="NSEW")
 
         button_frame = ButtonFrame(self)
-        button_frame.grid(row=0, column=1, rowspan=4, padx=20, sticky="S", pady=(0, 20))
+        button_frame.grid(row=0, column=1, rowspan=2, padx=20, sticky="S", pady=(0, 20))
 
         def load():
             cfg = config.load()
@@ -83,7 +81,7 @@ class App(tk.Frame):
             dept_var.set(cfg["department"])
 
             for w, name in zip(
-                [patient_frame, dutrumau_frame, bbhc_frame],
+                [todieutri_frame, dutrumau_frame, bbhc_frame],
                 ["patients", "dutrumau", "bbhc"],
             ):
                 w.clear()
@@ -107,7 +105,7 @@ class App(tk.Frame):
                     "password": dieuduong.get_password(),
                 },
                 "department": dept_var.get(),
-                "patients": patient_frame.get_items(),
+                "todieutri": todieutri_frame.get_items(),
                 "dutrumau": dutrumau_frame.get_items(),
                 "bbhc": bbhc_frame.get_items(),
             }
@@ -150,7 +148,7 @@ def run(cfg: config.Config, run_cfg: RunConfig):
             ):
                 run_dd(driver, cfg)
 
-        if any(p["ky_3tra"]["benhnhan"] for p in cfg["patients"]):
+        if any(p["ky_3tra"]["benhnhan"] for p in cfg["todieutri"]):
             for user in get_args(Literal["bacsi", "dieuduong"]):
                 if config.is_valid(cfg, user):
                     with auth.session(
@@ -168,7 +166,7 @@ def run(cfg: config.Config, run_cfg: RunConfig):
 
 def run_bs(driver: Driver, cfg: config.Config):
     d = dt.date.today()
-    for p in cfg["patients"]:
+    for p in cfg["todieutri"]:
         driver.goto(p["url"])
         log_patient_name(driver.waiting(".name span").text)
 
@@ -201,7 +199,7 @@ def run_bs(driver: Driver, cfg: config.Config):
 
 
 def run_dd(driver: Driver, cfg: config.Config):
-    for p in cfg["patients"]:
+    for p in cfg["todieutri"]:
         if any(p["ky_3tra"]["dieuduong"]):
             driver.goto(p["url"])
             log_patient_name(driver.waiting(".name span").text)
@@ -210,7 +208,7 @@ def run_dd(driver: Driver, cfg: config.Config):
 
 def run_bn(driver: Driver, cfg: config.Config):
     with create_connection() as con:
-        for p in cfg["patients"]:
+        for p in cfg["todieutri"]:
             driver.goto(p["url"])
             log_patient_name(driver.waiting(".name span").text)
             ma_hs = int(

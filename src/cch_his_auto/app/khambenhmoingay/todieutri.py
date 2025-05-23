@@ -1,49 +1,51 @@
 import tkinter as tk
+from typing import cast
 
-from .config import Patient
+from .config import Todieutri
 
-from cch_his_auto.common_ui.item_listframe import ScrollList, ScrollItem
+from cch_his_auto.common_ui.item_listframe import ListItem, ListFrame
+
+HEADERS_STATS = [
+    ("url", 200, 1),
+    ("XN", 80, 0),
+    ("CT", 80, 0),
+    ("MRI", 80, 0),
+    ("tờ ĐT", 80, 0),
+    ("Vị trí ký 3tra", 180, 0),
+    ("Xóa", 80, 0),
+]
+type Item = Todieutri
+type Size = int
+type Weight = int
 
 
-class PatientFrame(tk.LabelFrame):
-    type Item = Patient
-
-    def __init__(self, parent):
-        super().__init__(parent, text="Tờ điều trị")
-        self.rowconfigure(1, weight=1)
-        self.columnconfigure(0, weight=1)
-        header = tk.Frame(self)
-        columnconfigure(header)
-        header.grid(row=0, column=0, sticky="WE", padx=(0, 15), pady=(15, 0))
-        headers = ["url", "XN", "CT", "MRI", "tờ ĐT", "Vị trí ký 3tra", "Xóa"]
-        for i, h in enumerate(headers):
-            w = tk.Label(header, text=h, relief="raised", anchor="center")
-            w.grid(row=0, column=i, sticky="NSEW")
-
-        w = tk.Button(self, text="+", command=self.add_new, background="#d4a5ab")
-        w.grid(row=0, column=1, sticky="NSEW")
-
-        self.listframe = ScrollList(self)
-        self.listframe.grid(row=1, column=0, sticky="NSEW")
+class Frame(ListFrame):
+    def get_sizes(self) -> list[tuple[str, Size, Weight]]:
+        return HEADERS_STATS
 
     def add_new(self):
-        self.listframe.add_new(Line)
+        self.add(Line)
+        self.change_tab_text()
 
     def add_item(self, item: Item):
-        line = self.listframe.add_new(Line)
+        line = self.add(Line)
         line.set_item(item)
-
-    def get_items(self) -> list[Item]:
-        return self.listframe.get_items()
+        self.change_tab_text()
 
     def clear(self):
-        self.listframe.clear()
+        super().clear()
+        self.change_tab_text()
+
+    def get_title(self) -> str:
+        return f"Tờ điều trị ({self.count()})"
+
+    def change_tab_text(self):
+        self.master.nametowidget("kcb_nb").tab(0, text=self.get_title())
 
 
-class Line(ScrollItem):
+class Line(ListItem):
     def __init__(self, parent):
         super().__init__(parent)
-        columnconfigure(self)
         self.url_var = tk.StringVar()
         self.note_var = tk.StringVar()
 
@@ -79,10 +81,18 @@ class Line(ScrollItem):
         self.k3t_dd.grid(row=1, column=0)
         self.k3t_bn.grid(row=2, column=0)
 
-        del_btn = tk.Button(self, text="Xóa", command=self.destroy)
+        del_btn = tk.Button(self, text="Xóa", command=self.on_del)
         del_btn.grid(row=0, column=6)
 
-    def set_item(self, item: Patient):
+    def get_sizes(self) -> list[tuple[Size, Weight]]:
+        return list(map(lambda x: (x[1], x[2]), HEADERS_STATS))
+
+    def on_del(self):
+        tab_frame = self.master.master.master.master  # pyright: ignore
+        self.destroy()
+        cast(Frame, tab_frame).change_tab_text()
+
+    def set_item(self, item: Item):
         self.url_var.set(item["url"])
         self.note_var.set(item["note"])
         self.xn_var.set(item["ky_xn"])
@@ -93,7 +103,7 @@ class Line(ScrollItem):
         self.k3t_dd.set_vitri(item["ky_3tra"]["dieuduong"])
         self.k3t_bn.set_vitri(item["ky_3tra"]["benhnhan"])
 
-    def get_item(self) -> Patient:
+    def get_item(self) -> Item:
         return {
             "url": self.url_var.get(),
             "note": self.note_var.get(),
@@ -135,10 +145,3 @@ class Ky3Tra(tk.LabelFrame):
         self.v2.set(v[2])
         self.v3.set(v[3])
         self.v4.set(v[4])
-
-
-def columnconfigure(w: tk.Widget):
-    w.columnconfigure(0, weight=1, minsize=200)
-    for i in range(1, 7):
-        w.columnconfigure(i, minsize=80)
-    w.columnconfigure(5, minsize=180)

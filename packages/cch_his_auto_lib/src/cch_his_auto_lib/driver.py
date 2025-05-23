@@ -16,6 +16,7 @@ from selenium.common import (
 from selenium.webdriver import Keys
 
 _logger = logging.getLogger().getChild("driver")
+GLOBAL_DRIVER: "Driver | None" = None
 
 
 class DriverFn(Protocol):
@@ -25,9 +26,7 @@ class DriverFn(Protocol):
 
 
 class Driver(webdriver.Chrome):
-    """
-    Preconfigured chrome driver with some convenient methods.
-    """
+    "Preconfigured chrome driver with some convenient methods."
 
     def __init__(
         self, headless: bool = False, profile_path: PurePath | str | None = None
@@ -212,9 +211,7 @@ class Driver(webdriver.Chrome):
             time.sleep(2)
 
     def duplicate_tab(self) -> str:
-        """
-        Duplicate and return the current tab
-        """
+        "Duplicate and return the current tab"
         current_tab = self.current_window_handle
         url = self.current_url
         self.switch_to.new_window("tab")
@@ -231,4 +228,16 @@ class Driver(webdriver.Chrome):
         return ele
 
 
-__all__ = ["Driver", "DriverFn"]
+def get_global_driver() -> Driver:
+    global GLOBAL_DRIVER
+    if GLOBAL_DRIVER is None:
+        raise Exception("GLOBAL_DRIVER is not set")
+    return GLOBAL_DRIVER
+
+
+def set_global_driver(headless: bool, profile_path: str):
+    global GLOBAL_DRIVER
+    GLOBAL_DRIVER = Driver(headless, profile_path)
+
+
+__all__ = ["Driver", "DriverFn", "get_global_driver", "set_global_driver"]
