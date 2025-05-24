@@ -26,7 +26,7 @@ _out.setFormatter(
 _root_logger.addHandler(_out)
 
 _root_logger = _root_logger.getChild("driver")
-GLOBAL_DRIVER: "Driver | None" = None
+GLOBAL_DRIVER: "Driver"
 
 
 class Driver(webdriver.Chrome):
@@ -246,7 +246,6 @@ class Driver(webdriver.Chrome):
 
 def get_global_driver() -> Driver:
     global GLOBAL_DRIVER
-    assert GLOBAL_DRIVER is not None, "GLOBAL_DRIVER should be set"
     return GLOBAL_DRIVER
 
 
