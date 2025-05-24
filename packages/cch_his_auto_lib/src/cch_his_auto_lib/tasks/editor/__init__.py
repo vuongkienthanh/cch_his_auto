@@ -1,3 +1,3 @@
 import logging
 
-_logger = logging.getLogger().getChild("editor")
+_lgr = logging.getLogger().getChild("editor")

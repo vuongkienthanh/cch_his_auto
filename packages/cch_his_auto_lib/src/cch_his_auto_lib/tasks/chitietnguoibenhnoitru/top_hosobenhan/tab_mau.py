@@ -1,27 +1,29 @@
 from selenium.common import NoSuchElementException
 
-from cch_his_auto_lib.driver import Driver
-from . import ACTIVE_PANE, _logger
+
+from cch_his_auto_lib.driver import get_global_driver
+from . import ACTIVE_PANE, _lgr
 
 TAB_NUMBER = 7
-_logger = _logger.getChild("tab_mau")
+_lgr = _lgr.getChild("tab_mau")
 
 
-def get_bloodtype(driver: Driver) -> str | None:
+def get_bloodtype() -> str | None:
+    _d = get_global_driver()
     for i in range(2, 10):
         try:
-            ele = driver.waiting(
+            ele = _d.waiting(
                 f"{ACTIVE_PANE} tr:nth-child({i}) td:nth-child(12)", "nhóm máu phát"
             ).text.strip()
         except NoSuchElementException:
-            _logger.warning("-> can't find bloodtype")
+            _lgr.warning("-> can't find bloodtype")
             return None
         else:
             if ele == "Chưa xác định":
                 continue
             else:
-                _logger.info(f"bloodtype = {ele}")
+                _lgr.info(f"bloodtype = {ele}")
                 return ele
     else:
-        _logger.warning("-> can't find bloodtype")
+        _lgr.warning("-> can't find bloodtype")
         return None

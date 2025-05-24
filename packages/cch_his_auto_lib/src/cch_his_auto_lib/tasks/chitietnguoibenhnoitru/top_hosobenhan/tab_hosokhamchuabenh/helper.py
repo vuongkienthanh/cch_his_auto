@@ -7,44 +7,48 @@ from functools import partial
 from selenium.webdriver import Keys
 from selenium.common import NoSuchElementException, StaleElementReferenceException
 
-from cch_his_auto_lib.driver import Driver, DriverFn
+from cch_his_auto_lib.driver import get_global_driver
 from .. import ACTIVE_PANE
-from . import _logger
+from . import _lgr
+
 
 RIGHT_PANEL = f"{ACTIVE_PANE} .right-content"
 
 
 def do_nothing(*_):
-    _logger.warning("do nothing")
+    _lgr.warning("do nothing")
 
 
-def sign_current(driver: Driver):
-    driver.clicking(
+def sign_current():
+    _d = get_global_driver()
+    _d.clicking(
         f"{RIGHT_PANEL} .__action button:nth-child(2)", "clicking Ký tên BS dieu tri"
     )
 
 
-def sign_current2(driver: Driver):
-    driver.clicking(
+def sign_current2():
+    _d = get_global_driver()
+    _d.clicking(
         f"{RIGHT_PANEL} .__action button:nth-child(3)", "clicking Ký tên BS truong khoa"
     )
 
 
-def sign_current_both(driver: Driver):
-    sign_current(driver)
-    sign_current2(driver)
+def sign_current_both():
+    sign_current()
+    sign_current2()
 
 
-def sign_tab(driver: Driver, idx: int, sign_fn: DriverFn):
-    tab0 = driver.current_window_handle
-    datakey = driver.find(f"{RIGHT_PANEL} tr:nth-child({idx})").get_attribute(
+def sign_tab(idx: int, sign_fn: Callable):
+    _d = get_global_driver()
+    tab0 = _d.current_window_handle
+    datakey = _d.find(f"{RIGHT_PANEL} tr:nth-child({idx})").get_attribute(
         "data-row-key"
     )
-    _logger.debug(f"data row key = {datakey}")
-    driver.clicking(f"{RIGHT_PANEL} tr:nth-child({idx})", f"row {idx - 1}")
+    _lgr.debug(f"data row key = {datakey}")
+    _d.clicking(f"{RIGHT_PANEL} tr:nth-child({idx})", f"row {idx - 1}")
     time.sleep(2)
-    driver.clicking(f"a[data-key='{datakey}'] button", f"edit button {idx - 1}")
-    driver.goto_newtab_do_smth_then_goback(tab0, sign_fn)
+    _d.clicking(f"a[data-key='{datakey}'] button", f"edit button {idx - 1}")
+    _d.goto_newtab_do_smth_then_goback(tab0, sign_fn)
 
 
 class Status(StrEnum):
@@ -55,54 +59,55 @@ class Status(StrEnum):
     HOANTHANH = "Hoàn thành"
 
 
-def filter(driver: Driver, name: str) -> bool:
+def filter(name: str) -> bool:
     "Filter document based on `name`"
-    _logger.debug(f"name={name}")
-    ele = driver.clear_input(f"{RIGHT_PANEL} input")
-    _logger.debug("+++++ typing name")
+    _lgr.debug(f"name={name}")
+    _d = get_global_driver()
+    ele = _d.clear_input(f"{RIGHT_PANEL} input")
+    _lgr.debug("+++++ typing name")
     ele.send_keys(name)
     ele.send_keys(Keys.ENTER)
     for _ in range(60):  # 120 is too long
         time.sleep(1)
         try:
-            ele = driver.find(f"{RIGHT_PANEL} tr:nth-child(2) td:nth-child(2) div")
+            ele = _d.find(f"{RIGHT_PANEL} tr:nth-child(2) td:nth-child(2) div")
             if ele.text.strip().startswith(name):
-                _logger.info(f"-> found {name}")
+                _lgr.info(f"-> found {name}")
                 return True
         except NoSuchElementException:
             ...
     else:
-        _logger.warning(f"-> filtered {name} with no result")
+        _lgr.warning(f"-> filtered {name} with no result")
         return False
 
 
-def is_row_status(driver: Driver, idx: int, status: Status) -> bool:
+def is_row_status(idx: int, status: Status) -> bool:
     "Check if row at `idx` is `status`, first row is idx=2"
+    _d = get_global_driver()
     try:
-        _logger.debug(f"checking status = {status}")
+        _lgr.debug(f"checking status = {status}")
         return (
-            driver.waiting(
+            _d.waiting(
                 f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(3)",
                 f"row {idx} status",
             ).text.strip()
             == status
         )
     except StaleElementReferenceException:
-        return is_row_status(driver, idx, status)
+        return is_row_status(idx, status)
 
 
-def is_row_expandable(driver: Driver, idx: int) -> bool:
+def is_row_expandable(idx: int) -> bool:
     "Check if row at `idx` is expandable, first row is idx=2"
-    name = driver.waiting(
+    _d = get_global_driver()
+    name = _d.waiting(
         f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(2)", f"row {idx}"
     ).text
-    _logger.debug(f"checking {name}: expandable")
+    _lgr.debug(f"checking {name}: expandable")
     for _ in range(5):
         time.sleep(1)
         try:
-            ele = driver.find(
-                f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(1) button"
-            )
+            ele = _d.find(f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(1) button")
             class_list = ele.get_attribute("class")
             assert class_list is not None
             return "ant-table-row-expand-icon-collapsed" in class_list
@@ -112,76 +117,77 @@ def is_row_expandable(driver: Driver, idx: int) -> bool:
         return False
 
 
-def expand_row(driver: Driver, idx: int):
+def expand_row(idx: int):
     "Expand row at `idx`, first row is idx=2"
-    name = driver.waiting(
+    _d = get_global_driver()
+    name = _d.waiting(
         f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(2)", f"row {idx}"
     ).text
-    _logger.info(f"expanding {name}")
-    driver.clicking(f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(1) button")
+    _lgr.info(f"expanding {name}")
+    _d.clicking(f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(1) button")
 
 
 def filter_check_expand_sign(
-    driver: Driver,
     name: str,
-    chuaky_fn: Callable[[Driver, int], None] = do_nothing,
-    dangky_fn: Callable[[Driver, int], None] = do_nothing,
+    chuaky_fn: Callable[[int], None] = do_nothing,
+    dangky_fn: Callable[[int], None] = do_nothing,
     date: dt.date | None = None,
 ):
     """
     filter `name`, expand it if possible, then call `fn` respectively bases on status
     if `date` provided, only sign those with this date
     """
+    _d = get_global_driver()
 
-    def check_and_sign(driver: Driver, i: int):
-        name = driver.waiting(f"{RIGHT_PANEL} tr:nth-child({i}) td:nth-child(2)").text
-        _logger.debug(f"checking {name}")
-        if is_row_status(driver, i, Status.CHUAKY):
-            _logger.info(f"row condition: not met: {name} -> {Status.CHUAKY}")
-            driver.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
-            chuaky_fn(driver, i)
+    def check_and_sign(i: int):
+        name = _d.waiting(f"{RIGHT_PANEL} tr:nth-child({i}) td:nth-child(2)").text
+        _lgr.debug(f"checking {name}")
+        if is_row_status(i, Status.CHUAKY):
+            _lgr.info(f"row condition: not met: {name} -> {Status.CHUAKY}")
+            _d.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
+            chuaky_fn(i)
             time.sleep(5)
-        elif is_row_status(driver, i, Status.DANGKY):
-            _logger.info(f"row condition: not met: {name} -> {Status.DANGKY}")
-            driver.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
-            dangky_fn(driver, i)
+        elif is_row_status(i, Status.DANGKY):
+            _lgr.info(f"row condition: not met: {name} -> {Status.DANGKY}")
+            _d.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
+            dangky_fn(i)
             time.sleep(5)
         else:
-            _logger.info("row condition: OK")
+            _lgr.info("row condition: OK")
 
-    def check_and_sign_date(driver: Driver, i: int, date: dt.date):
-        name = driver.waiting(f"{RIGHT_PANEL} tr:nth-child({i}) td:nth-child(2)").text
-        _logger.debug(f"checking {name} with date={date}")
+    def check_and_sign_date(i: int, date: dt.date):
+        name = _d.waiting(f"{RIGHT_PANEL} tr:nth-child({i}) td:nth-child(2)").text
+        _lgr.debug(f"checking {name} with date={date}")
         if name.lstrip().startswith(date.strftime("%d/%m/%Y")):
-            if is_row_status(driver, i, Status.CHUAKY):
-                _logger.info(f"row condition: not met: {name} -> {Status.CHUAKY}")
-                driver.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
-                chuaky_fn(driver, i)
+            if is_row_status(i, Status.CHUAKY):
+                _lgr.info(f"row condition: not met: {name} -> {Status.CHUAKY}")
+                _d.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
+                chuaky_fn(i)
                 time.sleep(5)
-            elif is_row_status(driver, i, Status.DANGKY):
-                _logger.info(f"row condition: not met: {name} -> {Status.DANGKY}")
-                driver.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
-                dangky_fn(driver, i)
+            elif is_row_status(i, Status.DANGKY):
+                _lgr.info(f"row condition: not met: {name} -> {Status.DANGKY}")
+                _d.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
+                dangky_fn(i)
                 time.sleep(5)
             else:
-                _logger.info("row condition: OK")
+                _lgr.info("row condition: OK")
         else:
-            _logger.debug("-> skip date")
+            _lgr.debug("-> skip date")
 
-    if filter(driver, name) and (
-        driver.waiting(f"{RIGHT_PANEL} tr:nth-child(2) td:nth-child(3)").text.strip()
+    if filter(name) and (
+        _d.waiting(f"{RIGHT_PANEL} tr:nth-child(2) td:nth-child(3)").text.strip()
         != Status.HOANTHANH
     ):
-        if is_row_expandable(driver, 2):
+        if is_row_expandable(2):
             if date:
                 check_and_sign2 = partial(check_and_sign_date, date=date)
             else:
                 check_and_sign2 = check_and_sign
 
-            expand_row(driver, 2)
+            expand_row(2)
             for i in range(
-                3, len(driver.find_all(f"{RIGHT_PANEL} .ant-table-row-level-1")) + 3
+                3, len(_d.find_all(f"{RIGHT_PANEL} .ant-table-row-level-1")) + 3
             ):
-                check_and_sign2(driver, i)
+                check_and_sign2(i)
         else:
-            check_and_sign(driver, 2)
+            check_and_sign(2)

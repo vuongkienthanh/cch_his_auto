@@ -1,4 +1,3 @@
-from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tasks.editor import sign_staff_name
 from . import _trace, goto
 

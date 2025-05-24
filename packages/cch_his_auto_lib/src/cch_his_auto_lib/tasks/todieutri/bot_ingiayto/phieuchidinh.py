@@ -3,9 +3,9 @@ from enum import StrEnum
 
 from selenium.common import StaleElementReferenceException
 
-from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.driver import get_global_driver
 from cch_his_auto_lib.helper import EndOfLoop
-from . import _logger, _trace, goto
+from . import _lgr, _trace, goto
 
 
 class State(StrEnum):
@@ -14,34 +14,35 @@ class State(StrEnum):
 
 
 @_trace
-def sign_phieuchidinh(driver: Driver):
+def sign_phieuchidinh():
     "Inside *tờ điều trị*, try to sign *phiếu chỉ định* in sequence"
+    _d = get_global_driver()
 
     def close_dialog():
-        driver.clicking(
+        _d.clicking(
             ".ant-modal-close:has(~.ant-modal-body .__list)",
             "close dialog button",
         )
-        driver.wait_closing(".ant-modal-body .__list", "phieu chi dinh dialog")
+        _d.wait_closing(".ant-modal-body .__list", "phieu chi dinh dialog")
 
-    goto(driver, name="Phiếu chỉ định")
+    goto(name="Phiếu chỉ định")
     for i in range(120):
         time.sleep(1)
-        _logger.debug(f"checking button state {i}...")
-        for ele in driver.find_all(".__button button"):
+        _lgr.debug(f"checking button state {i}...")
+        for ele in _d.find_all(".__button button"):
             try:
                 if ele.text == State.Cancel:
-                    _logger.debug(f"button state is {State.Cancel}")
+                    _lgr.debug(f"button state is {State.Cancel}")
                     close_dialog()
                     return
                 elif ele.text == "Ký Bác sĩ":
-                    _logger.debug(f"button state is {State.Sign} -> click")
+                    _lgr.debug(f"button state is {State.Sign} -> click")
                     ele.click()
                     time.sleep(5)
                     close_dialog()
                     return
             except StaleElementReferenceException as e:
-                _logger.warning(f"get {e}")
+                _lgr.warning(f"get {e}")
     else:
         close_dialog()
         raise EndOfLoop("can't sign phieuchidinh while in dialog")

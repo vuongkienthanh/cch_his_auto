@@ -1,10 +1,9 @@
-import logging
 import tkinter as tk
 from tkinter import messagebox, ttk
 import datetime as dt
 from typing import Literal, get_args
 
-from cch_his_auto.app import PROFILE_PATH
+from cch_his_auto.app import PROFILE_PATH, _lgr
 from cch_his_auto.global_db import create_connection
 from cch_his_auto.common_ui.staff_info import UsernamePasswordFrame
 from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig, setLogLevel
@@ -12,7 +11,7 @@ from cch_his_auto.common_tasks.signature import try_get_signature
 
 from . import config, todieutri, dutrumau, bbhc
 
-from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.driver import start_global_driver, get_global_driver
 from cch_his_auto_lib.tasks import auth
 from cch_his_auto_lib.tasks.todieutri.bot_ingiayto import (
     sign_todieutri,
@@ -32,7 +31,6 @@ from cch_his_auto_lib.tasks.editor import sign_staff_name
 
 
 TITLE = "Khám bệnh mỗi ngày"
-_logger = logging.getLogger("app")
 
 
 class App(tk.Frame):
@@ -62,7 +60,8 @@ class App(tk.Frame):
         dutrumau_frame = dutrumau.Frame(self)
         bbhc_frame = bbhc.Frame(self)
 
-        for t in [todieutri_frame, dutrumau_frame, bbhc_frame]:
+        for i, t in enumerate([todieutri_frame, dutrumau_frame, bbhc_frame]):
+            t.set_tab_index(i)
             nb.add(t, text=t.get_title(), sticky="NSEW")
 
         button_frame = ButtonFrame(self)
@@ -127,86 +126,80 @@ def run(cfg: config.Config, run_cfg: RunConfig):
         return
 
     setLogLevel(run_cfg)
-    driver = Driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH)
-
-    try:
+    with start_global_driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH):
         if config.is_valid(cfg, "bacsi"):
             with auth.session(
-                driver,
                 cfg["bacsi"]["username"],
                 cfg["bacsi"]["password"],
                 cfg["department"],
             ):
-                run_bs(driver, cfg)
+                run_bs(cfg)
 
         if config.is_valid(cfg, "dieuduong"):
             with auth.session(
-                driver,
                 cfg["dieuduong"]["username"],
                 cfg["dieuduong"]["password"],
                 cfg["department"],
             ):
-                run_dd(driver, cfg)
+                run_dd(cfg)
 
         if any(p["ky_3tra"]["benhnhan"] for p in cfg["todieutri"]):
             for user in get_args(Literal["bacsi", "dieuduong"]):
                 if config.is_valid(cfg, user):
                     with auth.session(
-                        driver,
                         cfg[user]["username"],
                         cfg[user]["password"],
                         cfg["department"],
                     ):
-                        run_bn(driver, cfg)
+                        run_bn(cfg)
                     break
-    finally:
-        driver.quit()
-        messagebox.showinfo(message="finish")
+    messagebox.showinfo(message="finish")
 
 
-def run_bs(driver: Driver, cfg: config.Config):
+def run_bs(cfg: config.Config):
+    driver = get_global_driver()
     d = dt.date.today()
     for p in cfg["todieutri"]:
         driver.goto(p["url"])
         log_patient_name(driver.waiting(".name span").text)
 
         if p["ky_xn"]:
-            sign_phieuchidinh(driver)
+            sign_phieuchidinh()
         if p["ky_todieutri"]:
-            sign_todieutri(driver)
+            sign_todieutri()
         if any(p["ky_3tra"]["bacsi"]):
-            sign_phieuthuchienylenh_bs(driver, p["ky_3tra"]["bacsi"])
+            sign_phieuthuchienylenh_bs(p["ky_3tra"]["bacsi"])
         if any([p["ky_ct"], p["ky_mri"]]):
-            with top_hosobenhan.session(driver):
+            with top_hosobenhan.session():
                 if p["ky_ct"]:
                     filter_check_expand_sign(
-                        driver,
                         name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
-                        chuaky_fn=lambda driver, i: sign_tab(
-                            driver, i, sign_staff_name.phieuCT_bschidinh
+                        chuaky_fn=lambda i: sign_tab(
+                            i, sign_staff_name.phieuCT_bschidinh
                         ),
                         date=d,
                     )
                 if p["ky_mri"]:
                     filter_check_expand_sign(
-                        driver,
                         name="Phiếu chỉ định chụp cộng hưởng từ (MRI)",
-                        chuaky_fn=lambda driver, i: sign_tab(
-                            driver, i, sign_staff_name.phieuMRI_bschidinh
+                        chuaky_fn=lambda i: sign_tab(
+                            i, sign_staff_name.phieuMRI_bschidinh
                         ),
                         date=d,
                     )
 
 
-def run_dd(driver: Driver, cfg: config.Config):
+def run_dd(cfg: config.Config):
+    driver = get_global_driver()
     for p in cfg["todieutri"]:
         if any(p["ky_3tra"]["dieuduong"]):
             driver.goto(p["url"])
             log_patient_name(driver.waiting(".name span").text)
-            sign_phieuthuchienylenh_dd(driver, p["ky_3tra"]["dieuduong"])
+            sign_phieuthuchienylenh_dd(p["ky_3tra"]["dieuduong"])
 
 
-def run_bn(driver: Driver, cfg: config.Config):
+def run_bn(cfg: config.Config):
+    driver = get_global_driver()
     with create_connection() as con:
         for p in cfg["todieutri"]:
             driver.goto(p["url"])
@@ -217,15 +210,13 @@ def run_bn(driver: Driver, cfg: config.Config):
                     "ma ho so",
                 ).text
             )
-            if signature := try_get_signature(driver, con, ma_hs):
+            if signature := try_get_signature(con, ma_hs):
                 if any(p["ky_3tra"]["benhnhan"]):
-                    sign_phieuthuchienylenh_bn(
-                        driver, p["ky_3tra"]["benhnhan"], signature
-                    )
+                    sign_phieuthuchienylenh_bn(p["ky_3tra"]["benhnhan"], signature)
 
 
 def log_patient_name(name: str):
-    _logger.info(
+    _lgr.info(
         "\n".join(
             [
                 "",

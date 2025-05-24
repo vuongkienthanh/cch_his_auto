@@ -3,7 +3,7 @@ import datetime as dt
 
 from selenium.common import NoSuchElementException
 
-from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.driver import get_global_driver
 from cch_his_auto_lib.helper import tracing
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
     change_tab,
@@ -11,34 +11,38 @@ from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
     tab_todietri,
 )
 from cch_his_auto_lib.tasks import todieutri
+from .. import ACTIVE_PANE
+
 
 TAB_NUMBER = 6
-_logger = logging.getLogger("tab_soket15ngay")
-_trace = tracing(_logger)
 
-from .. import ACTIVE_PANE
+_lgr = logging.getLogger("tab_soket15ngay")
+_trace = tracing(_lgr)
+
 from .phieusoket import save_new_phieusoket
 
 
-def get_last_date(driver: Driver) -> dt.date | None:
+def get_last_date() -> dt.date | None:
     "Assume first row is the latest *sơ kết 15 ngày* , get that end_date"
+    _d = get_global_driver()
     try:
-        ele = driver.waiting(
+        ele = _d.waiting(
             f"{ACTIVE_PANE} tbody .ant-table-row-level-0:nth-child(2) td:nth-child(9)"
         ).text.strip()
         if ele == "":
             return None
         else:
-            _logger.info(f"last_date= {ele}")
+            _lgr.info(f"last_date= {ele}")
             return dt.datetime.strptime(ele, "%d/%m/%Y").date()
     except NoSuchElementException:
-        _logger.warning("-> can't find last_date")
+        _lgr.warning("-> can't find last_date")
         return None
 
 
-def add_new(driver: Driver):
+def add_new():
     "Add new *Phiếu sơ kết 15 ngày*"
-    driver.clicking(f"{ACTIVE_PANE} button")
+    _d = get_global_driver()
+    _d.clicking(f"{ACTIVE_PANE} button")
 
 
 ###

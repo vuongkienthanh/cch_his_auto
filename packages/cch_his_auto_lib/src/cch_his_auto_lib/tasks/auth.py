@@ -5,104 +5,108 @@ from contextlib import contextmanager
 from selenium.webdriver.common.by import By
 from selenium.common import NoSuchElementException
 
-from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.driver import get_global_driver
 from cch_his_auto_lib.tasks import danhsachnguoibenhnoitru, search_dialog
 from cch_his_auto_lib.helper import tracing, EndOfLoop
 
+_lgr = logging.getLogger().getChild("auth")
+_trace = tracing(_lgr)
+
 LOGIN_PANE_CSS = ".login-body"
-_logger = logging.getLogger().getChild("auth")
-_trace = tracing(_logger)
 
 
 @_trace
-def login(driver: Driver, username: str, password: str):
+def login(username: str, password: str):
     "login with provided `username` and `password`"
+    _d = get_global_driver()
     URL = "http://emr.ndtp.org/login"
-    _logger.info(f"login with username={username}")
-    if not driver.current_url.startswith(URL):
-        driver.goto(URL)
+    _lgr.info(f"login with username={username}")
+    if not _d.current_url.startswith(URL):
+        _d.goto(URL)
     for i in range(120):
         time.sleep(1)
         try:
-            _logger.debug(f"waiting login page {i}...")
-            driver.find(LOGIN_PANE_CSS)
+            _lgr.debug(f"waiting login page {i}...")
+            _d.find(LOGIN_PANE_CSS)
         except NoSuchElementException:
             try:
-                _logger.debug("checking whether any user is logged in")
-                driver.find(".card")
+                _lgr.debug("checking whether any user is logged in")
+                _d.find(".card")
             except NoSuchElementException:
-                _logger.debug("no user is currently logged in")
+                _lgr.debug("no user is currently logged in")
                 continue
             else:
-                _logger.info("found user already logged in -> proceed to log out")
+                _lgr.info("found user already logged in -> proceed to log out")
                 time.sleep(2)
-                logout(driver)
-                login(driver, username, password)
+                logout()
+                login(username, password)
                 return
         else:
-            _logger.debug("found login screen")
-            inputs = driver.find_elements(By.TAG_NAME, "input")
+            _lgr.debug("found login screen")
+            inputs = _d.find_elements(By.TAG_NAME, "input")
             time.sleep(2)  # wait for js to load
-            _logger.debug("+++++ typing username and password")
+            _lgr.debug("+++++ typing username and password")
             inputs[0].send_keys(username)
             inputs[1].send_keys(password)
             time.sleep(2)  # wait for js to load
-            driver.clicking(".action>button", "submit button")
-            driver.wait_closing(LOGIN_PANE_CSS, "login page")
+            _d.clicking(".action>button", "submit button")
+            _d.wait_closing(LOGIN_PANE_CSS, "login page")
             return
     else:
         raise EndOfLoop("can't log in")
 
 
 @_trace
-def logout(driver: Driver):
+def logout():
     "logout, then back to login page"
+    _d = get_global_driver()
     URL = "http://emr.ndtp.org/logout"
-    driver.goto(URL)
+    _d.goto(URL)
     try:
-        driver.waiting(LOGIN_PANE_CSS)
+        _d.waiting(LOGIN_PANE_CSS)
         return
     except NoSuchElementException:
-        logout(driver)
+        logout()
 
 
 @_trace
-def set_dept(driver: Driver, dept: str):
+def set_dept(dept: str):
     "Set department with exact `dept`"
-    _logger.info(f"dept={dept}")
+    _lgr.info(f"dept={dept}")
+    _d = get_global_driver()
 
     def _set_dept_in_dialog():
-        search_dialog.filter(driver, dept)
-        search_dialog.select_item_dropdown(driver, 0)
-        search_dialog.save(driver)
+        search_dialog.filter(dept)
+        search_dialog.select_item_dropdown(0)
+        search_dialog.save()
 
     for i in range(120):
         time.sleep(1)
         try:
-            _logger.debug(f"waiting choose dept dialog {i}...")
-            driver.find(search_dialog.DIALOG_CSS)
+            _lgr.debug(f"waiting choose dept dialog {i}...")
+            _d.find(search_dialog.DIALOG_CSS)
         except NoSuchElementException:
-            _logger.debug("-> can't find dept dialog")
+            _lgr.debug("-> can't find dept dialog")
             try:
-                _logger.debug("checking whether dept is set")
-                khoalamviec = driver.find(".khoaLamViec div span")
+                _lgr.debug("checking whether dept is set")
+                khoalamviec = _d.find(".khoaLamViec div span")
             except NoSuchElementException:
-                _logger.debug("-> can't find set dept, maybe the page is still loading")
+                _lgr.debug("-> can't find set dept, maybe the page is still loading")
                 continue
             else:
-                _logger.debug("-> found set dept, checking whether dept is set right")
+                _lgr.debug("-> found set dept, checking whether dept is set right")
                 if not (dept := dept.strip().lower()).startswith("khoa"):
                     dept = "khoa " + dept
                 if dept in khoalamviec.text.strip().lower():
-                    _logger.info("-> dept is set right")
+                    _lgr.info("-> dept is set right")
                     return
                 else:
-                    _logger.info(f"-> dept is not set to {dept} -> proceed to set dept")
-                    driver.clicking2(".khoaLamViec div svg", "change dept button")
+                    _lgr.info(f"-> dept is not set to {dept} -> proceed to set dept")
+                    _d.clicking2(".khoaLamViec div svg", "change dept button")
                     _set_dept_in_dialog()
                     return
         else:
-            _logger.debug("-> found dept dialog")
+            _lgr.debug("-> found dept dialog")
             _set_dept_in_dialog()
             return
     else:
@@ -110,13 +114,14 @@ def set_dept(driver: Driver, dept: str):
 
 
 @contextmanager
-def session(driver: Driver, username: str, password: str, dept: str):
-    _logger.info("============start session============")
-    login(driver, username, password)
-    driver.goto(danhsachnguoibenhnoitru.URL)
-    set_dept(driver, dept)
+def session(username: str, password: str, dept: str):
+    _lgr.info("============start session============")
+    _d = get_global_driver()
+    login(username, password)
+    _d.goto(danhsachnguoibenhnoitru.URL)
+    set_dept(dept)
     try:
-        yield driver
+        yield
     finally:
-        logout(driver)
-        _logger.info("============end session============")
+        logout()
+        _lgr.info("============end session============")

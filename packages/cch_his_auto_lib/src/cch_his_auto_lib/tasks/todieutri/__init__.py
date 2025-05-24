@@ -1,26 +1,30 @@
 import logging
+
 from selenium.common import NoSuchElementException
 
-from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.driver import get_global_driver
 from cch_his_auto_lib.helper import tracing
 
 URL = "http://emr.ndtp.org/quan-ly-noi-tru/chi-tiet-nguoi-benh-noi-tru/to-dieu-tri"
-_logger = logging.getLogger().getChild("todieutri")
-_trace = tracing(_logger)
+
+_lgr = logging.getLogger().getChild("todieutri")
+_trace = tracing(_lgr)
 
 
-def get_dienbien(driver: Driver) -> str | None:
+def get_dienbien() -> str | None:
+    _d = get_global_driver()
     try:
-        ele = driver.waiting("textarea.dien-bien").text.strip()
+        ele = _d.waiting("textarea.dien-bien").text.strip()
         if ele == "":
             return None
         else:
-            _logger.info(f"dien bien= {ele}")
+            _lgr.info(f"dien bien= {ele}")
             return ele
     except NoSuchElementException:
-        _logger.warning("-> can't find dien bien")
+        _lgr.warning("-> can't find dien bien")
         return None
 
 
-def back(driver: Driver):
-    driver.clicking(".footer-btn .right button:nth-child(2)", "go back button")
+def back():
+    _d = get_global_driver()
+    _d.clicking(".footer-btn .right button:nth-child(2)", "go back button")

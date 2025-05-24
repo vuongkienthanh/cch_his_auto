@@ -1,7 +1,9 @@
 import logging
 import time
-from typing import Protocol, Any
 from pathlib import PurePath
+from contextlib import contextmanager
+import sys
+from typing import Callable
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -15,14 +17,16 @@ from selenium.common import (
 )
 from selenium.webdriver import Keys
 
-_logger = logging.getLogger().getChild("driver")
+# set up logging
+_root_logger = logging.getLogger()
+_out = logging.StreamHandler(sys.stdout)
+_out.setFormatter(
+    logging.Formatter(fmt="{asctime} {name} {levelname}: {message}", style="{")
+)
+_root_logger.addHandler(_out)
+
+_root_logger = _root_logger.getChild("driver")
 GLOBAL_DRIVER: "Driver | None" = None
-
-
-class DriverFn(Protocol):
-    "A function typing hint that accepts Driver as first argument"
-
-    def __call__(self, driver: "Driver", /, *args, **kwargs) -> Any: ...
 
 
 class Driver(webdriver.Chrome):
@@ -35,7 +39,7 @@ class Driver(webdriver.Chrome):
         - `headless`: run driver in headless mode
         - `profile_path`: provide a profile path for more efficient subsequent uses
         """
-        _logger.info("---opening chrome")
+        _root_logger.info("---opening chrome")
         options = webdriver.ChromeOptions()
         options.add_argument("--disable-infobars")
         options.add_argument("--no-sandbox")
@@ -56,7 +60,7 @@ class Driver(webdriver.Chrome):
         super().__init__(options=options)
 
     def quit(self):
-        _logger.info("---driver quiting")
+        _root_logger.info("---driver quiting")
         super().quit()
 
     def find(self, css: str) -> WebElement:
@@ -73,15 +77,15 @@ class Driver(webdriver.Chrome):
         You can also provide a `name` for logging
         """
         try:
-            _logger.debug(f"waiting {name or css}")
+            _root_logger.debug(f"waiting {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         except TimeoutException:
-            _logger.error(f"-> can't find {name or css}")
+            _root_logger.error(f"-> can't find {name or css}")
             raise NoSuchElementException(f"can't find {name or css}")
         except StaleElementReferenceException:
             return self.waiting(css, name)
         else:
-            _logger.debug(f"-> done waiting {name or css}")
+            _root_logger.debug(f"-> done waiting {name or css}")
             return self.find(css)
 
     def wait_closing(self, css: str, /, name: str = "") -> None:
@@ -91,14 +95,14 @@ class Driver(webdriver.Chrome):
         """
         try:
             WebDriverWait(self, 120).until_not(lambda _: self.find(css).is_displayed())
-            _logger.debug(f"closing {name or css}")
+            _root_logger.debug(f"closing {name or css}")
         except TimeoutException:
-            _logger.error(f"-> can't close {name or css}")
+            _root_logger.error(f"-> can't close {name or css}")
             raise Exception(f"can't close {name or css}")
         except StaleElementReferenceException:
             return self.wait_closing(css, name)
         else:
-            _logger.debug(f"-> done closing {name or css}")
+            _root_logger.debug(f"-> done closing {name or css}")
 
     def waiting_to_be(self, css: str, to_be: str, /, name: str = "") -> WebElement:
         """
@@ -106,10 +110,10 @@ class Driver(webdriver.Chrome):
         You can also provide a `name` for logging
         """
         try:
-            _logger.debug(f"waiting {name or css} to be {to_be}")
+            _root_logger.debug(f"waiting {name or css} to be {to_be}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         except TimeoutException:
-            _logger.error(f"-> can't find {name or css}")
+            _root_logger.error(f"-> can't find {name or css}")
             raise NoSuchElementException(f"can't find {name or css}")
         except StaleElementReferenceException:
             return self.waiting_to_be(css, to_be, name)
@@ -117,12 +121,12 @@ class Driver(webdriver.Chrome):
             for _ in range(120):
                 time.sleep(1)
                 if (ele := self.find(css)).text.strip().startswith(to_be.strip()):
-                    _logger.debug(f"-> done waiting {name or css} to be {to_be}")
+                    _root_logger.debug(f"-> done waiting {name or css} to be {to_be}")
                     return ele
             else:
                 txt = self.find(css).text.strip()
                 ctx = f'{name or css} with to_be="{to_be}" is not equal to {txt}'
-                _logger.error(f"-> no such element: {ctx}")
+                _root_logger.error(f"-> no such element: {ctx}")
                 raise NoSuchElementException(ctx)
 
     def clicking(self, css: str, /, name: str = "") -> None:
@@ -131,10 +135,10 @@ class Driver(webdriver.Chrome):
         You can also provide a `name` for logging
         """
         try:
-            _logger.debug(f"clicking {name or css}")
+            _root_logger.debug(f"clicking {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         except TimeoutException:
-            _logger.error(f"-> can't find {name or css}")
+            _root_logger.error(f"-> can't find {name or css}")
             raise NoSuchElementException(f"can't find {name or css}")
         except StaleElementReferenceException:
             return self.clicking(css, name)
@@ -143,10 +147,10 @@ class Driver(webdriver.Chrome):
                 ele = self.find(css)
                 ActionChains(self).scroll_to_element(ele).pause(1).click(ele).perform()
             except NoSuchElementException as e:
-                _logger.error(f"-> can't click {name or css}")
+                _root_logger.error(f"-> can't click {name or css}")
                 raise e
             else:
-                _logger.debug(f"-> done clicking {name or css}")
+                _root_logger.debug(f"-> done clicking {name or css}")
 
     def clicking2(self, css: str, /, name: str = "") -> None:
         """
@@ -154,10 +158,10 @@ class Driver(webdriver.Chrome):
         You can also provide a `name` for logging
         """
         try:
-            _logger.debug(f"clicking non-clickable {name or css}")
+            _root_logger.debug(f"clicking non-clickable {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         except TimeoutException:
-            _logger.error(f"-> can't find {name or css}")
+            _root_logger.error(f"-> can't find {name or css}")
             raise NoSuchElementException(f"can't find {name or css}")
         except StaleElementReferenceException:
             return self.clicking2(css, name)
@@ -169,14 +173,14 @@ class Driver(webdriver.Chrome):
                     document.querySelector('{css}').dispatchEvent(evt);
                 """)
             except Exception as e:
-                _logger.error(f"-> can't click non-clickable {name or css}")
+                _root_logger.error(f"-> can't click non-clickable {name or css}")
                 raise e
             else:
-                _logger.debug(f"-> done clicking non-clickable {name or css}")
+                _root_logger.debug(f"-> done clicking non-clickable {name or css}")
 
     def goto(self, url: str) -> None:
         "Go to `url`"
-        _logger.info(f"---goto {url}")
+        _root_logger.info(f"---goto {url}")
         self.get(url)
         time.sleep(2)
 
@@ -185,7 +189,7 @@ class Driver(webdriver.Chrome):
         Go to a tab different than `main_tab`
         - `main_tab`: you can can this using `driver.current_window_handle`
         """
-        _logger.info("---go to new tab")
+        _root_logger.info("---go to new tab")
         time.sleep(1)
         for window_handle in self.window_handles:
             if window_handle != main_tab:
@@ -193,10 +197,10 @@ class Driver(webdriver.Chrome):
                 time.sleep(2)
                 break
         else:
-            _logger.error("-> can't go to new tab")
+            _root_logger.error("-> can't go to new tab")
             raise Exception("can't go to new tab")
 
-    def goto_newtab_do_smth_then_goback(self, main_tab: str, fn: DriverFn) -> None:
+    def goto_newtab_do_smth_then_goback(self, main_tab: str, fn: Callable) -> None:
         """
         Go to a tab different than `main_tab` and execute `fn`.
         - `main_tab`: you can can this using `driver.current_window_handle`
@@ -205,7 +209,7 @@ class Driver(webdriver.Chrome):
         try:
             fn(self)
         finally:
-            _logger.info("---going back to main tab")
+            _root_logger.info("---going back to main tab")
             self.close()
             self.switch_to.window(main_tab)
             time.sleep(2)
@@ -220,24 +224,44 @@ class Driver(webdriver.Chrome):
 
     def clear_input(self, css: str) -> WebElement:
         "Find element by `css` then clear it"
-        _logger.debug("clearing input")
+        _root_logger.debug("clearing input")
         ele = self.waiting(css)
         ele.send_keys(Keys.CONTROL, "a")
         ele.send_keys(Keys.DELETE)
         time.sleep(2)
         return ele
 
+    @contextmanager
+    def iframe(self, iframe_css: str):
+        "use as contextmanager for going in and out an iframe inside a modal"
+        try:
+            _root_logger.debug("go into iframe")
+            iframe = self.waiting(iframe_css)
+            self.switch_to.frame(iframe)
+            yield
+        finally:
+            _root_logger.debug("go back to parent frame")
+            self.switch_to.parent_frame()
+
 
 def get_global_driver() -> Driver:
     global GLOBAL_DRIVER
-    if GLOBAL_DRIVER is None:
-        raise Exception("GLOBAL_DRIVER is not set")
+    assert GLOBAL_DRIVER is not None, "GLOBAL_DRIVER should be set"
     return GLOBAL_DRIVER
 
 
-def set_global_driver(headless: bool, profile_path: str):
+def set_global_driver(headless: bool, profile_path: str) -> Driver:
     global GLOBAL_DRIVER
     GLOBAL_DRIVER = Driver(headless, profile_path)
+    return GLOBAL_DRIVER
 
 
-__all__ = ["Driver", "DriverFn", "get_global_driver", "set_global_driver"]
+@contextmanager
+def start_global_driver(headless: bool, profile_path: str):
+    try:
+        yield set_global_driver(headless, profile_path)
+    finally:
+        get_global_driver().quit()
+
+
+__all__ = ["Driver", "get_global_driver", "set_global_driver", "start_global_driver"]

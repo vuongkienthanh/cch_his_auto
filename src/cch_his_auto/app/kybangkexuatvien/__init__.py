@@ -11,7 +11,7 @@ from cch_his_auto.common_tasks.navigation import first_patient, next_patient
 
 from . import config
 
-from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.driver import start_global_driver
 from cch_his_auto_lib.tasks.auth import session
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.bot_indieuduong import (
     sign_bangkechiphiBHYT,
@@ -81,23 +81,20 @@ def run(cf: config.Config, run_cfg: RunConfig):
         return
 
     setLogLevel(run_cfg)
-    driver = Driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH)
-    try:
-        with create_connection() as con:
-            with session(driver, cf["username"], cf["password"], cf["department"]):
+    with start_global_driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH):
+        with session(cf["username"], cf["password"], cf["department"]):
+            with create_connection() as con:
                 ma_hs = listing.pop()
-                first_patient(driver, con, ma_hs)
-                process(driver, con, ma_hs)
+                first_patient(con, ma_hs)
+                process(con, ma_hs)
 
                 while len(listing) > 0:
                     ma_hs = listing.pop()
-                    next_patient(driver, con, ma_hs)
-                    process(driver, con, ma_hs)
-    finally:
-        driver.quit()
-        messagebox.showinfo(message="finish")
+                    next_patient(con, ma_hs)
+                    process(con, ma_hs)
+    messagebox.showinfo(message="finish")
 
 
-def process(driver: Driver, con: sqlite3.Connection, ma_hs: int):
-    if signature := try_get_signature(driver, con, ma_hs):
-        sign_bangkechiphiBHYT(driver, True, signature)
+def process(con: sqlite3.Connection, ma_hs: int):
+    if signature := try_get_signature(con, ma_hs):
+        sign_bangkechiphiBHYT(True, signature)

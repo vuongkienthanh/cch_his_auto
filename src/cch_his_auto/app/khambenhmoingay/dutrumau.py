@@ -3,7 +3,8 @@ from typing import cast
 
 from .config import DutruMau
 
-from cch_his_auto.common_ui.item_listframe import ListItem, ListFrame
+from cch_his_auto.common_ui.item_listframe import ListItem
+from .more_listframe import MoreListFrame
 
 HEADERS_STATS = [
     ("url", 200, 1),
@@ -23,28 +24,14 @@ type Size = int
 type Weight = int
 
 
-class Frame(ListFrame):
+class Frame(MoreListFrame):
+    def __init__(self, parent):
+        super().__init__(parent, Line)
     def get_sizes(self) -> list[tuple[str, Size, Weight]]:
         return HEADERS_STATS
 
-    def add_new(self):
-        self.add(Line)
-        self.change_tab_text()
-
-    def add_item(self, item: Item):
-        line = self.add(Line)
-        line.set_item(item)
-        self.change_tab_text()
-
-    def clear(self):
-        super().clear()
-        self.change_tab_text()
-
     def get_title(self) -> str:
         return f"Dự trù máu ({self.count()})"
-
-    def change_tab_text(self):
-        self.master.nametowidget("kcb_nb").tab(0, text=self.get_title())
 
 
 class Line(ListItem):

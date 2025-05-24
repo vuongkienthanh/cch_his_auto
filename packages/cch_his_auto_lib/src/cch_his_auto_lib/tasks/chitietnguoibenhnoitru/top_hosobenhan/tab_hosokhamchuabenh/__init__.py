@@ -1,14 +1,12 @@
 import datetime as dt
 
-from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.driver import get_global_driver
 from cch_his_auto_lib.helper import tracing
-from .. import (
-    _logger,
-)
+from .. import _lgr
 
 TAB_NUMBER = 1
-_logger = _logger.getChild("tab_hosokhamchuabenh")
-_trace = tracing(_logger)
+_lgr = _lgr.getChild("tab_hosokhamchuabenh")
+_trace = tracing(_lgr)
 
 from .helper import (
     filter_check_expand_sign,
@@ -25,214 +23,192 @@ from cch_his_auto_lib.tasks.editor import (
 
 
 @_trace
-def tobiabenhannhikhoa(driver: Driver):
+def tobiabenhannhikhoa():
     "Filter and sign name: *Tờ bìa bệnh án nhi khoa*"
     filter_check_expand_sign(
-        driver,
         name="Tờ bìa bệnh án Nhi khoa",
-        chuaky_fn=lambda driver, i: sign_tab(
-            driver, i, sign_staff_name.tobiabenhannhikhoa
-        ),
+        chuaky_fn=lambda i: sign_tab(i, sign_staff_name.tobiabenhannhikhoa),
     )
 
 
 @_trace
-def mucAbenhannhikhoa(driver: Driver):
+def mucAbenhannhikhoa():
     "Filter and sign name: *Mục A bệnh án nhi khoa*"
     filter_check_expand_sign(
-        driver,
         name="Mục A - Bệnh án Nhi khoa",
-        chuaky_fn=lambda driver, i: sign_tab(
-            driver, i, sign_staff_name.mucAbenhannhikhoa
-        ),
+        chuaky_fn=lambda i: sign_tab(i, sign_staff_name.mucAbenhannhikhoa),
     )
 
 
 @_trace
-def mucBtongketbenhan(driver: Driver):
+def mucBtongketbenhan():
     "Filter and sign name: *Mục B tổng kết bệnh án*"
     filter_check_expand_sign(
-        driver,
         name="Mục B - Tổng kết Bệnh án (Nội khoa, Nhi Khoa, Truyền nhiễm, Sơ sinh, Da liễu, DD-PHCN, HHTM)",
-        chuaky_fn=lambda driver, i: sign_tab(
-            driver, i, sign_staff_name.mucBtongketbenhan
-        ),
+        chuaky_fn=lambda i: sign_tab(i, sign_staff_name.mucBtongketbenhan),
     )
 
 
 @_trace
-def phieukhambenhvaovien(driver: Driver):
+def phieukhambenhvaovien():
     "Filter and sign name: *Phiếu khám bệnh vào viện*"
     filter_check_expand_sign(
-        driver,
         name="Phiếu khám bệnh vào viện",
-        chuaky_fn=lambda driver, _: sign_current(driver),
+        chuaky_fn=lambda _: sign_current(),
     )
 
 
 @_trace
-def phieuchidinhxetnghiem(driver: Driver):
+def phieuchidinhxetnghiem():
     "Filter and sign name: *Phiếu chỉ định xét nghiệm*"
     filter_check_expand_sign(
-        driver,
         name="Phiếu chỉ định xét nghiệm",
-        chuaky_fn=lambda driver, _: sign_current(driver),
+        chuaky_fn=lambda _: sign_current(),
     )
 
 
 @_trace
-def todieutri(driver: Driver, _dt: dt.date | None):
+def todieutri(_dt: dt.date | None):
     "Filter and sign name: *Tờ điều trị*"
+    _d = get_global_driver()
 
-    def chuaky_fn(driver: Driver, i: int):
+    def chuaky_fn(i: int):
         if _dt:
             date = dt.datetime.strptime(
-                driver.find(f".ant-table-tbody tr:nth-child({i}) td:nth-child(2)").text[
+                _d.find(f".ant-table-tbody tr:nth-child({i}) td:nth-child(2)").text[
                     :10
                 ],
                 "%d/%m/%Y",
             ).date()
             if date <= _dt:
-                sign_tab(driver, i, sign_staff_name.todieutri)
+                sign_tab(i, sign_staff_name.todieutri)
             else:
-                _logger.info("=> skip this date")
+                _lgr.info("=> skip this date")
         else:
-            sign_tab(driver, i, sign_staff_name.todieutri)
+            sign_tab(i, sign_staff_name.todieutri)
 
     filter_check_expand_sign(
-        driver,
         name="Tờ điều trị",
-        chuaky_fn=lambda driver, i: chuaky_fn(driver, i),
+        chuaky_fn=lambda i: chuaky_fn(i),
     )
 
 
 @_trace
-def phieuchidinhPTTT(driver: Driver):
+def phieuchidinhPTTT():
     "Filter and sign name: *Phiếu chỉ định PTTT*"
     filter_check_expand_sign(
-        driver,
         name="Phiếu chỉ định PTTT",
-        chuaky_fn=lambda driver, _: sign_current(driver),
+        chuaky_fn=lambda _: sign_current(),
     )
 
 
 @_trace
-def phieuCT(driver: Driver, signature: str | None):
+def phieuCT(signature: str | None):
     "Filter and sign name: *Phiếu chỉ định chụp CT*"
 
-    def dangky_fn(driver):
-        sign_staff_name.phieuCT_bsthuchien(driver)
+    def dangky_fn():
+        sign_staff_name.phieuCT_bsthuchien()
         if signature:
-            sign_patient_name.phieuCT_bn(driver, signature)
+            sign_patient_name.phieuCT_bn(signature)
 
-    def chuaky_fn(driver):
-        sign_staff_name.phieuCT_bschidinh(driver)
-        dangky_fn(driver)
+    def chuaky_fn():
+        sign_staff_name.phieuCT_bschidinh()
+        dangky_fn()
 
     filter_check_expand_sign(
-        driver,
         name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
-        chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
-        dangky_fn=lambda driver, i: sign_tab(driver, i, dangky_fn),
+        chuaky_fn=lambda i: sign_tab(i, chuaky_fn),
+        dangky_fn=lambda i: sign_tab(i, dangky_fn),
     )
 
 
-
-
 @_trace
-def phieuMRI(driver: Driver, signature: str | None):
+def phieuMRI(signature: str | None):
     "Filter and sign name: *Phiếu chỉ định chụp MRI*"
 
-    def dangky_fn(driver):
-        sign_staff_name.phieuMRI_bsthuchien(driver)
+    def dangky_fn():
+        sign_staff_name.phieuMRI_bsthuchien()
         if signature:
-            sign_patient_name.phieuMRI_bn(driver, signature)
+            sign_patient_name.phieuMRI_bn(signature)
 
-    def chuaky_fn(driver):
-        sign_staff_name.phieuMRI_bschidinh(driver)
-        dangky_fn(driver)
+    def chuaky_fn():
+        sign_staff_name.phieuMRI_bschidinh()
+        dangky_fn()
 
     filter_check_expand_sign(
-        driver,
         name="Phiếu chỉ định chụp cộng hưởng từ (MRI)",
-        chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
-        dangky_fn=lambda driver, i: sign_tab(driver, i, dangky_fn),
+        chuaky_fn=lambda i: sign_tab(i, chuaky_fn),
+        dangky_fn=lambda i: sign_tab(i, dangky_fn),
     )
 
 
 @_trace
-def giaiphaubenh(driver: Driver):
+def giaiphaubenh():
     "Filter and sign name: *Phiếu xét nghiệm giải phẫu bệnh sinh thiết*"
     filter_check_expand_sign(
-        driver,
         name="Phiếu xét nghiệm giải phẫu bệnh sinh thiết",
-        chuaky_fn=lambda driver, i: sign_tab(driver, i, sign_staff_name.giaiphaubenh),
+        chuaky_fn=lambda i: sign_tab(i, sign_staff_name.giaiphaubenh),
     )
 
 
 @_trace
-def phieusanglocdinhduong(driver: Driver):
+def phieusanglocdinhduong():
     "Filter and sign name: *Phiếu sàng lọc dinh dưỡng - Bệnh nhi nội trú*"
     filter_check_expand_sign(
-        driver,
         name="Phiếu sàng lọc dinh dưỡng - Bệnh nhi nội trú",
-        chuaky_fn=lambda driver, _: sign_current(driver),
+        chuaky_fn=lambda _: sign_current(),
     )
 
 
 @_trace
-def phieusoket15ngay(driver: Driver):
+def phieusoket15ngay():
     "Filter and sign name: *Phiếu sơ kết 15 ngày điều trị*"
     filter_check_expand_sign(
-        driver,
         name="Phiếu sơ kết 15 ngày điều trị",
-        chuaky_fn=lambda driver, _: sign_current_both(driver),
-        dangky_fn=lambda driver, _: sign_current2(driver),
+        chuaky_fn=lambda _: sign_current_both(),
+        dangky_fn=lambda _: sign_current2(),
     )
 
 
 @_trace
-def donthuoc(driver: Driver):
+def donthuoc():
     "Filter and sign name: *Đơn thuốc*"
     filter_check_expand_sign(
-        driver,
         name="Đơn thuốc",
-        chuaky_fn=lambda driver, _: sign_current(driver),
+        chuaky_fn=lambda _: sign_current(),
     )
 
 
 @_trace
-def phieucamkettruyenmau(driver: Driver, signature: str | None):
+def phieucamkettruyenmau(signature: str | None):
     "Filter and sign name: *Phiếu cam kết truyền máu*"
 
-    def chuaky_fn(driver):
+    def chuaky_fn():
         if signature:
-            check_agreement.check_phieucamkettruyenmau(driver)
-            sign_patient_name.phieucamkettruyenmau_bn(driver, signature)
+            check_agreement.check_phieucamkettruyenmau()
+            sign_patient_name.phieucamkettruyenmau_bn(signature)
 
     filter_check_expand_sign(
-        driver,
         name="Giấy cam đoan chấp nhận truyền máu và các chế phẩm của máu",
-        chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
+        chuaky_fn=lambda i: sign_tab(i, chuaky_fn),
     )
 
 
 @_trace
-def phieucamkettta5(driver: Driver, signature: str | None):
+def phieucamkettta5(signature: str | None):
     "Filter and sign name: *Phiếu cam kết thủ thuật a5*"
 
-    def chuaky_fn(driver):
-        check_agreement.check_phieucamkettta5(driver)
-        sign_staff_name.phieucamkettta5(driver)
-        dangky_fn(driver)
+    def chuaky_fn():
+        check_agreement.check_phieucamkettta5()
+        sign_staff_name.phieucamkettta5()
+        dangky_fn()
 
-    def dangky_fn(driver):
+    def dangky_fn():
         if signature:
-            sign_patient_name.phieucamkettta5(driver, signature)
+            sign_patient_name.phieucamkettta5(signature)
 
     filter_check_expand_sign(
-        driver,
         name="Giấy cam đoan chấp nhận phẫu thuật, thủ thuật và gây mê hồi sức(của BN) (A5)",
-        chuaky_fn=lambda driver, i: sign_tab(driver, i, chuaky_fn),
-        dangky_fn=lambda driver, i: sign_tab(driver, i, dangky_fn),
+        chuaky_fn=lambda i: sign_tab(i, chuaky_fn),
+        dangky_fn=lambda i: sign_tab(i, dangky_fn),
     )

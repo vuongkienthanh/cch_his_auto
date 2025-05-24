@@ -4,91 +4,97 @@ from contextlib import contextmanager
 
 from selenium.common import NoSuchElementException
 
-from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.driver import get_global_driver
 from cch_his_auto_lib.helper import EndOfLoop
 from .. import TOP_BTN_CSS
 
+_lgr = logging.getLogger("top_chitietthongtin")
+
 DIALOG_CSS = ".ant-modal:has(.avatar__image)"
-_logger = logging.getLogger("top_chitietthongtin")
 
 
 @contextmanager
-def session(driver):
+def session():
     "use as contextmanager for open and close chitietthongtin dialog"
     try:
-        yield open_dialog(driver)
+        yield open_dialog()
     finally:
-        close_dialog(driver)
+        close_dialog()
 
 
-def open_dialog(driver: Driver):
-    driver.clicking(
+def open_dialog():
+    _d = get_global_driver()
+    _d.clicking(
         f"{TOP_BTN_CSS}>div:first-child",
         "click Chi tiết thông tin button",
     )
-    driver.waiting(DIALOG_CSS, "Chi tiết thông tin dialog")
+    _d.waiting(DIALOG_CSS, "Chi tiết thông tin dialog")
 
 
-def close_dialog(driver: Driver):
-    driver.clicking(
+def close_dialog():
+    _d = get_global_driver()
+    _d.clicking(
         f"{DIALOG_CSS} .ant-modal-close",
         "close Chi tiết thông tin dialog",
     )
-    driver.wait_closing(DIALOG_CSS)
+    _d.wait_closing(DIALOG_CSS)
 
 
-def get_chieucao(driver: Driver) -> str | None:
+def get_chieucao() -> str | None:
+    _d = get_global_driver()
     for _ in range(30):
         time.sleep(1)
         try:
-            value = driver.find(
+            value = _d.find(
                 f"{DIALOG_CSS} .ant-col:nth-child(5) .ant-row:nth-child(1) .ant-col:nth-child(5) input"
             ).get_attribute("value")
             if value == "":
                 continue
             else:
                 assert value is not None
-                _logger.info(f"-> found chieucao={value}")
+                _lgr.info(f"-> found chieucao={value}")
                 return value
         except NoSuchElementException:
             ...
     else:
-        _logger.warning("-> can't found chieucao")
+        _lgr.warning("-> can't found chieucao")
         return None
 
 
-def get_cannang(driver: Driver) -> str | None:
+def get_cannang() -> str | None:
+    _d = get_global_driver()
     for _ in range(30):
         time.sleep(1)
         try:
-            value = driver.find(
+            value = _d.find(
                 f"{DIALOG_CSS} .ant-col:nth-child(5) .ant-row:nth-child(1) .ant-col:nth-child(6) input"
             ).get_attribute("value")
             if value == "":
                 continue
             else:
                 assert value is not None
-                _logger.info(f"-> found cannang={value}")
+                _lgr.info(f"-> found cannang={value}")
                 return value
         except NoSuchElementException:
             ...
     else:
-        _logger.warning("-> can't found cannang")
+        _lgr.warning("-> can't found cannang")
         return None
 
 
-def get_age_in_month(driver: Driver) -> int:
+def get_age_in_month() -> int:
+    _d = get_global_driver()
     for _ in range(30):
         time.sleep(1)
         try:
-            value = driver.find(
+            value = _d.find(
                 f"{DIALOG_CSS} .ant-col:nth-child(2) .ant-row .ant-col:nth-child(4) input"
             ).get_attribute("value")
             if value == "":
                 continue
             else:
                 assert value is not None
-                _logger.info(f"-> found age={value} tuổi")
+                _lgr.info(f"-> found age={value} tuổi")
                 a = value.strip().split(" ")
                 if len(a) == 1:
                     return int(a[0]) * 12
@@ -103,5 +109,5 @@ def get_age_in_month(driver: Driver) -> int:
         except NoSuchElementException:
             ...
     else:
-        _logger.error("-> can't find age")
+        _lgr.error("-> can't find age")
         raise EndOfLoop("-> can't find age")
