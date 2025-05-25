@@ -6,26 +6,21 @@ from .config import BBHC
 from cch_his_auto.common_ui.item_listframe import ListItem
 from .more_listframe import MoreListFrame
 
-HEADERS_STATS = [("url", 200, 1), ("khac", 200, 2), ("Xóa", 80, 0)]
+HEADER_STATS = [("url", 200, 1), ("khac", 200, 2), ("Xóa", 80, 0)]
 type Item = BBHC
-type Size = int
-type Weight = int
 
 
 class Frame(MoreListFrame):
     def __init__(self, parent):
-        super().__init__(parent, Line)
-
-    def get_sizes(self) -> list[tuple[str, Size, Weight]]:
-        return HEADERS_STATS
+        super().__init__(parent, Line, header_stats=HEADER_STATS)
 
     def get_title(self) -> str:
         return f"Biên bản hội chẩn ({self.count()})"
 
 
 class Line(ListItem):
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.url_var = tk.StringVar()
         self.note_var = tk.StringVar()
 
@@ -45,9 +40,6 @@ class Line(ListItem):
 
         del_btn = tk.Button(self, text="Xóa", command=self.on_del)
         del_btn.grid(row=0, column=2)
-
-    def get_sizes(self) -> list[tuple[Size, Weight]]:
-        return list(map(lambda x: (x[1], x[2]), HEADERS_STATS))
 
     def on_del(self):
         tab_frame = self.master.master.master.master  # pyright: ignore

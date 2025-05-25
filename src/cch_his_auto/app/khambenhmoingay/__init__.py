@@ -53,7 +53,7 @@ class App(tk.Frame):
         tk.Entry(info, textvariable=dept_var).grid(row=1, column=1, sticky="W")
         info.grid(row=0, column=0, sticky="N", pady=20)
 
-        nb = ttk.Notebook(self, name="kcb_nb")
+        nb = ttk.Notebook(self, name="kcb_notebook")
         nb.grid(row=1, column=0, sticky="NSEW")
 
         todieutri_frame = todieutri.Frame(self)

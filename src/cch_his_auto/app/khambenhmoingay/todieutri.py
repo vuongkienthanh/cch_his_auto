@@ -16,24 +16,19 @@ HEADERS_STATS = [
     ("Xóa", 80, 0),
 ]
 type Item = Todieutri
-type Size = int
-type Weight = int
 
 
 class Frame(MoreListFrame):
     def __init__(self, parent):
-        super().__init__(parent, Line)
-
-    def get_sizes(self) -> list[tuple[str, Size, Weight]]:
-        return HEADERS_STATS
+        super().__init__(parent, item_type=Line, header_stats=HEADERS_STATS)
 
     def get_title(self) -> str:
         return f"Tờ điều trị ({self.count()})"
 
 
 class Line(ListItem):
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, parent, column_stats):
+        super().__init__(parent, column_stats)
         self.url_var = tk.StringVar()
         self.note_var = tk.StringVar()
 
@@ -71,9 +66,6 @@ class Line(ListItem):
 
         del_btn = tk.Button(self, text="Xóa", command=self.on_del)
         del_btn.grid(row=0, column=6)
-
-    def get_sizes(self) -> list[tuple[Size, Weight]]:
-        return list(map(lambda x: (x[1], x[2]), HEADERS_STATS))
 
     def on_del(self):
         tab_frame = self.master.master.master.master  # pyright: ignore
