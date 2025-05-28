@@ -10,6 +10,7 @@ from selenium.webdriver import ActionChains
 from cch_his_auto_lib.driver import get_global_driver
 from cch_his_auto_lib.helper import EndOfLoop
 from . import _lgr
+from .fill_info import bienbanhoichan_fill_info, phieudutrucungcapmau_fill_info
 
 
 def _sign(name: str, btn_css: str, btn_txt: str, img_css: str):
@@ -221,6 +222,12 @@ def phieucamkettta5():
     )
 
 
+def bienbanhoichan_fill_info_then_thuky(value: str):
+    "*Biên bản hội chẩn thêm nội dung khác và ký (thư ký)*"
+    bienbanhoichan_fill_info(value)
+    bienbanhoichan_thuky()
+
+
 def bienbanhoichan_thuky():
     "*Biên bản hội chẩn (thư ký)*"
     _sign(
@@ -241,16 +248,62 @@ def bienbanhoichan_truongkhoa():
     )
 
 
-###
-# HIS BUG
-# Sometimes, an wrong bugged signature is presented when status = chuaky
-###
-# def phieudutrucungcapmau(driver: Driver):
-#     "*Phiếu dự trù và cung cấp máu*"
-#     _sign(
-#         driver,
-#         name="phieu du tru cung cap mau",
-#         btn_css=".sign-image button",
-#         btn_txt="Xác nhận ký BÁC SĨ ĐIỀU TRỊ",
-#         img_css=".sign-image img",
-#     )
+def phieudutrucungcapmau():
+    "*Phiếu dự trù và cung cấp máu*"
+    _sign(
+        name="phieu du tru cung cap mau",
+        btn_css=".sign-image button",
+        btn_txt="Xác nhận ký BÁC SĨ ĐIỀU TRỊ",
+        img_css=".sign-image img",
+    )
+
+
+def phieudutrucungcapmau_fill_info_then_sign(
+    duphongphauthuat: bool,
+    nhom1: bool,
+    date: str,
+    datruyenmau: bool,
+    khangthebatthuong: bool,
+    phanungtruyenmau: bool,
+    hcthientai: str,
+    truyenmaucochieuxa: bool,
+    cungnhom: bool,
+):
+    phieudutrucungcapmau_fill_info(
+        duphongphauthuat,
+        nhom1,
+        date,
+        datruyenmau,
+        khangthebatthuong,
+        phanungtruyenmau,
+        hcthientai,
+        truyenmaucochieuxa,
+        cungnhom,
+    )
+    phieudutrucungcapmau()
+
+
+############
+## UNSIGN ##
+############
+
+
+def _unsign(name: str, cancel_btn_css: str, img_css: str):
+    _d = get_global_driver()
+    _lgr.debug(f"unsigning {name}")
+    try:
+        _d.clicking2(img_css)
+    except NoSuchElementException:
+        return
+    else:
+        _d.clicking2(cancel_btn_css)
+        _d.clicking(".ant-modal .ant-btn.warning")
+
+
+def unsign_phieudutrucungcapmau():
+    "*Phiếu dự trù và cung cấp máu*"
+    _unsign(
+        name="phieu du tru cung cap mau",
+        cancel_btn_css=".layout-line-item .layout-line-item:nth-child(20) .info-sign svg",
+        img_css=".sign-image img",
+    )

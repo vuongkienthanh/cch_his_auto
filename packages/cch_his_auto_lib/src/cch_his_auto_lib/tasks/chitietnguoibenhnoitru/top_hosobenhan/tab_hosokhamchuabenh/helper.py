@@ -38,7 +38,7 @@ def sign_current_both():
     sign_current2()
 
 
-def sign_tab(idx: int, sign_fn: Callable):
+def goto_row_then_tabdo(idx: int, sign_fn: Callable):
     _d = get_global_driver()
     tab0 = _d.current_window_handle
     datakey = _d.find(f"{RIGHT_PANEL} tr:nth-child({idx})").get_attribute(

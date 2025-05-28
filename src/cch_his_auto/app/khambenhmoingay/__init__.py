@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 import datetime as dt
 from typing import Literal, get_args
+from functools import partial
 
 from cch_his_auto.app import PROFILE_PATH, _lgr
 from cch_his_auto.global_db import create_connection
@@ -25,7 +26,7 @@ from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
 )
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.top_hosobenhan.tab_hosokhamchuabenh.helper import (
     filter_check_expand_sign,
-    sign_tab,
+    goto_row_then_tabdo,
 )
 from cch_his_auto_lib.tasks.editor import sign_staff_name
 
@@ -135,13 +136,14 @@ def run(cfg: config.Config, run_cfg: RunConfig):
             ):
                 run_bs(cfg)
 
-        if config.is_valid(cfg, "dieuduong"):
-            with auth.session(
-                cfg["dieuduong"]["username"],
-                cfg["dieuduong"]["password"],
-                cfg["department"],
-            ):
-                run_dd(cfg)
+        if any(p["ky_3tra"]["dieuduong"] for p in cfg["todieutri"]):
+            if config.is_valid(cfg, "dieuduong"):
+                with auth.session(
+                    cfg["dieuduong"]["username"],
+                    cfg["dieuduong"]["password"],
+                    cfg["department"],
+                ):
+                    run_dd(cfg)
 
         if any(p["ky_3tra"]["benhnhan"] for p in cfg["todieutri"]):
             for user in get_args(Literal["bacsi", "dieuduong"]):
@@ -153,40 +155,85 @@ def run(cfg: config.Config, run_cfg: RunConfig):
                     ):
                         run_bn(cfg)
                     break
+        if any(cfg["bbhc"]):
+            if config.is_valid(cfg, "truongkhoa"):
+                run_tk(cfg)
     messagebox.showinfo(message="finish")
 
 
 def run_bs(cfg: config.Config):
     driver = get_global_driver()
     d = dt.date.today()
-    for p in cfg["todieutri"]:
-        driver.goto(p["url"])
+
+    _lgr.info("~~~~~ TỜ ĐIỀU TRỊ ~~~~~")
+    for tdt in cfg["todieutri"]:
+        driver.goto(tdt["url"])
         log_patient_name(driver.waiting(".name span").text)
 
-        if p["ky_xn"]:
+        if tdt["ky_xn"]:
             sign_phieuchidinh()
-        if p["ky_todieutri"]:
+        if tdt["ky_todieutri"]:
             sign_todieutri()
-        if any(p["ky_3tra"]["bacsi"]):
-            sign_phieuthuchienylenh_bs(p["ky_3tra"]["bacsi"])
-        if any([p["ky_ct"], p["ky_mri"]]):
+        if any(tdt["ky_3tra"]["bacsi"]):
+            sign_phieuthuchienylenh_bs(tdt["ky_3tra"]["bacsi"])
+        if any([tdt["ky_ct"], tdt["ky_mri"]]):
             with top_hosobenhan.session():
-                if p["ky_ct"]:
+                if tdt["ky_ct"]:
                     filter_check_expand_sign(
                         name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
-                        chuaky_fn=lambda i: sign_tab(
+                        chuaky_fn=lambda i: goto_row_then_tabdo(
                             i, sign_staff_name.phieuCT_bschidinh
                         ),
                         date=d,
                     )
-                if p["ky_mri"]:
+                if tdt["ky_mri"]:
                     filter_check_expand_sign(
                         name="Phiếu chỉ định chụp cộng hưởng từ (MRI)",
-                        chuaky_fn=lambda i: sign_tab(
+                        chuaky_fn=lambda i: goto_row_then_tabdo(
                             i, sign_staff_name.phieuMRI_bschidinh
                         ),
                         date=d,
                     )
+    _lgr.info("~~~~~ DỰ TRÙ MÁU ~~~~~")
+    for dtm in cfg["dutrumau"]:
+        driver.goto(dtm["url"])
+        log_patient_name(driver.waiting(".name span").text)
+        with top_hosobenhan.session():
+            filter_check_expand_sign(
+                "Phiếu dự trù và cung cấp máu",
+                chuaky_fn=lambda i: goto_row_then_tabdo(
+                    i,
+                    partial(
+                        sign_staff_name.phieudutrucungcapmau_fill_info_then_sign,
+                        dtm["duphongphauthuat"],
+                        dtm["nhom1"],
+                        dtm["date"],
+                        dtm["datruyenmau"],
+                        dtm["khangthebatthuong"],
+                        dtm["phanungtruyenmau"],
+                        dtm["hcthientai"],
+                        dtm["truyenmaucochieuxa"],
+                        dtm["cungnhom"],
+                    ),
+                ),
+            )
+
+    _lgr.info("~~~~~ BIÊN BẢN HỘI CHẨN ~~~~~")
+    for bbhc in cfg["bbhc"]:
+        driver.goto(bbhc["url"])
+        log_patient_name(driver.waiting(".name span").text)
+        with top_hosobenhan.session():
+            filter_check_expand_sign(
+                "Biên bản hội chẩn",
+                chuaky_fn=lambda i: goto_row_then_tabdo(
+                    i,
+                    partial(
+                        sign_staff_name.bienbanhoichan_fill_info_then_thuky,
+                        bbhc["khac"],
+                    ),
+                ),
+                date=d,
+            )
 
 
 def run_dd(cfg: config.Config):
@@ -213,6 +260,23 @@ def run_bn(cfg: config.Config):
             if signature := try_get_signature(con, ma_hs):
                 if any(p["ky_3tra"]["benhnhan"]):
                     sign_phieuthuchienylenh_bn(p["ky_3tra"]["benhnhan"], signature)
+
+
+def run_tk(cfg: config.Config):
+    driver = get_global_driver()
+    d = dt.date.today()
+    for bbhc in cfg["bbhc"]:
+        driver.goto(bbhc["url"])
+        log_patient_name(driver.waiting(".name span").text)
+        with top_hosobenhan.session():
+            filter_check_expand_sign(
+                "Biên bản hội chẩn",
+                chuaky_fn=lambda i: goto_row_then_tabdo(
+                    i,
+                    sign_staff_name.bienbanhoichan_truongkhoa,
+                ),
+                date=d,
+            )
 
 
 def log_patient_name(name: str):

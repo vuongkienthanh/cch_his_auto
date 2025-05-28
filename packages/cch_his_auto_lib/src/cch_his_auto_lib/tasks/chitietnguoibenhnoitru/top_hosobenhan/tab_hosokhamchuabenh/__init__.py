@@ -10,7 +10,7 @@ _trace = tracing(_lgr)
 
 from .helper import (
     filter_check_expand_sign,
-    sign_tab,
+    goto_row_then_tabdo,
     sign_current,
     sign_current2,
     sign_current_both,
@@ -18,7 +18,7 @@ from .helper import (
 from cch_his_auto_lib.tasks.editor import (
     sign_staff_name,
     sign_patient_name,
-    check_agreement,
+    fill_info,
 )
 
 
@@ -27,7 +27,7 @@ def tobiabenhannhikhoa():
     "Filter and sign name: *Tờ bìa bệnh án nhi khoa*"
     filter_check_expand_sign(
         name="Tờ bìa bệnh án Nhi khoa",
-        chuaky_fn=lambda i: sign_tab(i, sign_staff_name.tobiabenhannhikhoa),
+        chuaky_fn=lambda i: goto_row_then_tabdo(i, sign_staff_name.tobiabenhannhikhoa),
     )
 
 
@@ -36,7 +36,7 @@ def mucAbenhannhikhoa():
     "Filter and sign name: *Mục A bệnh án nhi khoa*"
     filter_check_expand_sign(
         name="Mục A - Bệnh án Nhi khoa",
-        chuaky_fn=lambda i: sign_tab(i, sign_staff_name.mucAbenhannhikhoa),
+        chuaky_fn=lambda i: goto_row_then_tabdo(i, sign_staff_name.mucAbenhannhikhoa),
     )
 
 
@@ -45,7 +45,7 @@ def mucBtongketbenhan():
     "Filter and sign name: *Mục B tổng kết bệnh án*"
     filter_check_expand_sign(
         name="Mục B - Tổng kết Bệnh án (Nội khoa, Nhi Khoa, Truyền nhiễm, Sơ sinh, Da liễu, DD-PHCN, HHTM)",
-        chuaky_fn=lambda i: sign_tab(i, sign_staff_name.mucBtongketbenhan),
+        chuaky_fn=lambda i: goto_row_then_tabdo(i, sign_staff_name.mucBtongketbenhan),
     )
 
 
@@ -81,11 +81,11 @@ def todieutri(_dt: dt.date | None):
                 "%d/%m/%Y",
             ).date()
             if date <= _dt:
-                sign_tab(i, sign_staff_name.todieutri)
+                goto_row_then_tabdo(i, sign_staff_name.todieutri)
             else:
                 _lgr.info("=> skip this date")
         else:
-            sign_tab(i, sign_staff_name.todieutri)
+            goto_row_then_tabdo(i, sign_staff_name.todieutri)
 
     filter_check_expand_sign(
         name="Tờ điều trị",
@@ -117,8 +117,8 @@ def phieuCT(signature: str | None):
 
     filter_check_expand_sign(
         name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
-        chuaky_fn=lambda i: sign_tab(i, chuaky_fn),
-        dangky_fn=lambda i: sign_tab(i, dangky_fn),
+        chuaky_fn=lambda i: goto_row_then_tabdo(i, chuaky_fn),
+        dangky_fn=lambda i: goto_row_then_tabdo(i, dangky_fn),
     )
 
 
@@ -137,8 +137,8 @@ def phieuMRI(signature: str | None):
 
     filter_check_expand_sign(
         name="Phiếu chỉ định chụp cộng hưởng từ (MRI)",
-        chuaky_fn=lambda i: sign_tab(i, chuaky_fn),
-        dangky_fn=lambda i: sign_tab(i, dangky_fn),
+        chuaky_fn=lambda i: goto_row_then_tabdo(i, chuaky_fn),
+        dangky_fn=lambda i: goto_row_then_tabdo(i, dangky_fn),
     )
 
 
@@ -147,7 +147,7 @@ def giaiphaubenh():
     "Filter and sign name: *Phiếu xét nghiệm giải phẫu bệnh sinh thiết*"
     filter_check_expand_sign(
         name="Phiếu xét nghiệm giải phẫu bệnh sinh thiết",
-        chuaky_fn=lambda i: sign_tab(i, sign_staff_name.giaiphaubenh),
+        chuaky_fn=lambda i: goto_row_then_tabdo(i, sign_staff_name.giaiphaubenh),
     )
 
 
@@ -185,12 +185,12 @@ def phieucamkettruyenmau(signature: str | None):
 
     def chuaky_fn():
         if signature:
-            check_agreement.check_phieucamkettruyenmau()
+            fill_info.check_phieucamkettruyenmau()
             sign_patient_name.phieucamkettruyenmau_bn(signature)
 
     filter_check_expand_sign(
         name="Giấy cam đoan chấp nhận truyền máu và các chế phẩm của máu",
-        chuaky_fn=lambda i: sign_tab(i, chuaky_fn),
+        chuaky_fn=lambda i: goto_row_then_tabdo(i, chuaky_fn),
     )
 
 
@@ -199,7 +199,7 @@ def phieucamkettta5(signature: str | None):
     "Filter and sign name: *Phiếu cam kết thủ thuật a5*"
 
     def chuaky_fn():
-        check_agreement.check_phieucamkettta5()
+        fill_info.check_phieucamkettta5()
         sign_staff_name.phieucamkettta5()
         dangky_fn()
 
@@ -209,6 +209,6 @@ def phieucamkettta5(signature: str | None):
 
     filter_check_expand_sign(
         name="Giấy cam đoan chấp nhận phẫu thuật, thủ thuật và gây mê hồi sức(của BN) (A5)",
-        chuaky_fn=lambda i: sign_tab(i, chuaky_fn),
-        dangky_fn=lambda i: sign_tab(i, dangky_fn),
+        chuaky_fn=lambda i: goto_row_then_tabdo(i, chuaky_fn),
+        dangky_fn=lambda i: goto_row_then_tabdo(i, dangky_fn),
     )
