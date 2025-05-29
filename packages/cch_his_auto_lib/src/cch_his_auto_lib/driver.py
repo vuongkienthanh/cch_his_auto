@@ -207,7 +207,7 @@ class Driver(webdriver.Chrome):
         """
         self.goto_newtab(main_tab)
         try:
-            fn(self)
+            fn()
         finally:
             _root_logger.info("---going back to main tab")
             self.close()
