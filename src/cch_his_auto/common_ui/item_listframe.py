@@ -45,14 +45,18 @@ class ListFrame[T](tk.Frame, ABC):
             headerframe.columnconfigure(i, minsize=width, weight=weight)
             w = tk.Label(headerframe, text=header, relief="raised", anchor="center")
             w.grid(row=0, column=i, sticky="NSEW")
-        headerframe.grid(row=0, column=0, sticky="WE", padx=(0, 15), pady=(15, 0))
-        w = tk.Button(self, text="+", command=self.add_new, background="#d4a5ab")
-        w.grid(row=0, column=1, sticky="NSEW")
-        w = tk.Button(self, text="x", command=self.clear, background="#d4a5ab")
-        w.grid(row=1, column=1, sticky="N")
+        headerframe.grid(row=0, column=0, sticky="WE", padx=(0, 15), pady=(5, 0))
+        btn_frame = tk.Frame(self)
+        btn_frame.grid(row=1, column=1, sticky="NSEW")
+        tk.Button(
+            btn_frame, text="+", command=self.add_new, background="#d4a5ab", width=5
+        ).grid(row=0)
+        tk.Button(
+            btn_frame, text="x", command=self.clear, background="#d4a5ab", width=5
+        ).grid(row=1)
         self.listframe = ScrollFrame(self)
         self.listframe.viewPort.columnconfigure(0, weight=1)
-        self.listframe.grid(row=1, column=0, sticky="NSEW")
+        self.listframe.grid(row=1, column=0, sticky="NSEW", pady=(0, 10))
 
     @cached_property
     def column_stats(self) -> list[tuple[Size, Weight]]:
