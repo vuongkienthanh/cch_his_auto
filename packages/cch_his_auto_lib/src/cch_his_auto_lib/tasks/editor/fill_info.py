@@ -1,6 +1,12 @@
 from cch_his_auto_lib.driver import get_global_driver
 
 
+def check_than_click(css):
+    _d = get_global_driver()
+    if _d.waiting(f"{css} span").text.strip() == "":
+        _d.clicking(css)
+
+
 def bienbanhoichan_fill_info(khac: str):
     _d = get_global_driver()
     _d.clear_input(
@@ -20,10 +26,6 @@ def phieudutrucungcapmau_fill_info(
     cungnhom: bool,
 ):
     _d = get_global_driver()
-
-    def check_than_click(css):
-        if _d.waiting(f"{css} span").text.strip() == "":
-            _d.clicking(css)
 
     duphongphauthuat_css = ".layout-line-item:nth-child(7)>div:nth-child(2) .check-item:nth-child(1) .check-box-contain"
     nhom1_css = ".layout-line-item:nth-child(7)>div:nth-child(2) .check-item:nth-child(2) .check-box-contain"
@@ -79,41 +81,13 @@ def phieudutrucungcapmau_fill_info(
         check_than_click(no)
 
 
-def phieucamkettruyenmau() -> bool:
-    _d = get_global_driver()
-    return (
-        _d.waiting(
-            ".component-page .layout-line-item:nth-child(10) .check-item:first-child .check-box-contain",
-            "agree checkbox",
-        ).text.strip()
-        == "x"
+def phieucamkettruyenmau_fill_info():
+    check_than_click(
+        ".component-page .layout-line-item:nth-child(10) .check-item:first-child .check-box-contain"
     )
 
 
-def check_phieucamkettruyenmau():
-    _d = get_global_driver()
-    if not phieucamkettruyenmau():
-        _d.clicking(
-            ".component-page .layout-line-item:nth-child(10) .check-item:first-child .check-box-contain",
-            "agree checkbox",
-        )
-
-
-def phieucamkettta5() -> bool:
-    _d = get_global_driver()
-    return (
-        _d.waiting(
-            ".component-page .layout-line-item:nth-child(10) .check-item:first-child .check-box-contain",
-            "agree checkbox",
-        ).text.strip()
-        == "x"
+def phieucamkettta5_fill_info():
+    check_than_click(
+        ".component-page .layout-line-item:nth-child(10) .check-item:first-child .check-box-contain"
     )
-
-
-def check_phieucamkettta5():
-    _d = get_global_driver()
-    if not phieucamkettta5():
-        _d.clicking(
-            ".component-page .layout-line-item:nth-child(10) .check-item:first-child .check-box-contain",
-            "agree checkbox",
-        )

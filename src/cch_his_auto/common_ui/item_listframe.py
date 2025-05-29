@@ -49,11 +49,11 @@ class ListFrame[T](tk.Frame, ABC):
         btn_frame = tk.Frame(self)
         btn_frame.grid(row=1, column=1, sticky="NSEW")
         tk.Button(
-            btn_frame, text="+", command=self.add_new, background="#d4a5ab", width=5
-        ).grid(row=0)
+            btn_frame, text="Add", command=self.add_new, background="#d4a5ab", width=5
+        ).grid(row=0, pady=5)
         tk.Button(
-            btn_frame, text="x", command=self.clear, background="#d4a5ab", width=5
-        ).grid(row=1)
+            btn_frame, text="Clear", command=self.clear, background="#d4a5ab", width=5
+        ).grid(row=1, pady=5)
         self.listframe = ScrollFrame(self)
         self.listframe.viewPort.columnconfigure(0, weight=1)
         self.listframe.grid(row=1, column=0, sticky="NSEW", pady=(0, 10))

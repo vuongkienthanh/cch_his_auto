@@ -18,7 +18,6 @@ from .helper import (
 from cch_his_auto_lib.tasks.editor import (
     sign_staff_name,
     sign_patient_name,
-    fill_info,
 )
 
 
@@ -185,8 +184,7 @@ def phieucamkettruyenmau(signature: str | None):
 
     def chuaky_fn():
         if signature:
-            fill_info.check_phieucamkettruyenmau()
-            sign_patient_name.phieucamkettruyenmau_bn(signature)
+            sign_patient_name.phieucamkettruyenmau_fill_info_then_sign_bn(signature)
 
     filter_check_expand_sign(
         name="Giấy cam đoan chấp nhận truyền máu và các chế phẩm của máu",
@@ -199,8 +197,7 @@ def phieucamkettta5(signature: str | None):
     "Filter and sign name: *Phiếu cam kết thủ thuật a5*"
 
     def chuaky_fn():
-        fill_info.check_phieucamkettta5()
-        sign_staff_name.phieucamkettta5()
+        sign_staff_name.phieucamkettta5_fill_info_then_sign()
         dangky_fn()
 
     def dangky_fn():

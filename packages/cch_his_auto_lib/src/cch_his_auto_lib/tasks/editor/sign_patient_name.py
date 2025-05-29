@@ -9,7 +9,7 @@ from selenium.webdriver import ActionChains
 
 from cch_his_auto_lib.driver import get_global_driver
 from cch_his_auto_lib.helper import EndOfLoop
-from . import _lgr
+from . import _lgr, fill_info
 
 
 def sign_canvas(signature: str):
@@ -168,3 +168,13 @@ def phieucamkettta5(signature: str):
         img_css=".sign-image img",
         signature=signature,
     )
+
+
+###########
+## COMBO ##
+###########
+
+
+def phieucamkettruyenmau_fill_info_then_sign_bn(signature: str):
+    fill_info.phieucamkettruyenmau_fill_info()
+    phieucamkettruyenmau_bn(signature)

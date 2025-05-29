@@ -9,8 +9,7 @@ from selenium.webdriver import ActionChains
 
 from cch_his_auto_lib.driver import get_global_driver
 from cch_his_auto_lib.helper import EndOfLoop
-from . import _lgr
-from .fill_info import bienbanhoichan_fill_info, phieudutrucungcapmau_fill_info
+from . import _lgr, fill_info
 
 
 def _sign(name: str, btn_css: str, btn_txt: str, img_css: str):
@@ -222,12 +221,6 @@ def phieucamkettta5():
     )
 
 
-def bienbanhoichan_fill_info_then_thuky(value: str):
-    "*Biên bản hội chẩn thêm nội dung khác và ký (thư ký)*"
-    bienbanhoichan_fill_info(value)
-    bienbanhoichan_thuky()
-
-
 def bienbanhoichan_thuky():
     "*Biên bản hội chẩn (thư ký)*"
     _sign(
@@ -258,31 +251,6 @@ def phieudutrucungcapmau():
     )
 
 
-def phieudutrucungcapmau_fill_info_then_sign(
-    duphongphauthuat: bool,
-    nhom1: bool,
-    date: str,
-    datruyenmau: bool,
-    khangthebatthuong: bool,
-    phanungtruyenmau: bool,
-    hcthientai: str,
-    truyenmaucochieuxa: bool,
-    cungnhom: bool,
-):
-    phieudutrucungcapmau_fill_info(
-        duphongphauthuat,
-        nhom1,
-        date,
-        datruyenmau,
-        khangthebatthuong,
-        phanungtruyenmau,
-        hcthientai,
-        truyenmaucochieuxa,
-        cungnhom,
-    )
-    phieudutrucungcapmau()
-
-
 ############
 ## UNSIGN ##
 ############
@@ -307,3 +275,43 @@ def unsign_phieudutrucungcapmau():
         cancel_btn_css=".layout-line-item .layout-line-item:nth-child(20) .info-sign svg",
         img_css=".sign-image img",
     )
+
+
+###########
+## COMBO ##
+###########
+
+
+def bienbanhoichan_fill_info_then_thuky(khac: str):
+    fill_info.bienbanhoichan_fill_info(khac)
+    bienbanhoichan_thuky()
+
+
+def phieudutrucungcapmau_fill_info_then_sign(
+    duphongphauthuat: bool,
+    nhom1: bool,
+    date: str,
+    datruyenmau: bool,
+    khangthebatthuong: bool,
+    phanungtruyenmau: bool,
+    hcthientai: str,
+    truyenmaucochieuxa: bool,
+    cungnhom: bool,
+):
+    fill_info.phieudutrucungcapmau_fill_info(
+        duphongphauthuat,
+        nhom1,
+        date,
+        datruyenmau,
+        khangthebatthuong,
+        phanungtruyenmau,
+        hcthientai,
+        truyenmaucochieuxa,
+        cungnhom,
+    )
+    phieudutrucungcapmau()
+
+
+def phieucamkettta5_fill_info_then_sign():
+    fill_info.phieucamkettta5_fill_info()
+    phieucamkettta5()
