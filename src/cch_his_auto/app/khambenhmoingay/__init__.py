@@ -82,7 +82,7 @@ class App(tk.Frame):
 
             for w, name in zip(
                 [todieutri_frame, dutrumau_frame, bbhc_frame],
-                ["patients", "dutrumau", "bbhc"],
+                ["todieutri", "dutrumau", "bbhc"],
             ):
                 w.clear()
                 for p in cfg[name]:
