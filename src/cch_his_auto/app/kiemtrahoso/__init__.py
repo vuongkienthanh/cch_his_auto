@@ -120,7 +120,7 @@ def run(cfg: config.Config, run_cfg: RunConfig):
                 process = process_normal_day
             with create_connection() as con:
                 if cfg["discharged"]:
-                    danhsachnguoibenhnoitru.filter_trangthainguoibenh([10])
+                    danhsachnguoibenhnoitru.filter_trangthainguoibenh(True)
 
                 ma_hs = listing.pop()
                 first_patient(con, ma_hs)

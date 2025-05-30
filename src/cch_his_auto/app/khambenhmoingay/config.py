@@ -104,17 +104,17 @@ def is_patient_list_valid(config: Config) -> bool:
     return ((len(config["todieutri"]) + len(config["dutrumau"])) > 0) & (
         all(
             [
-                url(p["url"])
-                and ("chi-tiet-nguoi-benh-noi-tru/to-dieu-tri/" in p["url"])
-                for p in config["todieutri"]
+                url(tdt["url"])
+                and ("chi-tiet-nguoi-benh-noi-tru/to-dieu-tri/" in tdt["url"])
+                for tdt in config["todieutri"]
             ]
         )
         & (
             all(
-                url(p["url"])
-                and ("chi-tiet-nguoi-benh-noi-tru/to-dieu-tri/" in p["url"])
-                and value_error_to_bool(dt.datetime.strptime, p["date"], "%d/%m/%Y")
-                for p in config["dutrumau"]
+                url(dtm["url"])
+                and ("chi-tiet-nguoi-benh-noi-tru/to-dieu-tri/" in dtm["url"])
+                and value_error_to_bool(dt.datetime.strptime, dtm["date"], "%d/%m/%Y")
+                for dtm in config["dutrumau"]
             )
         )
     )

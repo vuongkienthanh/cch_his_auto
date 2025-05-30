@@ -101,8 +101,8 @@ class App(tk.Frame):
                     "password": dieuduong.get_password(),
                 },
                 "truongkhoa": {
-                    "username": dieuduong.get_username(),
-                    "password": dieuduong.get_password(),
+                    "username": truongkhoa.get_username(),
+                    "password": truongkhoa.get_password(),
                 },
                 "department": dept_var.get(),
                 "todieutri": todieutri_frame.get_items(),
