@@ -24,7 +24,7 @@ from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
     top_hosobenhan,
 )
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.top_hosobenhan import (
-    tab_mau,
+    tab_dvkt,
     tab_hosokhamchuabenh,
 )
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.bot_sanglocdinhduong import (
@@ -136,8 +136,8 @@ def process_normal_day(signature: str | None):
     # điền thông tin nhóm máu
     bloodtype = tab_thongtinchung.get_bloodtype()
     if bloodtype is None:
-        with top_hosobenhan.session(tab_mau.TAB_NUMBER):
-            found_bloodtype = tab_mau.get_bloodtype()
+        with top_hosobenhan.session(tab_dvkt.TAB_NUMBER):
+            found_bloodtype = tab_dvkt.get_bloodtype()
         if found_bloodtype is not None:
             with edit_thongtinvaovien.session():
                 edit_thongtinvaovien.set_bloodtype(found_bloodtype)
@@ -185,8 +185,8 @@ def process_final_day(signature: str | None):
     # điền thông tin nhóm máu
     bloodtype = tab_thongtinchung.get_bloodtype()
     if bloodtype is None:
-        with top_hosobenhan.session(tab_mau.TAB_NUMBER):
-            found_bloodtype = tab_mau.get_bloodtype()
+        with top_hosobenhan.session(tab_dvkt.TAB_NUMBER):
+            found_bloodtype = tab_dvkt.get_bloodtype()
         if found_bloodtype is not None:
             with edit_thongtinvaovien.session():
                 edit_thongtinvaovien.set_bloodtype(found_bloodtype)

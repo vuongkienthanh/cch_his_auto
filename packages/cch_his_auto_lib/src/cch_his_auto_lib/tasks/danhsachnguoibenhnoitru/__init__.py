@@ -119,7 +119,7 @@ def filter_patient(ma_hs: int):
     ele.send_keys(str(ma_hs))
     ele.send_keys(Keys.ENTER)
     time.sleep(2)
-    _d.waiting_to_be(
+    _d.waiting_to_startswith(
         ".ant-table-body tbody tr:nth-child(2) td:nth-child(8)",
         str(ma_hs),
         "first row patient id",

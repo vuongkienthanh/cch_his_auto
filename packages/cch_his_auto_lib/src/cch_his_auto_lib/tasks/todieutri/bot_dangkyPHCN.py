@@ -24,7 +24,7 @@ def _open():
 def _cancel():
     _d = get_global_driver()
     _d.clicking(".footer-btn .left button:nth-child(3)", f"{_State.Cancel} button")
-    _d.waiting_to_be(
+    _d.waiting_to_startswith(
         ".footer-btn .left button:nth-child(3)",
         _State.AddNew,
         f"{_State.Cancel} becomes {_State.AddNew}",

@@ -39,7 +39,7 @@ def filter_patient(ma_hs: int):
     _lgr.debug("+++++ typing ma_hs to search entry")
     ele.send_keys(str(ma_hs))
     ele.send_keys(Keys.ENTER)
-    _d.waiting_to_be(
+    _d.waiting_to_startswith(
         f"{DRAWER_CSS} tbody tr:nth-child(2) td:nth-child(3)", str(ma_hs), "patient id"
     )
 

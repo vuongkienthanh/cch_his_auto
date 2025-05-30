@@ -33,7 +33,7 @@ def change_tab(tab: int):
 
 def wait_patient_page_loaded(ma_hs: int):
     _d = get_global_driver()
-    _d.waiting_to_be(
+    _d.waiting_to_startswith(
         "#root .patient-information span:nth-child(2) b",
         str(ma_hs),
         "patient id",

@@ -104,28 +104,30 @@ class Driver(webdriver.Chrome):
         else:
             _root_logger.debug(f"-> done closing {name or css}")
 
-    def waiting_to_be(self, css: str, to_be: str, /, name: str = "") -> WebElement:
+    def waiting_to_startswith(
+        self, css: str, target: str, /, name: str = ""
+    ) -> WebElement:
         """
-        Waiting element by `css` with textContent equals `to_be`.
+        Waiting element by `css` with textContent equals `target`.
         You can also provide a `name` for logging
         """
         try:
-            _root_logger.debug(f"waiting {name or css} to be {to_be}")
+            _root_logger.debug(f"waiting {name or css} to be {target}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
         except TimeoutException:
             _root_logger.error(f"-> can't find {name or css}")
             raise NoSuchElementException(f"can't find {name or css}")
         except StaleElementReferenceException:
-            return self.waiting_to_be(css, to_be, name)
+            return self.waiting_to_startswith(css, target, name)
         else:
             for _ in range(120):
                 time.sleep(1)
-                if (ele := self.find(css)).text.strip().startswith(to_be.strip()):
-                    _root_logger.debug(f"-> done waiting {name or css} to be {to_be}")
+                if (ele := self.find(css)).text.strip().startswith(target.strip()):
+                    _root_logger.debug(f"-> done waiting {name or css} to be {target}")
                     return ele
             else:
                 txt = self.find(css).text.strip()
-                ctx = f'{name or css} with to_be="{to_be}" is not equal to {txt}'
+                ctx = f'{name or css} with target="{target}" is not equal to {txt}'
                 _root_logger.error(f"-> no such element: {ctx}")
                 raise NoSuchElementException(ctx)
 
