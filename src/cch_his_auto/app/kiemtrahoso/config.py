@@ -12,10 +12,7 @@ class Config(TypedDict):
     password: str
     department: str
     listing: str
-    dinhduong: bool
-    nhommau:bool
-    normal_sign:bool
-    final_sign:bool
+    final: bool
 
 
 def save(cfg: Config):
@@ -34,10 +31,7 @@ def load() -> Config:
             "password": "",
             "department": "",
             "listing": "",
-            "dinhduong":False,
-            "nhommau":False,
-            "normal_sign": False,
-            "final_sign": False,
+            "final":False,
         }
 
 
