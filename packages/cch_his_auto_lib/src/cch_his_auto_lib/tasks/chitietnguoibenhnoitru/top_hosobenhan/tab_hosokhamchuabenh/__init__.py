@@ -68,7 +68,7 @@ def phieuchidinhxetnghiem():
 
 @_trace
 def todieutri(_dt: dt.date | None):
-    "Filter and sign name: *Tờ điều trị*"
+    "Filter and sign name: *Tờ điều trị* those before `_dt`"
     _d = get_global_driver()
 
     def chuaky_fn(i: int):
@@ -79,7 +79,7 @@ def todieutri(_dt: dt.date | None):
                 ],
                 "%d/%m/%Y",
             ).date()
-            if date <= _dt:
+            if date < _dt:
                 goto_row_then_tabdo(i, sign_staff_name.todieutri)
             else:
                 _lgr.info("=> skip this date")
