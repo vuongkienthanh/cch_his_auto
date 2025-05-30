@@ -48,11 +48,7 @@ class App(tk.Frame):
 
         mainframe = tk.Frame(self)
         mainframe.grid(row=1, column=0, sticky="NSEW")
-        discharged_var = tk.BooleanVar()
         is_finalday_var = tk.BooleanVar()
-        tk.Checkbutton(mainframe, text="đã xuất viện", variable=discharged_var).grid(
-            row=0, column=0, padx=20, pady=20, sticky="W"
-        )
         tk.Checkbutton(mainframe, text="ngày cuối cùng", variable=is_finalday_var).grid(
             row=0, column=1, padx=20, pady=20, sticky="W"
         )
@@ -74,7 +70,6 @@ class App(tk.Frame):
 
             listing.delete("1.0", "end")
             listing.insert("1.0", cfg["listing"])
-            discharged_var.set(cfg["discharged"])
             is_finalday_var.set(cfg["is_final_day"])
 
             button_frame.load_config()
@@ -85,7 +80,6 @@ class App(tk.Frame):
                 "password": bacsi.get_password(),
                 "department": bacsi.get_department(),
                 "listing": listing.get("1.0", "end"),
-                "discharged": discharged_var.get(),
                 "is_final_day": is_finalday_var.get(),
             }
 
@@ -119,8 +113,7 @@ def run(cfg: config.Config, run_cfg: RunConfig):
             else:
                 process = process_normal_day
             with create_connection() as con:
-                if cfg["discharged"]:
-                    danhsachnguoibenhnoitru.filter_trangthainguoibenh(True)
+                danhsachnguoibenhnoitru.filter_trangthainguoibenh_check_all()
 
                 ma_hs = listing.pop()
                 first_patient(con, ma_hs)

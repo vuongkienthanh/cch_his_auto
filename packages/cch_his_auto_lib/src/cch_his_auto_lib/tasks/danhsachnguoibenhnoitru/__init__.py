@@ -21,7 +21,7 @@ def get_khoalamviec() -> str:
 
 
 @_trace
-def filter_trangthainguoibenh(check_all: bool, indexes: list[int] | None = None):
+def filter_trangthainguoibenh(indexes: list[int]):
     """
     Open *Trạng thái người bệnh*.
     Uncheck all checkboxes, then check those in `indexes`.
@@ -35,22 +35,41 @@ def filter_trangthainguoibenh(check_all: bool, indexes: list[int] | None = None)
         " open menu trạng thái người bệnh",
     )
     _d.waiting(".ant-popover label", "danh sách trạng thái người bệnh")
-    if check_all:
-        _lgr.debug("check all boxes in trạng thái người bệnh")
-        _d.clicking(".check_all .ant-checkbox", "check all")
-    else:
-        assert indexes is not None
 
-        _lgr.debug("uncheck all boxes in trạng thái người bệnh")
-        for ele in _d.find_all(".ant-checkbox-group .ant-checkbox-checked"):
-            ele.click()
+    _lgr.debug("uncheck all boxes in trạng thái người bệnh")
+    for ele in _d.find_all(".ant-checkbox-group .ant-checkbox-checked"):
+        ele.click()
 
-        _lgr.debug("check boxes based on indexes")
-        for i in indexes:
-            _d.clicking(
-                f".ant-checkbox-group label:nth-child({i}) .ant-checkbox",
-                _d.find(f".ant-popover label:nth-child({i})").text,
-            )
+    _lgr.debug("check boxes based on indexes")
+    for i in indexes:
+        _d.clicking(
+            f".ant-checkbox-group label:nth-child({i}) .ant-checkbox",
+            _d.find(f".ant-popover label:nth-child({i})").text,
+        )
+    _d.clicking(
+        ".base-search_component .ant-col:nth-child(7) button",
+        "close menu trạng thái người bệnh",
+    )
+    _d.wait_closing(".ant-popover:has(label:nth-child(10))")
+
+
+@_trace
+def filter_trangthainguoibenh_check_all():
+    """
+    Open *Trạng thái người bệnh*.
+    check all checkboxes
+    Then close it
+    """
+    _d = get_global_driver()
+    _d.clicking(
+        ".base-search_component .ant-col:nth-child(7) button",
+        " open menu trạng thái người bệnh",
+    )
+    _d.waiting(".ant-popover label", "danh sách trạng thái người bệnh")
+    _d.waiting(".check-all .ant-checkbox", "danh sách trạng thái người bệnh")
+    if not _d.find(".check-all .ant-checkbox input").is_selected():
+        _d.clicking(".check-all .ant-checkbox", "check all")
+
     _d.clicking(
         ".base-search_component .ant-col:nth-child(7) button",
         "close menu trạng thái người bệnh",

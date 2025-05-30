@@ -12,7 +12,6 @@ class Config(TypedDict):
     password: str
     department: str
     listing: str
-    discharged: bool
     is_final_day: bool
 
 
@@ -32,7 +31,6 @@ def load() -> Config:
             "password": "",
             "department": "",
             "listing": "",
-            "discharged": False,
             "is_final_day": False,
         }
 
