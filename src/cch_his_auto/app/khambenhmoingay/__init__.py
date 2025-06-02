@@ -136,7 +136,7 @@ def run(cfg: config.Config, run_cfg: RunConfig):
             ):
                 run_bs(cfg)
 
-        if any(p["ky_3tra"]["dieuduong"] for p in cfg["todieutri"]):
+        if any(any(p["ky_3tra"]["dieuduong"]) for p in cfg["todieutri"]):
             if config.is_valid(cfg, "dieuduong"):
                 with auth.session(
                     cfg["dieuduong"]["username"],
@@ -145,7 +145,7 @@ def run(cfg: config.Config, run_cfg: RunConfig):
                 ):
                     run_dd(cfg)
 
-        if any(p["ky_3tra"]["benhnhan"] for p in cfg["todieutri"]):
+        if any(any(p["ky_3tra"]["benhnhan"]) for p in cfg["todieutri"]):
             for user in get_args(Literal["bacsi", "dieuduong"]):
                 if config.is_valid(cfg, user):
                     with auth.session(
@@ -157,7 +157,12 @@ def run(cfg: config.Config, run_cfg: RunConfig):
                     break
         if any(cfg["bbhc"]):
             if config.is_valid(cfg, "truongkhoa"):
-                run_tk(cfg)
+                with auth.session(
+                    cfg["truongkhoa"]["username"],
+                    cfg["truongkhoa"]["password"],
+                    cfg["department"],
+                ):
+                    run_tk(cfg)
     messagebox.showinfo(message="finish")
 
 
