@@ -20,11 +20,11 @@ def get_bloodtype() -> str | None:
     _d.clicking2(f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:last-child svg")
     try:
         abo = _d.waiting(
-            f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(8) td:nth-child(2)"
+            f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(7) td:nth-child(2)"
         ).text
         if (
             _d.waiting(
-                f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(12) td:nth-child(2)"
+                f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(11) td:nth-child(2)"
             ).text.strip()
             == "DƯƠNG TÍNH"
         ):

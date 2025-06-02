@@ -20,6 +20,8 @@ from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.tab_thongtinchung import (
 )
 from . import config
 
+TITLE = "Nhóm máu"
+
 
 def run(cfg: config.Config, run_cfg: RunConfig):
     if not config.is_valid(cfg):
