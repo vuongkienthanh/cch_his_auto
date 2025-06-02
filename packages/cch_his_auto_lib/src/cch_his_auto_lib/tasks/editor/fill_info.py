@@ -10,9 +10,7 @@ def check_than_click(css):
 
 def bienbanhoichan_fill_info(khac: str):
     _d = get_global_driver()
-    # _d.clear_input(
-    #     ".layout-line-item .layout-line-item:nth-child(37) span[contenteditable]"
-    # ).send_keys(khac)
+    _d.waiting(".layout-line-item .layout-line-item:nth-child(37)")
     ActionChains(_d).click(
         _d.find(
             ".layout-line-item .layout-line-item:nth-child(37) span[contenteditable]"

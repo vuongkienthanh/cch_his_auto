@@ -276,7 +276,7 @@ def run_tk(cfg: config.Config):
         with top_hosobenhan.session():
             filter_check_expand_sign(
                 "Biên bản hội chẩn",
-                chuaky_fn=lambda i: goto_row_then_tabdo(
+                dangky_fn=lambda i: goto_row_then_tabdo(
                     i,
                     sign_staff_name.bienbanhoichan_truongkhoa,
                 ),
