@@ -53,7 +53,7 @@ def phieukhambenhvaovien():
     "Filter and sign name: *Phiếu khám bệnh vào viện*"
     filter_check_expand_sign(
         name="Phiếu khám bệnh vào viện",
-        chuaky_fn=lambda _: sign_current(),
+        chuaky_fn=sign_current,
     )
 
 
@@ -62,7 +62,7 @@ def phieuchidinhxetnghiem():
     "Filter and sign name: *Phiếu chỉ định xét nghiệm*"
     filter_check_expand_sign(
         name="Phiếu chỉ định xét nghiệm",
-        chuaky_fn=lambda _: sign_current(),
+        chuaky_fn=sign_current,
     )
 
 
@@ -97,7 +97,7 @@ def phieuchidinhPTTT():
     "Filter and sign name: *Phiếu chỉ định PTTT*"
     filter_check_expand_sign(
         name="Phiếu chỉ định PTTT",
-        chuaky_fn=lambda _: sign_current(),
+        chuaky_fn=sign_current,
     )
 
 
@@ -155,7 +155,7 @@ def phieusanglocdinhduong():
     "Filter and sign name: *Phiếu sàng lọc dinh dưỡng - Bệnh nhi nội trú*"
     filter_check_expand_sign(
         name="Phiếu sàng lọc dinh dưỡng - Bệnh nhi nội trú",
-        chuaky_fn=lambda _: sign_current(),
+        chuaky_fn=sign_current,
     )
 
 
@@ -164,8 +164,8 @@ def phieusoket15ngay():
     "Filter and sign name: *Phiếu sơ kết 15 ngày điều trị*"
     filter_check_expand_sign(
         name="Phiếu sơ kết 15 ngày điều trị",
-        chuaky_fn=lambda _: sign_current_both(),
-        dangky_fn=lambda _: sign_current2(),
+        chuaky_fn=sign_current_both,
+        dangky_fn=sign_current2,
     )
 
 
@@ -174,7 +174,7 @@ def donthuoc():
     "Filter and sign name: *Đơn thuốc*"
     filter_check_expand_sign(
         name="Đơn thuốc",
-        chuaky_fn=lambda _: sign_current(),
+        chuaky_fn=sign_current,
     )
 
 

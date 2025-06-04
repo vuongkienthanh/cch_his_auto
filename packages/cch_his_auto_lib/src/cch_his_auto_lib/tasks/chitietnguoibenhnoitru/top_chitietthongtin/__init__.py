@@ -57,7 +57,7 @@ def get_chieucao() -> str | None:
         except NoSuchElementException:
             ...
     else:
-        _lgr.warning("-> can't found chieucao")
+        _lgr.warning("-> can't find chieucao")
         return None
 
 
@@ -78,7 +78,7 @@ def get_cannang() -> str | None:
         except NoSuchElementException:
             ...
     else:
-        _lgr.warning("-> can't found cannang")
+        _lgr.warning("-> can't find cannang")
         return None
 
 

@@ -19,35 +19,36 @@ def do_nothing(*_):
     _lgr.warning("do nothing")
 
 
-def sign_current():
+def sign_current(i: int):
     _d = get_global_driver()
+    _d.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
     _d.clicking(
         f"{RIGHT_PANEL} .__action button:nth-child(2)", "clicking Ký tên BS dieu tri"
     )
 
 
-def sign_current2():
+def sign_current2(i: int):
     _d = get_global_driver()
+    _d.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
     _d.clicking(
         f"{RIGHT_PANEL} .__action button:nth-child(3)", "clicking Ký tên BS truong khoa"
     )
 
 
-def sign_current_both():
-    sign_current()
-    sign_current2()
+def sign_current_both(i: int):
+    sign_current(i)
+    sign_current2(i)
 
 
-def goto_row_then_tabdo(idx: int, sign_fn: Callable):
+def goto_row_then_tabdo(i: int, sign_fn: Callable):
     _d = get_global_driver()
+    _d.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
     tab0 = _d.current_window_handle
-    datakey = _d.find(f"{RIGHT_PANEL} tr:nth-child({idx})").get_attribute(
-        "data-row-key"
-    )
+    datakey = _d.find(f"{RIGHT_PANEL} tr:nth-child({i})").get_attribute("data-row-key")
     _lgr.debug(f"data row key = {datakey}")
-    _d.clicking(f"{RIGHT_PANEL} tr:nth-child({idx})", f"row {idx - 1}")
+    _d.clicking(f"{RIGHT_PANEL} tr:nth-child({i})", f"row {i - 1}")
     time.sleep(2)
-    _d.clicking(f"a[data-key='{datakey}'] button", f"edit button {idx - 1}")
+    _d.clicking(f"a[data-key='{datakey}'] button", f"edit button {i - 1}")
     _d.goto_newtab_do_smth_then_goback(tab0, sign_fn)
 
 
@@ -144,12 +145,10 @@ def filter_check_expand_sign(
         _lgr.debug(f"checking {name}")
         if is_row_status(i, Status.CHUAKY):
             _lgr.info(f"row condition: not met: {name} -> {Status.CHUAKY}")
-            _d.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
             chuaky_fn(i)
             time.sleep(5)
         elif is_row_status(i, Status.DANGKY):
             _lgr.info(f"row condition: not met: {name} -> {Status.DANGKY}")
-            _d.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
             dangky_fn(i)
             time.sleep(5)
         else:
@@ -161,12 +160,10 @@ def filter_check_expand_sign(
         if name.lstrip().startswith(date.strftime("%d/%m/%Y")):
             if is_row_status(i, Status.CHUAKY):
                 _lgr.info(f"row condition: not met: {name} -> {Status.CHUAKY}")
-                _d.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
                 chuaky_fn(i)
                 time.sleep(5)
             elif is_row_status(i, Status.DANGKY):
                 _lgr.info(f"row condition: not met: {name} -> {Status.DANGKY}")
-                _d.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
                 dangky_fn(i)
                 time.sleep(5)
             else:

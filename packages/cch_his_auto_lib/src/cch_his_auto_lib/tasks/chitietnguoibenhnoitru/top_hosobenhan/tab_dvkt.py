@@ -1,3 +1,4 @@
+from selenium.common import NoSuchElementException
 from cch_his_auto_lib.driver import get_global_driver
 from . import ACTIVE_PANE, _lgr
 
@@ -14,9 +15,13 @@ def get_bloodtype() -> str | None:
     _d.clear_input(
         f"{ACTIVE_PANE} .ant-table-header th:nth-child(2) .custom-header-cell:nth-child(2) input"
     ).send_keys(target)
-    _d.waiting_to_startswith(
-        f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:nth-child(2)", target
-    )
+    try:
+        _d.waiting_to_startswith(
+            f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:nth-child(2)", target
+        )
+    except NoSuchElementException:
+        _lgr.warning("There is no bloodtype test")
+        return None
     _d.clicking2(f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:last-child svg")
     try:
         abo = _d.waiting(
