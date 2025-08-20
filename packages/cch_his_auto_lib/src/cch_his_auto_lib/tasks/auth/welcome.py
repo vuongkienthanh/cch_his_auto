@@ -1,19 +1,13 @@
-import logging
 import time
-from contextlib import contextmanager
 
 from selenium.webdriver.common.by import By
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.tasks import danhsachnguoibenhnoitru
-from cch_his_auto_lib.tracing import tracing
-from cch_his_auto_lib.errors import EndOfLoop
+from cch_his_auto_lib.errors import EndOfLoopException
 
-from . import dept_dialog
+from . import dept_dialog, _lgr, _trace
 
-_lgr = logging.getLogger().getChild("auth")
-_trace = tracing(_lgr)
 
 LOGIN_PANE_CSS = ".login-body"
 
@@ -55,7 +49,7 @@ def login(d: Driver, username: str, password: str):
             d.wait_closing(LOGIN_PANE_CSS, "login page")
             return
     else:
-        raise EndOfLoop("can't log in")
+        raise EndOfLoopException("can't log in")
 
 
 @_trace
@@ -110,17 +104,4 @@ def set_dept(d: Driver, dept: str):
             _set_dept_in_dialog()
             return
     else:
-        raise EndOfLoop("can't set dept")
-
-
-@contextmanager
-def session(d: Driver, username: str, password: str, dept: str):
-    _lgr.info("============start session============")
-    login(d, username, password)
-    d.goto(danhsachnguoibenhnoitru.URL)
-    set_dept(d, dept)
-    try:
-        yield
-    finally:
-        logout(d)
-        _lgr.info("============end session============")
+        raise EndOfLoopException("can't set dept")

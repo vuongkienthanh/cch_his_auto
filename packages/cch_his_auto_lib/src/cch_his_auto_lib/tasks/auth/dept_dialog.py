@@ -1,8 +1,7 @@
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.tracing import _root
 
 
-_lgr = _root.getChild("dept dialog")
+from . import _lgr
 
 DIALOG_CSS = ".ant-modal:has(.ant-modal-body>div>div>div>.ant-select)"
 DIALOG_SEARCH_CSS = f"{DIALOG_CSS} input[type=search]"

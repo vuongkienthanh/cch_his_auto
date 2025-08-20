@@ -1,7 +1,8 @@
 import time
+import logging
 from pathlib import PurePath
 from contextlib import contextmanager
-from typing import Callable, Protocol, Any
+from typing import Protocol, Any
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -15,9 +16,11 @@ from selenium.common import (
 )
 from selenium.webdriver import Keys
 
-from .tracing import _root
+from .tracing import set_up_root_logger
+from .errors import WaitClosingException
 
-_lgr = _root.getChild("driver")
+
+_lgr = logging.getLogger("driver")
 
 
 class Driver(webdriver.Chrome):
@@ -62,6 +65,7 @@ class Driver(webdriver.Chrome):
         """
         Waiting element by `css`.
         You can also provide a `name` for logging
+        Can raise NoSuchElementException
         """
         try:
             _lgr.debug(f"waiting {name or css}")
@@ -79,13 +83,14 @@ class Driver(webdriver.Chrome):
         """
         Wait element by `css` to be closed.
         You can also provide a `name` for logging
+        Can raise WaitClosingException
         """
         try:
-            WebDriverWait(self, 120).until_not(lambda _: self.find(css).is_displayed())
             _lgr.debug(f"closing {name or css}")
+            WebDriverWait(self, 120).until_not(lambda _: self.find(css).is_displayed())
         except TimeoutException:
             _lgr.error(f"-> can't close {name or css}")
-            raise Exception(f"can't close {name or css}")
+            raise WaitClosingException(f"can't close {name or css}")
         except StaleElementReferenceException:
             return self.wait_closing(css, name)
         else:
@@ -95,6 +100,7 @@ class Driver(webdriver.Chrome):
         """
         Waiting element by `css` with textContent startswith `w`.
         You can also provide a `name` for logging
+        Can raise NoSuchElementException
         """
         try:
             _lgr.debug(f"waiting {name or css} to be {w}")
@@ -112,9 +118,7 @@ class Driver(webdriver.Chrome):
                     return ele
             else:
                 txt = self.find(css).text.strip()
-                ctx = (
-                    f"-> can't find {name or css} startswith {w}. Found {txt} instead."
-                )
+                ctx = f"-> found {name or css} but not startswith {w}. Found {txt} instead."
                 _lgr.error(ctx)
                 raise NoSuchElementException(ctx)
 
@@ -122,6 +126,7 @@ class Driver(webdriver.Chrome):
         """
         Clicking element by `css`.
         You can also provide a `name` for logging
+        Can raise NoSuchElementException
         """
         try:
             _lgr.debug(f"clicking {name or css}")
@@ -132,19 +137,15 @@ class Driver(webdriver.Chrome):
         except StaleElementReferenceException:
             return self.clicking(css, name)
         else:
-            try:
-                ele = self.find(css)
-                ActionChains(self).scroll_to_element(ele).pause(1).click(ele).perform()
-            except NoSuchElementException as e:
-                _lgr.error(f"-> can't click {name or css}")
-                raise e
-            else:
-                _lgr.debug(f"-> done clicking {name or css}")
+            ele = self.find(css)
+            ActionChains(self).scroll_to_element(ele).pause(1).click(ele).perform()
+            _lgr.debug(f"-> done clicking {name or css}")
 
     def clicking2(self, css: str, /, name: str = "") -> None:
         """
         Clicking non-clickable element by `css`.
         You can also provide a `name` for logging
+        Can raise NoSuchElementException
         """
         try:
             _lgr.debug(f"clicking non-clickable {name or css}")
@@ -155,17 +156,139 @@ class Driver(webdriver.Chrome):
         except StaleElementReferenceException:
             return self.clicking2(css, name)
         else:
+            self.execute_script(f"""
+                let evt = document.createEvent("MouseEvents");
+                evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                document.querySelector('{css}').dispatchEvent(evt);
+            """)
+            _lgr.debug(f"-> done clicking non-clickable {name or css}")
+
+    def sign_staff_signature(self, btn_css: str, btn_txt: str, img_css: str, name: str):
+        """
+        Try of sign staff, provided:
+        - `btn_css`: the sign button css
+        - `btn_txt`: the text on sign button
+        - `img_css`: the signature css
+        You can also provide a `name` for logging
+        Can raise NoSuchElementException
+        """
+        for _ in range(120):
             try:
-                self.execute_script(f"""
-                    let evt = document.createEvent("MouseEvents");
-                    evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-                    document.querySelector('{css}').dispatchEvent(evt);
-                """)
-            except Exception as e:
-                _lgr.error(f"-> can't click non-clickable {name or css}")
-                raise e
+                _lgr.debug(f"finding {name} button")
+                self.find(btn_css)
+            except NoSuchElementException:
+                _lgr.debug("-> can't find sign button, finding signature instead")
+                try:
+                    self.find(img_css)
+                except NoSuchElementException:
+                    _lgr.debug("-> can't find signature -> next in loop")
+                    time.sleep(1)
+                    continue
+                else:
+                    _lgr.info("-> found signature already signed")
+                    return
             else:
-                _lgr.debug(f"-> done clicking non-clickable {name or css}")
+                break
+        else:
+            raise NoSuchElementException(f"can't find {btn_css}")
+
+        ele = self.find(btn_css)
+        target = btn_txt.strip()
+        for _ in range(120):
+            if ele.text.strip().startswith(target):
+                _lgr.debug("-> found sign button with correct btn_txt")
+                break
+            else:
+                _lgr.debug("-> found sign button but wrong btn_txt -> next in loop")
+                time.sleep(1)
+                continue
+        else:
+            raise NoSuchElementException(f"found {btn_css} but not startswith {target}")
+
+        time.sleep(1)
+        ele.click()
+
+        try:
+            self.waiting(img_css, "signature image")
+        except NoSuchElementException:
+            self.refresh()
+            self.waiting(img_css, "signature image 2nd time")
+
+    def sign_canvas(self, signature: str):
+        "use when patient signature needed to be signed"
+        self.waiting("canvas")
+        script = """
+            let c = document.querySelector('canvas');
+            let ctx = c.getContext('2d');
+            let image = new Image();
+            image.onload = function() {{
+                ctx.drawImage(image, 0, 0, 400, 200);
+            }};
+            image.src = '{signature}'
+            """.format(signature=signature)
+
+        self.execute_script(script)
+        time.sleep(3)
+        self.clicking("canvas")
+        self.clicking(
+            ".ant-modal .bottom-action-right button",
+            "save after finish drawing signature",
+        )
+
+    def sign_patient_signature(
+        self, btn_css: str, btn_txt: str, img_css: str, signature: str, name: str
+    ):
+        """
+        Try of sign patient signature, provided:
+        - `btn_css`: the sign button css
+        - `btn_txt`: the text on sign button
+        - `img_css`: the signature css
+        - `signature`: the signature data
+        You can also provide a `name` for logging
+        Can raise NoSuchElementException
+        """
+        for _ in range(120):
+            try:
+                _lgr.debug(f"finding {name} button")
+                ele = self.find(btn_css)
+            except NoSuchElementException:
+                _lgr.debug("-> can't find sign button, finding signature instead")
+                try:
+                    self.find(img_css)
+                except NoSuchElementException:
+                    _lgr.debug("-> can't find signature -> continue")
+                    time.sleep(1)
+                    continue
+                else:
+                    _lgr.info("-> found signature already signed")
+                    return
+            else:
+                break
+        else:
+            raise NoSuchElementException(f"can't find {btn_css}")
+
+        ele = self.find(btn_css)
+        target = btn_txt.strip()
+        for _ in range(120):
+            if ele.text.strip().startswith(target):
+                _lgr.debug("-> found sign button with correct btn_txt")
+                break
+            else:
+                _lgr.debug("-> found sign button but wrong btn_txt -> next in loop")
+                time.sleep(1)
+                continue
+        else:
+            raise NoSuchElementException(f"found {btn_css} but not startswith {target}")
+
+        time.sleep(1)
+        ele.click()
+        self.sign_canvas(signature)
+
+        try:
+            self.waiting(img_css, "signature image")
+        except NoSuchElementException:
+            self.refresh()
+            self.waiting(img_css, "signature image 2nd time")
 
     def goto(self, url: str) -> None:
         "Go to `url`"
@@ -189,14 +312,14 @@ class Driver(webdriver.Chrome):
             _lgr.error("-> can't go to new tab")
             raise Exception("can't go to new tab")
 
-    def goto_newtab_do_smth_then_goback(self, main_tab: str, f: Callable) -> None:
+    def goto_newtab_do_smth_then_goback(self, main_tab: str, f: "DriverFn") -> None:
         """
         Go to a tab different than `main_tab` and execute `f`.
         - `main_tab`: you can get this by `driver.current_window_handle`
         """
         self.goto_newtab(main_tab)
         try:
-            f()
+            f(self)
         finally:
             _lgr.info("---going back to main tab")
             self.close()
@@ -221,7 +344,7 @@ class Driver(webdriver.Chrome):
         return ele
 
     @contextmanager
-    def iframe(self, iframe_css: str):
+    def iframe(self, iframe_css: str, close_btn_cs: str):
         "use as contextmanager for going in and out an iframe inside a modal"
         try:
             _lgr.debug("go into iframe")
@@ -231,6 +354,8 @@ class Driver(webdriver.Chrome):
         finally:
             _lgr.debug("go back to parent frame")
             self.switch_to.parent_frame()
+            self.find(close_btn_cs).click()
+            self.wait_closing(iframe_css)
 
 
 class DriverFn(Protocol):
@@ -241,8 +366,9 @@ class DriverFn(Protocol):
 
 @contextmanager
 def start_driver(headless: bool, profile_path: str):
+    set_up_root_logger()
+    d = Driver(headless, profile_path)
     try:
-        d = Driver(headless, profile_path)
         yield d
     finally:
         _lgr.info("---driver quiting")

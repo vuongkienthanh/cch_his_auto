@@ -1,17 +1,18 @@
 from selenium.common import NoSuchElementException
 
-from cch_his_auto_lib.driver import get_global_driver
+from cch_his_auto_lib.driver import Driver
+
 from . import goto, _lgr, _trace
 
 
 @_trace
-def get_signature() -> str | None:
-    _d = get_global_driver()
-    main_tab = _d.current_window_handle
-    goto("cam kết chung về nhập viện")
-    _d.goto_newtab(main_tab)
+def get_signature_data(d: Driver) -> str | None:
+    "Get patient signature data in *Cam kết chung khi nhập viện*"
+    main_tab = d.current_window_handle
+    goto(d, "cam kết chung về nhập viện")
+    d.goto_newtab(main_tab)
     try:
-        ele = _d.waiting(".layout-line-item:nth-child(43) img", "patient signature")
+        ele = d.waiting(".layout-line-item:nth-child(43) img", "patient signature")
         ans = ele.get_dom_attribute("src").strip()
         _lgr.info(">>> found patient signature")
         return ans
@@ -19,5 +20,5 @@ def get_signature() -> str | None:
         _lgr.warning("??? can't find patient signature")
         return None
     finally:
-        _d.close()
-        _d.switch_to.window(main_tab)
+        d.close()
+        d.switch_to.window(main_tab)
