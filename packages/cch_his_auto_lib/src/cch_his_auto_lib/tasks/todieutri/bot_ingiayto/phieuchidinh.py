@@ -4,7 +4,7 @@ from enum import StrEnum
 from selenium.common import StaleElementReferenceException
 
 from cch_his_auto_lib.driver import get_global_driver
-from cch_his_auto_lib.helper import EndOfLoop
+from cch_his_auto_lib.tracing import EndOfLoop
 from . import _lgr, _trace, goto
 
 

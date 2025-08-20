@@ -1,7 +1,7 @@
 import time
 
 from cch_his_auto_lib.driver import get_global_driver
-from cch_his_auto_lib.helper import tracing, EndOfLoop
+from cch_his_auto_lib.tracing import tracing, EndOfLoop
 from .. import _lgr
 
 _lgr = _lgr.getChild("ingiayto")

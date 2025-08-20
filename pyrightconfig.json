@@ -1,0 +1,10 @@
+{
+    "pythonVersion": "3.13",
+    "pythonPlatform": "Linux",
+    "typeCheckingMode": "basic",
+    "reportAny": false,
+    "reportExplicitAny": false,
+    "reportUnusedCallResult": false,
+    "reportUnknownMemberType": false,
+    "reportMissingTypeStubs": false
+}

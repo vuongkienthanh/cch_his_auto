@@ -3,7 +3,7 @@ import logging
 from selenium.webdriver import Keys
 
 from cch_his_auto_lib.driver import get_global_driver
-from cch_his_auto_lib.helper import tracing
+from cch_his_auto_lib.tracing import tracing
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import wait_patient_page_loaded
 from .. import TOP_BTN_CSS
 

@@ -1,7 +1,7 @@
 import logging
 
 from cch_his_auto_lib.driver import get_global_driver
-from cch_his_auto_lib.helper import tracing
+from cch_his_auto_lib.tracing import tracing
 from cch_his_auto_lib.tasks import search_menu
 
 _lgr = logging.getLogger("bot_indieuduong")

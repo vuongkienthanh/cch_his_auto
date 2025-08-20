@@ -1,8 +1,17 @@
 import logging
 from typing import Callable
+import sys
+
+# set up logging
+_root = logging.getLogger()
+_out = logging.StreamHandler(sys.stdout)
+_out.setFormatter(
+    logging.Formatter(fmt="{asctime} {name} {levelname}: {message}", style="{")
+)
+_root.addHandler(_out)
 
 
-def tracing(logger: logging.Logger):
+def tracing(logger: logging.Logger) -> Callable:
     "Add logging to functions"
 
     def inner(f: Callable):
@@ -21,7 +30,3 @@ def tracing(logger: logging.Logger):
         return inner2
 
     return inner
-
-
-class EndOfLoop(Exception):
-    "Loop checking css element but not found"

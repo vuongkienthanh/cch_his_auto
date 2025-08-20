@@ -4,7 +4,7 @@ import datetime as dt
 from selenium.webdriver.remote.webelement import WebElement
 
 from cch_his_auto_lib.driver import get_global_driver
-from cch_his_auto_lib.helper import EndOfLoop, tracing
+from cch_his_auto_lib.tracing import EndOfLoop, tracing
 from .. import _lgr, ACTIVE_PANE
 
 TAB_NUMBER = 3

@@ -5,7 +5,7 @@ from selenium.common import StaleElementReferenceException, NoSuchElementExcepti
 from selenium.webdriver import ActionChains, Keys
 
 from cch_his_auto_lib.driver import get_global_driver
-from cch_his_auto_lib.helper import EndOfLoop
+from cch_his_auto_lib.tracing import EndOfLoop
 from . import _lgr, _trace
 
 

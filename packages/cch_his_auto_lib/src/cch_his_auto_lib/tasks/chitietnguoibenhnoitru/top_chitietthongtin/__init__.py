@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import get_global_driver
-from cch_his_auto_lib.helper import EndOfLoop
+from cch_his_auto_lib.tracing import EndOfLoop
 from .. import TOP_BTN_CSS
 
 _lgr = logging.getLogger("top_chitietthongtin")

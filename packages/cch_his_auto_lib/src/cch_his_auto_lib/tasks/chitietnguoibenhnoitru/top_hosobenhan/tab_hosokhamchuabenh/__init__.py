@@ -1,7 +1,7 @@
 import datetime as dt
 
 from cch_his_auto_lib.driver import get_global_driver
-from cch_his_auto_lib.helper import tracing
+from cch_his_auto_lib.tracing import tracing
 from .. import _lgr
 
 TAB_NUMBER = 1

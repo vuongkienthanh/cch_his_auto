@@ -3,7 +3,7 @@ import logging
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import get_global_driver
-from cch_his_auto_lib.helper import tracing
+from cch_his_auto_lib.tracing import tracing
 
 URL = "http://emr.ndtp.org/quan-ly-noi-tru/chi-tiet-nguoi-benh-noi-tru/to-dieu-tri"
 

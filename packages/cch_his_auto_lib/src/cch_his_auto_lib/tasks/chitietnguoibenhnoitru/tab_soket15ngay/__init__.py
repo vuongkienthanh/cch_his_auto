@@ -4,7 +4,7 @@ import datetime as dt
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import get_global_driver
-from cch_his_auto_lib.helper import tracing
+from cch_his_auto_lib.tracing import tracing
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
     change_tab,
     tab_thongtinchung,
