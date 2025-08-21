@@ -3,7 +3,7 @@ import datetime as dt
 
 from selenium.common import NoSuchElementException
 
-from cch_his_auto_lib.driver import get_global_driver
+from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tracing import tracing
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
     change_tab,
@@ -22,11 +22,10 @@ _trace = tracing(_lgr)
 from .phieusoket import save_new_phieusoket
 
 
-def get_last_date() -> dt.date | None:
+def get_last_date(d: Driver) -> dt.date | None:
     "Assume first row is the latest *sơ kết 15 ngày* , get that end_date"
-    _d = get_global_driver()
     try:
-        ele = _d.waiting(
+        ele = d.waiting(
             f"{ACTIVE_PANE} tbody .ant-table-row-level-0:nth-child(2) td:nth-child(9)"
         ).text.strip()
         if ele == "":
@@ -39,10 +38,9 @@ def get_last_date() -> dt.date | None:
         return None
 
 
-def add_new():
+def add_new(d: Driver):
     "Add new *Phiếu sơ kết 15 ngày*"
-    _d = get_global_driver()
-    _d.clicking(f"{ACTIVE_PANE} button")
+    d.clicking(f"{ACTIVE_PANE} button")
 
 
 ###

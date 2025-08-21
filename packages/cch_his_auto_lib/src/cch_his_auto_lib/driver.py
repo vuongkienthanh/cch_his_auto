@@ -163,7 +163,9 @@ class Driver(webdriver.Chrome):
             """)
             _lgr.debug(f"-> done clicking non-clickable {name or css}")
 
-    def sign_staff_signature(self, btn_css: str, btn_txt: str, img_css: str, name: str):
+    def sign_staff_signature(
+        self, btn_css: str, btn_txt: str, img_css: str, name: str = ""
+    ):
         """
         Try of sign staff, provided:
         - `btn_css`: the sign button css
@@ -236,7 +238,12 @@ class Driver(webdriver.Chrome):
         )
 
     def sign_patient_signature(
-        self, btn_css: str, btn_txt: str, img_css: str, signature: str, name: str
+        self,
+        btn_css: str,
+        btn_txt: str,
+        img_css: str,
+        signature: str,
+        name: str = "",
     ):
         """
         Try of sign patient signature, provided:

@@ -1,4 +1,4 @@
-from cch_his_auto_lib.driver import get_global_driver
+from cch_his_auto_lib.driver import Driver
 from . import ACTIVE_PANE, _lgr
 
 TAB_NUMBER = 7

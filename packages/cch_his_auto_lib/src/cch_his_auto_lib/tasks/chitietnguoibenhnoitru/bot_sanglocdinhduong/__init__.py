@@ -101,7 +101,7 @@ def add_all_phieusanglocdinhduong(d: Driver, admission_date: dt.date):
     else:
         next_date = admission_date
 
-    save_new_phieusangloc(next_date, cannang, chieucao, build_machedo(age_in_month))
+    save_new_phieusangloc(d, next_date, cannang, chieucao, build_machedo(age_in_month))
     next_date = next_date + dt.timedelta(days=7)
 
     while next_date <= today:
@@ -109,6 +109,7 @@ def add_all_phieusanglocdinhduong(d: Driver, admission_date: dt.date):
         open_dialog(d)
         add_new(d)
         save_new_phieusangloc(
+            d,
             next_date,
             cannang,
             chieucao,

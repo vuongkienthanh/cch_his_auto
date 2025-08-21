@@ -1,24 +1,23 @@
 from selenium.webdriver import ActionChains, Keys
-from cch_his_auto_lib.driver import get_global_driver
+from cch_his_auto_lib.driver import Driver
 
 
-def check_than_click(css):
-    _d = get_global_driver()
-    if _d.waiting(f"{css} span").text.strip() == "":
-        _d.clicking(css)
+def check_than_click(d: Driver, css):
+    if d.waiting(f"{css} span").text.strip() == "":
+        d.clicking(css)
 
 
-def bienbanhoichan_fill_info(khac: str):
-    _d = get_global_driver()
-    _d.waiting(".layout-line-item .layout-line-item:nth-child(37)")
-    ActionChains(_d).click(
-        _d.find(
+def bienbanhoichan_fill_info(d: Driver, khac: str):
+    d.waiting(".layout-line-item .layout-line-item:nth-child(37)")
+    ActionChains(d).click(
+        d.find(
             ".layout-line-item .layout-line-item:nth-child(37) span[contenteditable]"
         )
     ).send_keys(Keys.CONTROL, "a").send_keys(Keys.DELETE).send_keys(khac).perform()
 
 
 def phieudutrucungcapmau_fill_info(
+    d: Driver,
     duphongphauthuat: bool,
     nhom1: bool,
     date: str,
@@ -29,69 +28,69 @@ def phieudutrucungcapmau_fill_info(
     truyenmaucochieuxa: bool,
     cungnhom: bool,
 ):
-    _d = get_global_driver()
-
     duphongphauthuat_css = ".layout-line-item:nth-child(7)>div:nth-child(2) .check-item:nth-child(1) .check-box-contain"
     nhom1_css = ".layout-line-item:nth-child(7)>div:nth-child(2) .check-item:nth-child(2) .check-box-contain"
     nhom2_css = ".layout-line-item:nth-child(7)>div:nth-child(2) .check-item:nth-child(3) .check-box-contain"
     if duphongphauthuat:
-        check_than_click(duphongphauthuat_css)
+        check_than_click(d, duphongphauthuat_css)
         if nhom1:
-            check_than_click(nhom1_css)
+            check_than_click(d, nhom1_css)
         else:
-            check_than_click(nhom2_css)
-        _d.clicking(".layout-line-item:nth-child(7)>div:nth-child(4) .value-display")
-        _d.clear_input(
+            check_than_click(d, nhom2_css)
+        d.clicking(".layout-line-item:nth-child(7)>div:nth-child(4) .value-display")
+        d.clear_input(
             ".layout-line-item:nth-child(7)>div:nth-child(4) input"
         ).send_keys(date)
 
     yes = ".layout-line-item:nth-child(13)>div:nth-child(2) .check-item:nth-child(1) .check-box-contain"
     no = ".layout-line-item:nth-child(13)>div:nth-child(2) .check-item:nth-child(2) .check-box-contain"
     if datruyenmau:
-        check_than_click(yes)
+        check_than_click(d, yes)
     else:
-        check_than_click(no)
+        check_than_click(d, no)
 
     yes = ".layout-line-item:nth-child(13)>div:nth-child(3) .check-item:nth-child(1) .check-box-contain"
     no = ".layout-line-item:nth-child(13)>div:nth-child(3) .check-item:nth-child(2) .check-box-contain"
     if khangthebatthuong:
-        check_than_click(yes)
+        check_than_click(d, yes)
     else:
-        check_than_click(no)
+        check_than_click(d, no)
 
     yes = ".layout-line-item:nth-child(14)>div:nth-child(4) .check-item:nth-child(1) .check-box-contain"
     no = ".layout-line-item:nth-child(14)>div:nth-child(4) .check-item:nth-child(2) .check-box-contain"
     if phanungtruyenmau:
-        check_than_click(yes)
+        check_than_click(d, yes)
     else:
-        check_than_click(no)
+        check_than_click(d, no)
 
-    _d.clear_input(
+    d.clear_input(
         ".layout-line-item:nth-child(15)>div:nth-child(2) [contenteditable]"
     ).send_keys(hcthientai)
 
     yes = ".layout-line-item:nth-child(16) .check-item:nth-child(1) .check-box-contain"
     no = ".layout-line-item:nth-child(16) .check-item:nth-child(2) .check-box-contain"
     if truyenmaucochieuxa:
-        check_than_click(yes)
+        check_than_click(d, yes)
     else:
-        check_than_click(no)
+        check_than_click(d, no)
 
     yes = ".layout-line-item:nth-child(17) .check-item:nth-child(1) .check-box-contain"
     no = ".layout-line-item:nth-child(17) .check-item:nth-child(2) .check-box-contain"
     if cungnhom:
-        check_than_click(yes)
+        check_than_click(d, yes)
     else:
-        check_than_click(no)
+        check_than_click(d, no)
 
 
-def phieucamkettruyenmau_fill_info():
+def phieucamkettruyenmau_fill_info(d: Driver):
     check_than_click(
-        ".component-page .layout-line-item:nth-child(10) .check-item:first-child .check-box-contain"
+        d,
+        ".component-page .layout-line-item:nth-child(10) .check-item:first-child .check-box-contain",
     )
 
 
-def phieucamkettta5_fill_info():
+def phieucamkettta5_fill_info(d: Driver):
     check_than_click(
-        ".component-page .layout-line-item:nth-child(10) .check-item:first-child .check-box-contain"
+        d,
+        ".component-page .layout-line-item:nth-child(10) .check-item:first-child .check-box-contain",
     )

@@ -1,7 +1,6 @@
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.tasks.editor.sign_patient_name import sign_canvas
 from . import goto, _trace
 
 
@@ -24,7 +23,7 @@ def _sign_bangkechiphiBHYT_patient(d: Driver, signature: str):
     except NoSuchElementException:
         ...
     else:
-        sign_canvas(signature)
+        d.sign_canvas(signature)
     finally:
         d.waiting(".ant-row:nth-child(26) .ant-col:nth-child(4) .sign-image img")
 

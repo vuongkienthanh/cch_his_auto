@@ -2,19 +2,18 @@ import logging
 
 from selenium.common import NoSuchElementException
 
-from cch_his_auto_lib.driver import get_global_driver
+from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tracing import tracing
 
 URL = "http://emr.ndtp.org/quan-ly-noi-tru/chi-tiet-nguoi-benh-noi-tru/to-dieu-tri"
 
-_lgr = logging.getLogger().getChild("todieutri")
+_lgr = logging.getLogger("todieutri")
 _trace = tracing(_lgr)
 
 
-def get_dienbien() -> str | None:
-    _d = get_global_driver()
+def get_dienbien(d: Driver) -> str | None:
     try:
-        ele = _d.waiting("textarea.dien-bien").text.strip()
+        ele = d.waiting("textarea.dien-bien").text.strip()
         if ele == "":
             return None
         else:
@@ -25,6 +24,5 @@ def get_dienbien() -> str | None:
         return None
 
 
-def back():
-    _d = get_global_driver()
-    _d.clicking(".footer-btn .right button:nth-child(2)", "go back button")
+def back(d: Driver):
+    d.clicking(".footer-btn .right button:nth-child(2)", "go back button")

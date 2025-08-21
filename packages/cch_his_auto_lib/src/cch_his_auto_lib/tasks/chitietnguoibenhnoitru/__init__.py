@@ -2,7 +2,7 @@ import logging
 
 from selenium.common import NoSuchElementException
 
-from cch_his_auto_lib.driver import get_global_driver
+from cch_his_auto_lib.driver import Driver
 
 URL = "http://emr.ndtp.org/quan-ly-noi-tru/chi-tiet-nguoi-benh-noi-tru/"
 
@@ -14,10 +14,9 @@ NAV_CSS = f"{MAIN_CSS}>div>div>div>.ant-tabs-nav .ant-tabs-nav-list"
 ACTIVE_PANE = f"{MAIN_CSS}>div>div>div>.ant-tabs-tabpane-active"
 
 
-def is_tab_active(tab: int) -> bool:
-    _d = get_global_driver()
+def is_tab_active(d: Driver, tab: int) -> bool:
     try:
-        _d.waiting(
+        d.waiting(
             f"{NAV_CSS}>div:nth-child({tab})[class='ant-tabs-tab ant-tabs-tab-active']"
         )
         return True
@@ -25,15 +24,13 @@ def is_tab_active(tab: int) -> bool:
         return False
 
 
-def change_tab(tab: int):
-    _d = get_global_driver()
-    _d.clicking(f"{NAV_CSS}>div:nth-child({tab})")
-    assert is_tab_active(tab)
+def change_tab(d: Driver, tab: int):
+    d.clicking(f"{NAV_CSS}>div:nth-child({tab})")
+    assert is_tab_active(d, tab)
 
 
-def wait_patient_page_loaded(ma_hs: int):
-    _d = get_global_driver()
-    _d.waiting_to_startswith(
+def wait_patient_page_loaded(d: Driver, ma_hs: int):
+    d.waiting_to_startswith(
         "#root .patient-information span:nth-child(2) b",
         str(ma_hs),
         "patient id",

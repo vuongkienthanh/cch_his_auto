@@ -1,4 +1,4 @@
-from cch_his_auto_lib.tasks.editor import sign_staff_name
+from cch_his_auto_lib.tasks.editor import sign_staff
 from . import _trace, goto
 
 

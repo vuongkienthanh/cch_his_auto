@@ -4,8 +4,8 @@ from contextlib import contextmanager
 
 from selenium.common import NoSuchElementException
 
-from cch_his_auto_lib.driver import get_global_driver
-from cch_his_auto_lib.tracing import EndOfLoop
+from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.errors import EndOfLoopException
 from .. import TOP_BTN_CSS
 
 _lgr = logging.getLogger("top_chitietthongtin")
@@ -14,38 +14,35 @@ DIALOG_CSS = ".ant-modal:has(.avatar__image)"
 
 
 @contextmanager
-def session():
+def session(d: Driver):
     "use as contextmanager for open and close chitietthongtin dialog"
     try:
-        yield open_dialog()
+        yield open_dialog(d)
     finally:
-        close_dialog()
+        close_dialog(d)
 
 
-def open_dialog():
-    _d = get_global_driver()
-    _d.clicking(
+def open_dialog(d: Driver):
+    d.clicking(
         f"{TOP_BTN_CSS}>div:first-child",
         "click Chi tiết thông tin button",
     )
-    _d.waiting(DIALOG_CSS, "Chi tiết thông tin dialog")
+    d.waiting(DIALOG_CSS, "Chi tiết thông tin dialog")
 
 
-def close_dialog():
-    _d = get_global_driver()
-    _d.clicking(
+def close_dialog(d: Driver):
+    d.clicking(
         f"{DIALOG_CSS} .ant-modal-close",
         "close Chi tiết thông tin dialog",
     )
-    _d.wait_closing(DIALOG_CSS)
+    d.wait_closing(DIALOG_CSS)
 
 
-def get_chieucao() -> str | None:
-    _d = get_global_driver()
+def get_chieucao(d: Driver) -> str | None:
     for _ in range(30):
         time.sleep(1)
         try:
-            value = _d.find(
+            value = d.find(
                 f"{DIALOG_CSS} .ant-col:nth-child(5) .ant-row:nth-child(1) .ant-col:nth-child(5) input"
             ).get_attribute("value")
             if value == "":
@@ -61,12 +58,11 @@ def get_chieucao() -> str | None:
         return None
 
 
-def get_cannang() -> str | None:
-    _d = get_global_driver()
+def get_cannang(d: Driver) -> str | None:
     for _ in range(30):
         time.sleep(1)
         try:
-            value = _d.find(
+            value = d.find(
                 f"{DIALOG_CSS} .ant-col:nth-child(5) .ant-row:nth-child(1) .ant-col:nth-child(6) input"
             ).get_attribute("value")
             if value == "":
@@ -82,12 +78,11 @@ def get_cannang() -> str | None:
         return None
 
 
-def get_age_in_month() -> int:
-    _d = get_global_driver()
+def get_age_in_month(d: Driver) -> int:
     for _ in range(30):
         time.sleep(1)
         try:
-            value = _d.find(
+            value = d.find(
                 f"{DIALOG_CSS} .ant-col:nth-child(2) .ant-row .ant-col:nth-child(4) input"
             ).get_attribute("value")
             if value == "":
@@ -110,4 +105,4 @@ def get_age_in_month() -> int:
             ...
     else:
         _lgr.error("-> can't find age")
-        raise EndOfLoop("-> can't find age")
+        raise EndOfLoopException("-> can't find age")

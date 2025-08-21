@@ -3,8 +3,8 @@ from enum import StrEnum
 
 from selenium.common import StaleElementReferenceException
 
-from cch_his_auto_lib.driver import get_global_driver
-from cch_his_auto_lib.tracing import EndOfLoop
+from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.errors import EndOfLoopException
 from . import _lgr, _trace, goto
 
 
@@ -14,22 +14,21 @@ class State(StrEnum):
 
 
 @_trace
-def sign_phieuchidinh():
+def sign_phieuchidinh(d: Driver):
     "Inside *tờ điều trị*, try to sign *phiếu chỉ định* in sequence"
-    _d = get_global_driver()
 
     def close_dialog():
-        _d.clicking(
+        d.clicking(
             ".ant-modal-close:has(~.ant-modal-body .__list)",
             "close dialog button",
         )
-        _d.wait_closing(".ant-modal-body .__list", "phieu chi dinh dialog")
+        d.wait_closing(".ant-modal-body .__list", "phieu chi dinh dialog")
 
-    goto(name="Phiếu chỉ định")
+    goto(d, name="Phiếu chỉ định")
     for i in range(120):
         time.sleep(1)
         _lgr.debug(f"checking button state {i}...")
-        for ele in _d.find_all(".__button button"):
+        for ele in d.find_all(".__button button"):
             try:
                 if ele.text == State.Cancel:
                     _lgr.debug(f"button state is {State.Cancel}")
@@ -45,4 +44,4 @@ def sign_phieuchidinh():
                 _lgr.warning(f"get {e}")
     else:
         close_dialog()
-        raise EndOfLoop("can't sign phieuchidinh while in dialog")
+        raise EndOfLoopException("can't sign phieuchidinh while in dialog")
