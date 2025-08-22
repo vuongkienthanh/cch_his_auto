@@ -11,7 +11,7 @@ class UsernamePasswordFrame(tk.LabelFrame):
         tk.Label(self, text="username").grid(row=0, column=0)
         tk.Entry(self, textvariable=self.username_var).grid(row=0, column=1)
         tk.Label(self, text="password").grid(row=1, column=0)
-        tk.Entry(self, show="*", textvariable=self.password_var).grid(row=1, column=1)
+        tk.Entry(self, textvariable=self.password_var).grid(row=1, column=1)
 
     def get_username(self):
         return self.username_var.get()

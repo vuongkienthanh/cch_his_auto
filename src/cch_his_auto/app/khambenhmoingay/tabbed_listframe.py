@@ -1,15 +1,16 @@
 from cch_his_auto.common_ui.item_listframe import ListFrame, ListItem
 
 
-class MoreListFrame(ListFrame):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class TabbedListFrame(ListFrame):
+    "ListFrame with title and tab index"
+
+    def __init__(self, parent, title: str, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+        self.title = title
         self.tab_index: int | None = None
 
-    def get_title(self) -> str: ...
-
-    def set_tab_index(self, i: int):
-        self.tab_index = i
+    def get_title_with_count(self) -> str:
+        return f"{self.title} ({self.count()})"
 
     def add_new(self) -> ListItem:
         line = super().add_new()
@@ -25,4 +26,4 @@ class MoreListFrame(ListFrame):
         self.change_tab_text()
 
     def change_tab_text(self):
-        self.master.nametowidget("kcb_notebook").tab(self.tab_index, text=self.get_title())
+        self.master.tab("current", text=self.get_title_with_count())  # type:ignore

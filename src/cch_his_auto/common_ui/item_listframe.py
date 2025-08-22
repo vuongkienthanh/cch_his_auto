@@ -1,21 +1,21 @@
 import tkinter as tk
 from abc import ABC, abstractmethod
 from typing import cast
-from functools import cached_property
 
 from cch_his_auto.common_ui.scrollable_frame import ScrollFrame
 
 type Size = int
 type Weight = int
+type Header_stats = list[tuple[str, Size, Weight]]
 
 
 class ListItem[T](tk.Frame, ABC):
+    "abstract class for an item frame in ListFrame"
+
     @abstractmethod
-    def __init__(self, parent, column_stats: list[tuple[Size, Weight]]):
+    def __init__(self, parent):
         "derive this and add more widgets"
         super().__init__(parent)
-        for i, (width, weight) in enumerate(column_stats):
-            self.columnconfigure(i, minsize=width, weight=weight)
 
     @abstractmethod
     def set_item(self, item: T):
@@ -25,23 +25,32 @@ class ListItem[T](tk.Frame, ABC):
     def get_item(self) -> T:
         "return a dict with contained info"
 
+    def _config(self, stats: Header_stats):
+        for i, (_, width, weight) in enumerate(stats):
+            self.columnconfigure(i, minsize=width, weight=weight)
 
-class ListFrame[T](tk.Frame, ABC):
+
+class ListFrame[T](tk.Frame):
+    """
+    The container for derived ListItem.
+    After you derive a ListItem and set up Header_stat, you can use this as it is
+    """
+
     def __init__(
         self,
         parent,
         item_type: type[ListItem],
-        header_stats: list[tuple[str, Size, Weight]],
+        stats: Header_stats,
         *args,
         **kwargs,
     ):
         super().__init__(parent, *args, *kwargs)
         self.item_type = item_type
-        self.header_stats = header_stats
+        self.stats = stats
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
         headerframe = tk.Frame(self)
-        for i, (header, width, weight) in enumerate(header_stats):
+        for i, (header, width, weight) in enumerate(stats):
             headerframe.columnconfigure(i, minsize=width, weight=weight)
             w = tk.Label(headerframe, text=header, relief="raised", anchor="center")
             w.grid(row=0, column=i, sticky="NSEW")
@@ -58,12 +67,9 @@ class ListFrame[T](tk.Frame, ABC):
         self.listframe.viewPort.columnconfigure(0, weight=1)
         self.listframe.grid(row=1, column=0, sticky="NSEW", pady=(0, 10))
 
-    @cached_property
-    def column_stats(self) -> list[tuple[Size, Weight]]:
-        return list(map(lambda x: (x[1], x[2]), self.header_stats))
-
     def add_new(self) -> ListItem:
-        line = self.item_type(self.listframe.viewPort, self.column_stats)
+        line = self.item_type(self.listframe.viewPort)
+        line._config(self.stats)
         line.grid(row=len(self.listframe.viewPort.grid_slaves()), column=0, sticky="EW")
         return line
 

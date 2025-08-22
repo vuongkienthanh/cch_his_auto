@@ -2,17 +2,17 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 import datetime as dt
 from typing import Literal, get_args
-from functools import partial
 
 from cch_his_auto.app import PROFILE_PATH, _lgr
 from cch_his_auto.global_db import create_connection
 from cch_his_auto.common_ui.staff_info import UsernamePasswordFrame
-from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig, setLogLevel
+from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig
 from cch_his_auto.common_tasks.signature import try_get_signature
 
-from . import config, todieutri, dutrumau, bbhc
+from . import config, todieutri
+from .tabbed_listframe import TabbedListFrame
 
-from cch_his_auto_lib.driver import start_global_driver, get_global_driver
+from cch_his_auto_lib.driver import Driver, start_driver
 from cch_his_auto_lib.tasks import auth
 from cch_his_auto_lib.tasks.todieutri.bot_ingiayto import (
     sign_todieutri,
@@ -28,7 +28,7 @@ from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.top_hosobenhan.tab_hosokhamch
     filter_check_expand_sign,
     goto_row_then_tabdo,
 )
-from cch_his_auto_lib.tasks.editor import sign_staff_name
+from cch_his_auto_lib.tasks.editor import sign_staff
 
 
 TITLE = "Khám bệnh mỗi ngày"
@@ -43,10 +43,8 @@ class App(tk.Frame):
         info = tk.LabelFrame(self, text="Thông tin đăng nhập")
         bacsi = UsernamePasswordFrame(info, text="Bác sĩ")
         dieuduong = UsernamePasswordFrame(info, text="Điều dưỡng")
-        truongkhoa = UsernamePasswordFrame(info, text="Trưởng khoa")
         bacsi.grid(row=0, column=0)
         dieuduong.grid(row=0, column=1)
-        truongkhoa.grid(row=0, column=2)
         dept_var = tk.StringVar()
         tk.Label(info, text="Khoa lâm sàng:", justify="right").grid(
             row=1, column=0, sticky="E"
@@ -54,16 +52,18 @@ class App(tk.Frame):
         tk.Entry(info, textvariable=dept_var).grid(row=1, column=1, sticky="W")
         info.grid(row=0, column=0, sticky="N", pady=20)
 
-        nb = ttk.Notebook(self, name="kcb_notebook")
+        nb = ttk.Notebook(self)
         nb.grid(row=1, column=0, sticky="NSEW")
 
-        todieutri_frame = todieutri.Frame(self)
-        dutrumau_frame = dutrumau.Frame(self)
-        bbhc_frame = bbhc.Frame(self)
+        todieutri_frame = TabbedListFrame(
+            nb,
+            title="Tờ điều trị",
+            item_type=todieutri.Line,
+            stats=todieutri.HEADERS_STATS,
+        )
 
-        for i, t in enumerate([todieutri_frame, dutrumau_frame, bbhc_frame]):
-            t.set_tab_index(i)
-            nb.add(t, text=t.get_title(), sticky="NSEW")
+        for i, t in enumerate([todieutri_frame]):
+            nb.add(t, text=t.get_title_with_count(), sticky="NSEW")
 
         button_frame = ButtonFrame(self)
         button_frame.grid(row=0, column=1, rowspan=2, padx=20, sticky="S", pady=(0, 20))
@@ -71,22 +71,15 @@ class App(tk.Frame):
         def load():
             cfg = config.load()
 
-            for w, name in zip(
-                [bacsi, dieuduong, truongkhoa],  # widgets
-                ["bacsi", "dieuduong", "truongkhoa"],  # dict names
-            ):
-                w.set_username(cfg[name]["username"])
-                w.set_password(cfg[name]["password"])
-
+            bacsi.set_username(cfg["bacsi"]["username"])
+            bacsi.set_password(cfg["bacsi"]["password"])
+            dieuduong.set_username(cfg["dieuduong"]["username"])
+            dieuduong.set_password(cfg["dieuduong"]["password"])
             dept_var.set(cfg["department"])
 
-            for w, name in zip(
-                [todieutri_frame, dutrumau_frame, bbhc_frame],
-                ["todieutri", "dutrumau", "bbhc"],
-            ):
-                w.clear()
-                for p in cfg[name]:
-                    w.add_item(p)
+            todieutri_frame.clear()
+            for item in cfg["todieutri"]:
+                todieutri_frame.add_item(item)
 
             button_frame.load_config()
 
@@ -100,14 +93,8 @@ class App(tk.Frame):
                     "username": dieuduong.get_username(),
                     "password": dieuduong.get_password(),
                 },
-                "truongkhoa": {
-                    "username": truongkhoa.get_username(),
-                    "password": truongkhoa.get_password(),
-                },
                 "department": dept_var.get(),
                 "todieutri": todieutri_frame.get_items(),
-                "dutrumau": dutrumau_frame.get_items(),
-                "bbhc": bbhc_frame.get_items(),
             }
 
         def save():
@@ -126,165 +113,101 @@ def run(cfg: config.Config, run_cfg: RunConfig):
         messagebox.showerror(message="Sai data đầu vào")
         return
 
-    setLogLevel(run_cfg)
-    with start_global_driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH):
+    with start_driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH) as d:
         if config.is_valid(cfg, "bacsi"):
             with auth.session(
+                d,
                 cfg["bacsi"]["username"],
                 cfg["bacsi"]["password"],
                 cfg["department"],
             ):
-                run_bs(cfg)
+                run_bs(d, cfg)
 
         if any(any(p["ky_3tra"]["dieuduong"]) for p in cfg["todieutri"]):
             if config.is_valid(cfg, "dieuduong"):
                 with auth.session(
+                    d,
                     cfg["dieuduong"]["username"],
                     cfg["dieuduong"]["password"],
                     cfg["department"],
                 ):
-                    run_dd(cfg)
+                    run_dd(d, cfg)
 
         if any(any(p["ky_3tra"]["benhnhan"]) for p in cfg["todieutri"]):
             for user in get_args(Literal["bacsi", "dieuduong"]):
                 if config.is_valid(cfg, user):
                     with auth.session(
+                        d,
                         cfg[user]["username"],
                         cfg[user]["password"],
                         cfg["department"],
                     ):
-                        run_bn(cfg)
+                        run_bn(d, cfg)
                     break
-        if any(cfg["bbhc"]):
-            if config.is_valid(cfg, "truongkhoa"):
-                with auth.session(
-                    cfg["truongkhoa"]["username"],
-                    cfg["truongkhoa"]["password"],
-                    cfg["department"],
-                ):
-                    run_tk(cfg)
     messagebox.showinfo(message="finish")
 
 
-def run_bs(cfg: config.Config):
-    driver = get_global_driver()
-    d = dt.date.today()
+def run_bs(d: Driver, cfg: config.Config):
+    today = dt.date.today()
 
     _lgr.info("~~~~~ TỜ ĐIỀU TRỊ ~~~~~")
     for tdt in cfg["todieutri"]:
-        driver.goto(tdt["url"])
-        log_patient_name(driver.waiting(".name span").text)
+        d.goto(tdt["url"])
+        _log_patient_name(d.waiting(".name span").text)
 
         if tdt["ky_xn"]:
-            sign_phieuchidinh()
+            sign_phieuchidinh(d)
         if tdt["ky_todieutri"]:
-            sign_todieutri()
+            sign_todieutri(d)
         if any(tdt["ky_3tra"]["bacsi"]):
-            sign_phieuthuchienylenh_bs(tdt["ky_3tra"]["bacsi"])
+            sign_phieuthuchienylenh_bs(d, tdt["ky_3tra"]["bacsi"])
         if any([tdt["ky_ct"], tdt["ky_mri"]]):
-            with top_hosobenhan.session():
+            with top_hosobenhan.session(d):
                 if tdt["ky_ct"]:
                     filter_check_expand_sign(
+                        d,
                         name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
-                        chuaky_fn=lambda i: goto_row_then_tabdo(
-                            i, sign_staff_name.phieuCT_bschidinh
+                        chuaky_fn=lambda d, i: goto_row_then_tabdo(
+                            d, i, sign_staff.phieuCT_bschidinh
                         ),
-                        date=d,
+                        date=today,
                     )
                 if tdt["ky_mri"]:
                     filter_check_expand_sign(
+                        d,
                         name="Phiếu chỉ định chụp cộng hưởng từ (MRI)",
-                        chuaky_fn=lambda i: goto_row_then_tabdo(
-                            i, sign_staff_name.phieuMRI_bschidinh
+                        chuaky_fn=lambda d, i: goto_row_then_tabdo(
+                            d, i, sign_staff.phieuMRI_bschidinh
                         ),
-                        date=d,
+                        date=today,
                     )
-    _lgr.info("~~~~~ DỰ TRÙ MÁU ~~~~~")
-    for dtm in cfg["dutrumau"]:
-        driver.goto(dtm["url"])
-        log_patient_name(driver.waiting(".name span").text)
-        with top_hosobenhan.session():
-            filter_check_expand_sign(
-                "Phiếu dự trù và cung cấp máu",
-                chuaky_fn=lambda i: goto_row_then_tabdo(
-                    i,
-                    partial(
-                        sign_staff_name.phieudutrucungcapmau_fill_info_then_sign,
-                        dtm["duphongphauthuat"],
-                        dtm["nhom1"],
-                        dtm["date"],
-                        dtm["datruyenmau"],
-                        dtm["khangthebatthuong"],
-                        dtm["phanungtruyenmau"],
-                        dtm["hcthientai"],
-                        dtm["truyenmaucochieuxa"],
-                        dtm["cungnhom"],
-                    ),
-                ),
-            )
-
-    _lgr.info("~~~~~ BIÊN BẢN HỘI CHẨN ~~~~~")
-    for bbhc in cfg["bbhc"]:
-        driver.goto(bbhc["url"])
-        log_patient_name(driver.waiting(".name span").text)
-        with top_hosobenhan.session():
-            filter_check_expand_sign(
-                "Biên bản hội chẩn",
-                chuaky_fn=lambda i: goto_row_then_tabdo(
-                    i,
-                    partial(
-                        sign_staff_name.bienbanhoichan_fill_info_then_thuky,
-                        bbhc["khac"],
-                    ),
-                ),
-                date=d,
-            )
 
 
-def run_dd(cfg: config.Config):
-    driver = get_global_driver()
+def run_dd(d: Driver, cfg: config.Config):
     for p in cfg["todieutri"]:
         if any(p["ky_3tra"]["dieuduong"]):
-            driver.goto(p["url"])
-            log_patient_name(driver.waiting(".name span").text)
-            sign_phieuthuchienylenh_dd(p["ky_3tra"]["dieuduong"])
+            d.goto(p["url"])
+            _log_patient_name(d.waiting(".name span").text)
+            sign_phieuthuchienylenh_dd(d, p["ky_3tra"]["dieuduong"])
 
 
-def run_bn(cfg: config.Config):
-    driver = get_global_driver()
+def run_bn(d: Driver, cfg: config.Config):
     with create_connection() as con:
         for p in cfg["todieutri"]:
-            driver.goto(p["url"])
-            log_patient_name(driver.waiting(".name span").text)
+            d.goto(p["url"])
+            _log_patient_name(d.waiting(".name span").text)
             ma_hs = int(
-                driver.waiting(
+                d.waiting(
                     ".patient-information .additional-item:nth-child(2) .info",
                     "ma ho so",
                 ).text
             )
-            if signature := try_get_signature(con, ma_hs):
+            if signature := try_get_signature(d, con, ma_hs):
                 if any(p["ky_3tra"]["benhnhan"]):
-                    sign_phieuthuchienylenh_bn(p["ky_3tra"]["benhnhan"], signature)
+                    sign_phieuthuchienylenh_bn(d, p["ky_3tra"]["benhnhan"], signature)
 
 
-def run_tk(cfg: config.Config):
-    driver = get_global_driver()
-    d = dt.date.today()
-    for bbhc in cfg["bbhc"]:
-        driver.goto(bbhc["url"])
-        log_patient_name(driver.waiting(".name span").text)
-        with top_hosobenhan.session():
-            filter_check_expand_sign(
-                "Biên bản hội chẩn",
-                dangky_fn=lambda i: goto_row_then_tabdo(
-                    i,
-                    sign_staff_name.bienbanhoichan_truongkhoa,
-                ),
-                date=d,
-            )
-
-
-def log_patient_name(name: str):
+def _log_patient_name(name: str):
     _lgr.info(
         "\n".join(
             [

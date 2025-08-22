@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import cast
 
-from cch_his_auto.app import kiemtrahoso, khambenhmoingay
+from cch_his_auto.app import khambenhmoingay, kiemtrahoso
 
 
 class MainApp(tk.Tk):

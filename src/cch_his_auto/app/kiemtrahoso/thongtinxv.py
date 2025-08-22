@@ -3,10 +3,10 @@ from tkinter import messagebox
 from cch_his_auto.app import PROFILE_PATH
 
 from cch_his_auto.global_db import create_connection
-from cch_his_auto.common_ui.button_frame import RunConfig, setLogLevel
+from cch_his_auto.common_ui.button_frame import RunConfig
 from cch_his_auto.common_tasks.navigation import first_patient, next_patient
 
-from cch_his_auto_lib.driver import start_global_driver
+from cch_his_auto_lib.driver import start_driver
 from cch_his_auto_lib.tasks import auth, danhsachnguoibenhnoitru
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import tab_thongtinchung
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.tab_thongtinchung import (
@@ -21,32 +21,9 @@ def run(cfg: config.Config, run_cfg: RunConfig):
         messagebox.showerror(message="chưa đủ thông tin")
         return
 
-    setLogLevel(run_cfg)
-    listing = [int(ma_hs) for ma_hs in cfg["listing"].strip().splitlines()]
-
     machanthuong_kemtheo_missing = []
     discharge_date_is_none = []
     appointment_date_is_sat_sun = []
-
-    def check_machanthuong_kemtheo(ma_hs: int):
-        diagnosis = tab_thongtinchung.get_discharge_diagnosis()
-        if diagnosis is not None:
-            if diagnosis.startswith("S") and not any(
-                [d[0] in "WYV" for d in tab_thongtinchung.get_discharge_comorbid()]
-            ):
-                machanthuong_kemtheo_missing.append(ma_hs)
-
-    def check_discharge_date(ma_hs: int):
-        date = tab_thongtinchung.get_discharge_date()
-        if date is None:
-            discharge_date_is_none.append(ma_hs)
-
-    def check_appointment_date(ma_hs: int):
-        date = tab_thongtinchung.get_appointment_date()
-        # is saturday / sunday
-        if date is not None:
-            if date.weekday() in [5, 6]:
-                appointment_date_is_sat_sun.append(ma_hs)
 
     viettat_dict = {
         "hp": "hậu phẫu",
@@ -55,41 +32,62 @@ def run(cfg: config.Config, run_cfg: RunConfig):
         "dmc": "dưới màng cứng",
     }
 
-    def sua_viet_tat():
-        # mở rộng chữ viết tắt
-        detail = tab_thongtinchung.get_discharge_diagnosis_detail()
-        if detail is not None:
-            detail = detail.lower()
-            for k, v in viettat_dict.items():
-                detail = detail.replace(k, v)
-            with edit_thongtinravien.session():
-                edit_thongtinravien.set_discharge_diagnosis_detail(detail)
-        treatment = tab_thongtinchung.get_treatment()
-        if treatment is not None:
-            treatment = treatment.lower()
-            for k, v in viettat_dict.items():
-                treatment = treatment.replace(k, v)
-            with edit_thongtinravien.session():
-                edit_thongtinravien.set_treatment(treatment)
+    def check_machanthuong_kemtheo(ma_hs: int):
+        diagnosis = tab_thongtinchung.get_discharge_diagnosis(d)
+        if diagnosis is not None:
+            if diagnosis.startswith("S") and not any(
+                [d[0] in "WYV" for d in tab_thongtinchung.get_discharge_comorbid(d)]
+            ):
+                machanthuong_kemtheo_missing.append(ma_hs)
 
-    def check(ma_hs: int):
-        check_machanthuong_kemtheo(ma_hs)
-        check_discharge_date(ma_hs)
-        check_appointment_date(ma_hs)
-        sua_viet_tat()
+    def check_discharge_date(ma_hs: int):
+        date = tab_thongtinchung.get_discharge_date(d)
+        if date is None:
+            discharge_date_is_none.append(ma_hs)
 
-    with start_global_driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH):
-        with auth.session(cfg["username"], cfg["password"], cfg["department"]):
+    with start_driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH) as d:
+
+        def check_appointment_date(ma_hs: int):
+            date = tab_thongtinchung.get_appointment_date(d)
+            # is saturday / sunday
+            if date is not None:
+                if date.weekday() in [5, 6]:
+                    appointment_date_is_sat_sun.append(ma_hs)
+
+        def sua_viet_tat():
+            # mở rộng chữ viết tắt
+            detail = tab_thongtinchung.get_discharge_diagnosis_detail(d)
+            if detail is not None:
+                detail = detail.lower()
+                for k, v in viettat_dict.items():
+                    detail = detail.replace(k, v)
+                with edit_thongtinravien.session(d):
+                    edit_thongtinravien.set_discharge_diagnosis_detail(d, detail)
+            treatment = tab_thongtinchung.get_treatment(d)
+            if treatment is not None:
+                treatment = treatment.lower()
+                for k, v in viettat_dict.items():
+                    treatment = treatment.replace(k, v)
+                with edit_thongtinravien.session(d):
+                    edit_thongtinravien.set_treatment(d, treatment)
+
+        def check(ma_hs: int):
+            check_machanthuong_kemtheo(ma_hs)
+            check_discharge_date(ma_hs)
+            check_appointment_date(ma_hs)
+            sua_viet_tat()
+
+        with auth.session(d, cfg["username"], cfg["password"], cfg["department"]):
             with create_connection() as con:
-                danhsachnguoibenhnoitru.filter_trangthainguoibenh_check_all()
+                danhsachnguoibenhnoitru.filter_trangthainguoibenh_check_all(d)
 
-                ma_hs = listing.pop()
-                first_patient(con, ma_hs)
+                ma_hs = cfg["listing"].pop()
+                first_patient(d, con, ma_hs)
                 check(ma_hs)
 
-                while len(listing) > 0:
-                    ma_hs = listing.pop()
-                    next_patient(con, ma_hs)
+                while len(cfg["listing"]) > 0:
+                    ma_hs = cfg["listing"].pop()
+                    next_patient(d, con, ma_hs)
                     check(ma_hs)
 
     if len(machanthuong_kemtheo_missing) > 0:

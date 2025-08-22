@@ -1,23 +1,26 @@
+"""
+This is the right side (tk.Frame) of an app.
+Its layout consists of 3 buttons [Save, Load, Run] and 2 checkboxes [Headless, Debug].
+Its config is typed hint to `RunConfig`.
+The frame provides `save_config`, and `load_config` for `RunConfig`.
+You can `bind_save`, `bind_load`, `bind_run` functions onto the corresponding buttons.
+"""
+
 import tkinter as tk
 from typing import TypedDict
-import os.path
+from pathlib import PurePath
+import os
 import json
 import logging
 
-APP_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FILEPATH = os.path.join(APP_PATH, "run_config.json")
+
+APP_PATH = PurePath(__file__).parent.parent
+FILEPATH = APP_PATH / "run_config.json"
 
 
 class RunConfig(TypedDict):
     headless: bool
     debug: bool
-
-
-def setLogLevel(cfg: RunConfig):
-    if cfg["debug"]:
-        logging.getLogger().setLevel(logging.DEBUG)
-    else:
-        logging.getLogger().setLevel(logging.INFO)
 
 
 class ButtonFrame(tk.Frame):
@@ -47,7 +50,14 @@ class ButtonFrame(tk.Frame):
             self,
             text="Debug",
             variable=self.debug,
+            command=self.setLogLevel,
         ).grid(row=5, column=0, pady=5)
+
+    def setLogLevel(self):
+        if self.debug:
+            logging.getLogger().setLevel(logging.DEBUG)
+        else:
+            logging.getLogger().setLevel(logging.INFO)
 
     def bind_load(self, f):
         self.load_btn.configure(command=f)
@@ -82,3 +92,4 @@ class ButtonFrame(tk.Frame):
 
         self.headless.set(cfg["headless"])
         self.debug.set(cfg["debug"])
+        self.setLogLevel()

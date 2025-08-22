@@ -6,12 +6,12 @@ from cch_his_auto.app import PROFILE_PATH
 
 from cch_his_auto.global_db import create_connection
 from cch_his_auto.common_ui.staff_info import UsernamePasswordDeptFrame
-from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig, setLogLevel
+from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig
 from cch_his_auto.common_tasks.navigation import first_patient, next_patient
 from cch_his_auto.common_tasks.signature import try_get_signature
 
 
-from cch_his_auto_lib.driver import start_global_driver
+from cch_his_auto_lib.driver import Driver, start_driver
 from cch_his_auto_lib.tasks import auth, danhsachnguoibenhnoitru
 from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
     tab_thongtinchung,
@@ -72,7 +72,7 @@ class App(tk.Frame):
             bacsi.set_department(cfg["department"])
 
             listing.delete("1.0", "end")
-            listing.insert("1.0", cfg["listing"])
+            listing.insert("1.0", "\n".join([str(ma_hs) for ma_hs in cfg["listing"]]))
             final_var.set(cfg["final"])
 
             button_frame.load_config()
@@ -82,7 +82,10 @@ class App(tk.Frame):
                 "username": bacsi.get_username(),
                 "password": bacsi.get_password(),
                 "department": bacsi.get_department(),
-                "listing": listing.get("1.0", "end"),
+                "listing": [
+                    int(ma_hs)
+                    for ma_hs in listing.get("1.0", "end").strip().splitlines()
+                ],
                 "final": final_var.get(),
             }
 
@@ -111,54 +114,53 @@ def run(cfg: config.Config, run_cfg: RunConfig):
         messagebox.showerror(message="chưa đủ thông tin")
         return
 
-    setLogLevel(run_cfg)
-    listing = [int(ma_hs) for ma_hs in cfg["listing"].strip().splitlines()]
-
     if cfg["final"]:
         process = process_final_sign
     else:
         process = process_normal_sign
 
-    with start_global_driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH):
-        with auth.session(cfg["username"], cfg["password"], cfg["department"]):
+    with start_driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH) as d:
+        with auth.session(d, cfg["username"], cfg["password"], cfg["department"]):
             with create_connection() as con:
-                danhsachnguoibenhnoitru.filter_trangthainguoibenh_check_all()
+                danhsachnguoibenhnoitru.filter_trangthainguoibenh_check_all(d)
 
-                ma_hs = listing.pop()
-                first_patient(con, ma_hs)
-                signature = try_get_signature(con, ma_hs)
-                process(signature)
+                ma_hs = cfg["listing"].pop()
+                first_patient(d, con, ma_hs)
+                signature = try_get_signature(d, con, ma_hs)
+                process(d, signature)
 
-                while len(listing) > 0:
-                    ma_hs = listing.pop()
-                    next_patient(con, ma_hs)
-                    signature = try_get_signature(con, ma_hs)
-                    process(signature)
+                while len(cfg["listing"]) > 0:
+                    ma_hs = cfg["listing"].pop()
+                    next_patient(d, con, ma_hs)
+                    signature = try_get_signature(d, con, ma_hs)
+                    process(d, signature)
 
     messagebox.showinfo(message="finish")
 
 
-def process_normal_sign(signature: str | None):
-    with top_hosobenhan.session():
-        tab_hosokhamchuabenh.phieuchidinhxetnghiem()
-        tab_hosokhamchuabenh.todieutri(dt.date.today())
-        tab_hosokhamchuabenh.phieuCT(signature)
-        tab_hosokhamchuabenh.phieuMRI(signature)
-        tab_hosokhamchuabenh.giaiphaubenh()
-        tab_hosokhamchuabenh.phieusanglocdinhduong()
-        tab_hosokhamchuabenh.phieuchidinhPTTT()
-        tab_hosokhamchuabenh.phieusoket15ngay()
-        tab_hosokhamchuabenh.phieucamkettruyenmau(signature)
+def process_normal_sign(d: Driver, signature: str | None):
+    with top_hosobenhan.session(d):
+        tab_hosokhamchuabenh.phieuchidinhxetnghiem(
+            d,
+        )
+        tab_hosokhamchuabenh.todieutri(d, dt.date.today())
+        tab_hosokhamchuabenh.phieuCT(d, signature)
+        tab_hosokhamchuabenh.phieuMRI(d, signature)
+        tab_hosokhamchuabenh.giaiphaubenh(d)
+        tab_hosokhamchuabenh.phieusanglocdinhduong(d)
+        tab_hosokhamchuabenh.phieuchidinhPTTT(d)
+        tab_hosokhamchuabenh.phieusoket15ngay(d)
+        tab_hosokhamchuabenh.phieucamkettruyenmau(d, signature)
         # tab_hosokhamchuabenh.phieucamkettta5( signature) # HIS BUG
 
 
-def process_final_sign(signature: str | None):
-    discharge_date = tab_thongtinchung.get_discharge_date()
+def process_final_sign(d: Driver, signature: str | None):
+    discharge_date = tab_thongtinchung.get_discharge_date(d)
 
-    with top_hosobenhan.session():
+    with top_hosobenhan.session(d):
         # tab_hosokhamchuabenh.tobiabenhannhikhoa()
-        tab_hosokhamchuabenh.mucAbenhannhikhoa()
-        tab_hosokhamchuabenh.mucBtongketbenhan()
-        tab_hosokhamchuabenh.phieukhambenhvaovien()
-        tab_hosokhamchuabenh.todieutri(discharge_date)
-        tab_hosokhamchuabenh.donthuoc()
+        tab_hosokhamchuabenh.mucAbenhannhikhoa(d)
+        tab_hosokhamchuabenh.mucBtongketbenhan(d)
+        tab_hosokhamchuabenh.phieukhambenhvaovien(d)
+        tab_hosokhamchuabenh.todieutri(d, discharge_date)
+        tab_hosokhamchuabenh.donthuoc(d)

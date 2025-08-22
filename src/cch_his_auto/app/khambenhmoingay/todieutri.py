@@ -1,10 +1,11 @@
 import tkinter as tk
 from typing import cast
 
-from .config import Todieutri
 
 from cch_his_auto.common_ui.item_listframe import ListItem
-from .more_listframe import MoreListFrame
+
+from .tabbed_listframe import TabbedListFrame
+from .config import Todieutri
 
 HEADERS_STATS = [
     ("url", 200, 1),
@@ -18,17 +19,9 @@ HEADERS_STATS = [
 type Item = Todieutri
 
 
-class Frame(MoreListFrame):
-    def __init__(self, parent):
-        super().__init__(parent, item_type=Line, header_stats=HEADERS_STATS)
-
-    def get_title(self) -> str:
-        return f"Tờ điều trị ({self.count()})"
-
-
 class Line(ListItem):
-    def __init__(self, parent, column_stats):
-        super().__init__(parent, column_stats)
+    def __init__(self, parent):
+        super().__init__(parent)
         self.url_var = tk.StringVar()
         self.note_var = tk.StringVar()
 
@@ -70,7 +63,7 @@ class Line(ListItem):
     def on_del(self):
         tab_frame = self.master.master.master.master  # pyright: ignore
         self.destroy()
-        cast(Frame, tab_frame).change_tab_text()
+        cast(TabbedListFrame, tab_frame).change_tab_text()
 
     def set_item(self, item: Item):
         self.url_var.set(item["url"])

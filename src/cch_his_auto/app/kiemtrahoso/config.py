@@ -11,7 +11,7 @@ class Config(TypedDict):
     username: str
     password: str
     department: str
-    listing: str
+    listing: list[int]
     final: bool
 
 
@@ -30,8 +30,8 @@ def load() -> Config:
             "username": "",
             "password": "",
             "department": "",
-            "listing": "",
-            "final":False,
+            "listing": [],
+            "final": False,
         }
 
 
@@ -40,5 +40,5 @@ def is_valid(cfg: Config) -> bool:
         cfg["username"] != ""
         and cfg["password"] != ""
         and cfg["department"] != ""
-        and len(cfg["listing"].strip().splitlines()) > 0
+        and len(cfg["listing"]) > 0
     )

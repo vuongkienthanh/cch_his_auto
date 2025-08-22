@@ -2,7 +2,6 @@ from typing import Literal, TypedDict
 import json
 import os.path
 import os
-import datetime as dt
 
 from validators import url
 
@@ -32,34 +31,11 @@ class Todieutri(TypedDict):
     ky_3tra: Ky_3tra
 
 
-class DutruMau(TypedDict):
-    url: str
-    note: str
-    duphongphauthuat: bool
-    nhom1: bool
-    date: str
-    datruyenmau: bool
-    khangthebatthuong: bool
-    phanungtruyenmau: bool
-    hcthientai: str
-    truyenmaucochieuxa: bool
-    cungnhom: bool
-
-
-class BBHC(TypedDict):
-    url: str
-    note: str
-    khac: str  # phân loại PT, ks dự phòng,...
-
-
 class Config(TypedDict):
     bacsi: LogInfo
     dieuduong: LogInfo
-    truongkhoa: LogInfo
     department: str
     todieutri: list[Todieutri]
-    dutrumau: list[DutruMau]
-    bbhc: list[BBHC]
 
 
 def save(config: Config):
@@ -82,41 +58,17 @@ def load() -> Config:
                 "username": "",
                 "password": "",
             },
-            "truongkhoa": {
-                "username": "",
-                "password": "",
-            },
             "department": "",
             "todieutri": [],
-            "dutrumau": [],
-            "bbhc": [],
         }
 
 
 def is_patient_list_valid(config: Config) -> bool:
-    def value_error_to_bool(fn, *args):
-        try:
-            fn(*args)
-            return True
-        except ValueError:
-            return False
-
-    return (
-        any(len(config[name]) > 0 for name in ["todieutri", "dutrumau", "bbhc"])
-        & all(
-            url(tdt["url"])
-            and ("chi-tiet-nguoi-benh-noi-tru/to-dieu-tri/" in tdt["url"])
-            for tdt in config["todieutri"]
-        )
-        & all(
-            url(dtm["url"])
-            and ("chi-tiet-nguoi-benh-noi-tru/to-dieu-tri/" in dtm["url"])
-            and value_error_to_bool(dt.datetime.strptime, dtm["date"], "%d/%m/%Y")
-            for dtm in config["dutrumau"]
-        )
-        & all(url(bbhc["url"]) for bbhc in config["bbhc"])
+    return len(config["todieutri"]) > 0 & all(
+        url(tdt["url"]) and ("chi-tiet-nguoi-benh-noi-tru/to-dieu-tri/" in tdt["url"])
+        for tdt in config["todieutri"]
     )
 
 
-def is_valid(config: Config, kind: Literal["bacsi", "dieuduong", "truongkhoa"]) -> bool:
+def is_valid(config: Config, kind: Literal["bacsi", "dieuduong"]) -> bool:
     return config[kind]["username"] != "" and config[kind]["password"] != ""
