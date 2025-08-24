@@ -4,7 +4,7 @@ import logging
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import TOP_BTN_CSS
+from cch_his_auto_lib.action.chitietnguoibenhnoitru import TOP_BTN_CSS
 
 _lgr = logging.getLogger("top_hosobenhan")
 

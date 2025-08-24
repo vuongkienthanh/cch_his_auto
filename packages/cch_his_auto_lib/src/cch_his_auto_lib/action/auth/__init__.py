@@ -1,12 +1,19 @@
 import time
+import logging
+
 
 from selenium.webdriver.common.by import By
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.errors import EndOfLoopException
+from cch_his_auto_lib.tracing import tracing
 
-from . import dept_dialog, _lgr, _trace
+_lgr = logging.getLogger("auth")
+_trace = tracing(_lgr)
+
+
+from . import dept_dialog
 
 
 LOGIN_PANE_CSS = ".login-body"

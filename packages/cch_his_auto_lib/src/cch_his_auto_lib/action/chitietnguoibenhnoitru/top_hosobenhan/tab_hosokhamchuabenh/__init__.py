@@ -15,7 +15,7 @@ from .helper import (
     sign_current2,
     sign_current_both,
 )
-from cch_his_auto_lib.tasks.editor import (
+from cch_his_auto_lib.action.editor import (
     sign_staff,
     sign_patient,
 )

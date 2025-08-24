@@ -2,7 +2,7 @@ from functools import partial
 from typing import Callable
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.tasks.editor import sign_staff, sign_patient
+from cch_his_auto_lib.action.editor import sign_staff, sign_patient
 from . import _trace, goto
 
 

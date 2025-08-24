@@ -5,12 +5,12 @@ from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tracing import tracing
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
+from cch_his_auto_lib.action.chitietnguoibenhnoitru import (
     change_tab,
     tab_thongtinchung,
     tab_todietri,
 )
-from cch_his_auto_lib.tasks import todieutri
+from cch_his_auto_lib.action import todieutri
 from .. import ACTIVE_PANE
 
 

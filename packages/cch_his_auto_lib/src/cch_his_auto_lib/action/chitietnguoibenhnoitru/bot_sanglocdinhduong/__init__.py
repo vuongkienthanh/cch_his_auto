@@ -5,7 +5,7 @@ from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tracing import tracing
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
+from cch_his_auto_lib.action.chitietnguoibenhnoitru import (
     top_chitietthongtin,
 )
 
@@ -77,13 +77,13 @@ def add_new(d: Driver):
 @_trace
 def add_all_phieusanglocdinhduong(d: Driver, admission_date: dt.date):
     "Complete all *Phiếu sàng lọc* from admission_date up til today"
-    with top_chitietthongtin.session():
-        cannang = top_chitietthongtin.get_cannang()
-        age_in_month = top_chitietthongtin.get_age_in_month()
+    with top_chitietthongtin.session(d):
+        cannang = top_chitietthongtin.get_cannang(d)
+        age_in_month = top_chitietthongtin.get_age_in_month(d)
         if not cannang:
             _lgr.warning("cannang is empty -> skip Sàng lọc dinh dưỡng")
             return
-        chieucao = top_chitietthongtin.get_chieucao()
+        chieucao = top_chitietthongtin.get_chieucao(d)
         if not chieucao:
             _lgr.warning("chieucao is empty -> skip Sàng lọc dinh dưỡng")
             return

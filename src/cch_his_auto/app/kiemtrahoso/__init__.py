@@ -12,12 +12,13 @@ from cch_his_auto.common_tasks.signature import try_get_signature
 
 
 from cch_his_auto_lib.driver import Driver, start_driver
-from cch_his_auto_lib.tasks import auth, danhsachnguoibenhnoitru
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
+from cch_his_auto_lib.action import danhsachnguoibenhnoitru
+from cch_his_auto_lib.task import auth
+from cch_his_auto_lib.action.chitietnguoibenhnoitru import (
     tab_thongtinchung,
     top_hosobenhan,
 )
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.top_hosobenhan import (
+from cch_his_auto_lib.action.chitietnguoibenhnoitru.top_hosobenhan import (
     tab_hosokhamchuabenh,
 )
 

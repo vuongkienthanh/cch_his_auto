@@ -34,7 +34,7 @@ def sign_phieuchidinh(d: Driver):
                     _lgr.debug(f"button state is {State.Cancel}")
                     close_dialog()
                     return
-                elif ele.text == "Ký Bác sĩ":
+                elif ele.text == State.Sign:
                     _lgr.debug(f"button state is {State.Sign} -> click")
                     ele.click()
                     time.sleep(5)

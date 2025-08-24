@@ -13,22 +13,22 @@ from . import config, todieutri
 from .tabbed_listframe import TabbedListFrame
 
 from cch_his_auto_lib.driver import Driver, start_driver
-from cch_his_auto_lib.tasks import auth
-from cch_his_auto_lib.tasks.todieutri.bot_ingiayto import (
+from cch_his_auto_lib.task import auth
+from cch_his_auto_lib.action.todieutri.bot_ingiayto import (
     sign_todieutri,
     sign_phieuchidinh,
     sign_phieuthuchienylenh_bn,
     sign_phieuthuchienylenh_bs,
     sign_phieuthuchienylenh_dd,
 )
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import (
+from cch_his_auto_lib.action.chitietnguoibenhnoitru import (
     top_hosobenhan,
 )
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru.top_hosobenhan.tab_hosokhamchuabenh.helper import (
+from cch_his_auto_lib.action.chitietnguoibenhnoitru.top_hosobenhan.tab_hosokhamchuabenh.helper import (
     filter_check_expand_sign,
     goto_row_then_tabdo,
 )
-from cch_his_auto_lib.tasks.editor import sign_staff
+from cch_his_auto_lib.action.editor import sign_staff
 
 
 TITLE = "Khám bệnh mỗi ngày"

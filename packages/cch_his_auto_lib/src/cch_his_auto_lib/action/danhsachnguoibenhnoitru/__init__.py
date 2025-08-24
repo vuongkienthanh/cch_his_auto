@@ -7,7 +7,7 @@ from selenium.webdriver import ActionChains
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tracing import tracing
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import wait_patient_page_loaded
+from cch_his_auto_lib.action.chitietnguoibenhnoitru import wait_patient_page_loaded
 
 URL = "http://emr.ndtp.org/quan-ly-noi-tru/danh-sach-nguoi-benh-noi-tru"
 

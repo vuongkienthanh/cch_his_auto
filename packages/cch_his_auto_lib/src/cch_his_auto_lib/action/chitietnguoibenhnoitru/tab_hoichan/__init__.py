@@ -1,6 +1,6 @@
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.tasks.chitietnguoibenhnoitru import ACTIVE_PANE
-from cch_his_auto_lib.tasks.editor.sign_staff import (
+from cch_his_auto_lib.action.chitietnguoibenhnoitru import ACTIVE_PANE
+from cch_his_auto_lib.action.editor.sign_staff import (
     bienbanhoichan_thuky,
     bienbanhoichan_truongkhoa,
 )

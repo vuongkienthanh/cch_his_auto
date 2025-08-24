@@ -5,7 +5,11 @@ description = "Automate your HIS workflow at CCH"
 readme = "README.md"
 authors = [{ name = "vuongkienthanh", email = "thanhstardust@outlook.com" }]
 requires-python = ">=3.13"
-dependencies = ["cch_his_auto_lib", "validators>=0.34.0"]
+dependencies = [
+    "cch_his_auto_lib",
+    "rich>=14.1.0",
+    "validators>=0.34.0",
+]
 
 [dependency-groups]
 build = ["pyinstaller>=6.12.0"]

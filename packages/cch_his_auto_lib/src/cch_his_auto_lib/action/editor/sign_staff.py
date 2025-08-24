@@ -1,9 +1,5 @@
 import time
 
-from selenium.common import (
-    NoSuchElementException,
-)
-
 from cch_his_auto_lib.driver import Driver
 from . import _lgr
 
@@ -169,30 +165,4 @@ def phieudutrucungcapmau(d: Driver):
         btn_txt="Xác nhận ký BÁC SĨ ĐIỀU TRỊ",
         img_css=".sign-image img",
         name="phieu du tru cung cap mau",
-    )
-
-
-############
-## UNSIGN ##
-############
-
-
-def _unsign(d: Driver, name: str, cancel_btn_css: str, img_css: str):
-    _lgr.debug(f"unsigning {name}")
-    try:
-        d.clicking2(img_css)
-    except NoSuchElementException:
-        return
-    else:
-        d.clicking2(cancel_btn_css)
-        d.clicking(".ant-modal .ant-btn.warning")
-
-
-def unsign_phieudutrucungcapmau(d: Driver):
-    "*Phiếu dự trù và cung cấp máu*"
-    _unsign(
-        d,
-        name="phieu du tru cung cap mau",
-        cancel_btn_css=".layout-line-item .layout-line-item:nth-child(20) .info-sign svg",
-        img_css=".sign-image img",
     )
