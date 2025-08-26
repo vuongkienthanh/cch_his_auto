@@ -1,12 +1,13 @@
 import logging
 import time
 import datetime as dt
+from contextlib import contextmanager
 
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver import ActionChains
 
-from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.driver import Driver, DriverFn
 from cch_his_auto_lib.tracing import tracing
 from cch_his_auto_lib.action.chitietnguoibenhnoitru import wait_patient_page_loaded
 
@@ -31,38 +32,15 @@ def huytimkiem(d: Driver):
 TRANGTHAINGUOIBENH_POPOVER = ".ant-popover:has(.check-all)"
 
 
-@_trace
-def filter_trangthainguoibenh(d: Driver, indexes: list[int]):
-    """
-    Open *Trạng thái người bệnh*.
-    Uncheck all checkboxes, then check those in `indexes`.
-    `indexes` is 1-indexed.
-    Then close it
-    """
-    _lgr.debug(f"filter_trangthainguoibenh indexes={indexes}")
+@contextmanager
+def open_trangthainguoibenh(d: Driver):
     d.clicking(
         ".base-search_component .ant-col:nth-child(7) button",
         " open menu trạng thái người bệnh",
     )
     d.waiting(f"{TRANGTHAINGUOIBENH_POPOVER} .check-all")
     try:
-        _lgr.debug("uncheck all boxes in trạng thái người bệnh")
-        try:
-            ele = d.find(
-                f"{TRANGTHAINGUOIBENH_POPOVER} .check-all .ant-checkbox-checked"
-            )
-            ele.click()
-        except NoSuchElementException:
-            ele = d.find(f"{TRANGTHAINGUOIBENH_POPOVER} .check-all .ant-checkbox")
-            ele.click()
-            ele.click()
-
-        _lgr.debug("check boxes based on indexes")
-        for i in indexes:
-            d.clicking(
-                f"{TRANGTHAINGUOIBENH_POPOVER} .ant-checkbox-group label:nth-child({i}) .ant-checkbox",
-                d.find(f".ant-popover label:nth-child({i})").text,
-            )
+        yield
     finally:
         d.clicking(
             ".base-search_component .ant-col:nth-child(7) button",
@@ -72,26 +50,43 @@ def filter_trangthainguoibenh(d: Driver, indexes: list[int]):
 
 
 @_trace
+def filter_trangthainguoibenh(d: Driver, indexes: list[int]):
+    """
+    Open *Trạng thái người bệnh*.
+    Uncheck all checkboxes, then check those in `indexes`.
+    `indexes` is 1-indexed.
+    Then close it
+    """
+    _lgr.debug(f"filter_trangthainguoibenh indexes={indexes}")
+    with open_trangthainguoibenh(d):
+        _lgr.debug("uncheck all boxes in trạng thái người bệnh")
+
+        ele = d.find(f"{TRANGTHAINGUOIBENH_POPOVER} .check-all .ant-checkbox input")
+        if ele.is_selected():
+            ele.click()
+        else:
+            ele.click()
+            ele.click()
+
+        _lgr.debug("check boxes corresponded to indexes")
+        for i in indexes:
+            d.clicking(
+                f"{TRANGTHAINGUOIBENH_POPOVER} .ant-checkbox-group label:nth-child({i}) .ant-checkbox input",
+                d.find(f".ant-popover label:nth-child({i})").text,
+            )
+
+
+@_trace
 def filter_trangthainguoibenh_check_all(d: Driver):
     """
     Open *Trạng thái người bệnh*.
     check all checkboxes
     Then close it
     """
-    d.clicking(
-        ".base-search_component .ant-col:nth-child(7) button",
-        " open menu trạng thái người bệnh",
-    )
-    d.waiting(".ant-popover label", "danh sách trạng thái người bệnh")
-    d.waiting(".check-all .ant-checkbox", "danh sách trạng thái người bệnh")
-    if not d.find(".check-all .ant-checkbox input").is_selected():
-        d.clicking(".check-all .ant-checkbox", "check all")
-
-    d.clicking(
-        ".base-search_component .ant-col:nth-child(7) button",
-        "close menu trạng thái người bệnh",
-    )
-    d.wait_closing(".ant-popover:has(label:nth-child(10))")
+    with open_trangthainguoibenh(d):
+        ele = d.find(f"{TRANGTHAINGUOIBENH_POPOVER} .check-all .ant-checkbox input")
+        if not ele.is_selected():
+            ele.click()
 
 
 @_trace
