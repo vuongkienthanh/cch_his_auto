@@ -2,14 +2,11 @@ import time
 
 from cch_his_auto_lib.driver import Driver
 
-from . import _lgr
-
 
 def phieuthuchienylenh_bn(
     d: Driver, arr: tuple[bool, bool, bool, bool, bool], signature: str
 ):
     "*Phiếu thực hiện y lệnh (bệnh nhân)*"
-    _lgr.info("++++ doing phieuthuchienylenh_bn, may take a while")
     d.waiting(".table-tbody")
     time.sleep(3)
     for col in map(lambda x: x[0], filter(lambda x: x[1], zip([3, 4, 5, 6, 7], arr))):

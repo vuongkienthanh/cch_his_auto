@@ -2,6 +2,7 @@ import logging
 import time
 import datetime as dt
 
+from selenium.common import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver import ActionChains
 
@@ -19,6 +20,17 @@ def get_khoalamviec(d: Driver) -> str:
     return d.waiting(".khoaLamViec div span", "khoa lam viec").text.strip()
 
 
+def huytimkiem(d: Driver):
+    d.clicking(
+        ".base-search_component > div > div:nth-child(2) button:first-child",
+        "Hủy tìm kiếm button",
+    )
+    time.sleep(5)  # no change on UI
+
+
+TRANGTHAINGUOIBENH_POPOVER = ".ant-popover:has(.check-all)"
+
+
 @_trace
 def filter_trangthainguoibenh(d: Driver, indexes: list[int]):
     """
@@ -32,23 +44,31 @@ def filter_trangthainguoibenh(d: Driver, indexes: list[int]):
         ".base-search_component .ant-col:nth-child(7) button",
         " open menu trạng thái người bệnh",
     )
-    d.waiting(".ant-popover label", "danh sách trạng thái người bệnh")
+    d.waiting(f"{TRANGTHAINGUOIBENH_POPOVER} .check-all")
+    try:
+        _lgr.debug("uncheck all boxes in trạng thái người bệnh")
+        try:
+            ele = d.find(
+                f"{TRANGTHAINGUOIBENH_POPOVER} .check-all .ant-checkbox-checked"
+            )
+            ele.click()
+        except NoSuchElementException:
+            ele = d.find(f"{TRANGTHAINGUOIBENH_POPOVER} .check-all .ant-checkbox")
+            ele.click()
+            ele.click()
 
-    _lgr.debug("uncheck all boxes in trạng thái người bệnh")
-    for ele in d.find_all(".ant-checkbox-group .ant-checkbox-checked"):
-        ele.click()
-
-    _lgr.debug("check boxes based on indexes")
-    for i in indexes:
+        _lgr.debug("check boxes based on indexes")
+        for i in indexes:
+            d.clicking(
+                f"{TRANGTHAINGUOIBENH_POPOVER} .ant-checkbox-group label:nth-child({i}) .ant-checkbox",
+                d.find(f".ant-popover label:nth-child({i})").text,
+            )
+    finally:
         d.clicking(
-            f".ant-checkbox-group label:nth-child({i}) .ant-checkbox",
-            d.find(f".ant-popover label:nth-child({i})").text,
+            ".base-search_component .ant-col:nth-child(7) button",
+            "close menu trạng thái người bệnh",
         )
-    d.clicking(
-        ".base-search_component .ant-col:nth-child(7) button",
-        "close menu trạng thái người bệnh",
-    )
-    d.wait_closing(".ant-popover:has(label:nth-child(10))")
+        d.wait_closing(TRANGTHAINGUOIBENH_POPOVER)
 
 
 @_trace

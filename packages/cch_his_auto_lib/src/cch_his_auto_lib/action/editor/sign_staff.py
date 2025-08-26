@@ -1,7 +1,6 @@
 import time
 
 from cch_his_auto_lib.driver import Driver
-from . import _lgr
 
 
 def tobiabenhannhikhoa(d: Driver):
@@ -46,7 +45,6 @@ def todieutri(d: Driver):
 
 def phieuthuchienylenh_bs(d: Driver, arr: tuple[bool, bool, bool, bool, bool]):
     "*Phiếu thực hiện y lệnh (bác sĩ)*"
-    _lgr.info("++++ doing phieuthuchienylenh_bs, may take a while")
     d.waiting(".table-tbody")
     time.sleep(3)
     for col in map(lambda x: x[0], filter(lambda x: x[1], zip([3, 4, 5, 6, 7], arr))):
@@ -66,7 +64,6 @@ def phieuthuchienylenh_bs(d: Driver, arr: tuple[bool, bool, bool, bool, bool]):
 
 def phieuthuchienylenh_dd(d: Driver, arr: tuple[bool, bool, bool, bool, bool]):
     "*Phiếu thực hiện y lệnh (điều dưỡng)*"
-    _lgr.info("++++ doing phieuthuchienylenh_dd, may take a while")
     d.waiting(".table-tbody")
     time.sleep(3)
     for col in map(lambda x: x[0], filter(lambda x: x[1], zip([3, 4, 5, 6, 7], arr))):
