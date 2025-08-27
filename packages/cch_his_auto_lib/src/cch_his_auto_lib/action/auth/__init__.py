@@ -1,6 +1,8 @@
 import time
 import logging
+from contextlib import contextmanager
 
+from rich import print
 
 from selenium.webdriver.common.by import By
 from selenium.common import NoSuchElementException
@@ -8,6 +10,7 @@ from selenium.common import NoSuchElementException
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.errors import EndOfLoopException
 from cch_his_auto_lib.tracing import tracing
+from cch_his_auto_lib.action import danhsachnguoibenhnoitru
 
 _lgr = logging.getLogger("auth")
 _trace = tracing(_lgr)
@@ -53,7 +56,7 @@ def login(d: Driver, username: str, password: str):
             inputs[1].send_keys(password)
             time.sleep(2)  # wait for js to load
             d.clicking(".action>button", "submit button")
-            d.wait_closing(LOGIN_PANE_CSS, "login page")
+            d.wait_disappearing(LOGIN_PANE_CSS, "login page")
             return
     else:
         raise EndOfLoopException("can't log in")
@@ -112,3 +115,16 @@ def set_dept(d: Driver, dept: str):
             return
     else:
         raise EndOfLoopException("can't set dept")
+
+
+@contextmanager
+def session(d: Driver, username: str, password: str, dept: str):
+    print("[red]============start session============")
+    login(d, username, password)
+    d.goto(danhsachnguoibenhnoitru.URL)
+    set_dept(d, dept)
+    try:
+        yield
+    finally:
+        logout(d)
+        print("[red]============end session============")

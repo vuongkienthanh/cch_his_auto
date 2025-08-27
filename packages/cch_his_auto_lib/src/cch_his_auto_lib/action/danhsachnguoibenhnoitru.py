@@ -32,9 +32,7 @@ TRANGTHAINGUOIBENH_POPOVER = ".ant-popover:has(.check-all)"
 
 @contextmanager
 def open_trangthainguoibenh(d: Driver):
-    """
-    Open *Trạng thái người bệnh* as a context
-    """
+    "Open and close *Trạng thái người bệnh* as a context manager"
     d.clicking(
         "#base-search_component .ant-col:nth-child(7) button",
         " open menu trạng thái người bệnh",
@@ -47,7 +45,7 @@ def open_trangthainguoibenh(d: Driver):
             "#base-search_component .ant-col:nth-child(7) button",
             "close menu trạng thái người bệnh",
         )
-        d.wait_closing(TRANGTHAINGUOIBENH_POPOVER)
+        d.wait_disappearing(TRANGTHAINGUOIBENH_POPOVER)
 
 
 @_trace
@@ -91,14 +89,14 @@ BOLOC_POPOVER = ".ant-popover:has(form +div button)"
 
 @contextmanager
 def open_boloc(d: Driver):
-    "Open *Bộ lọc*"
+    "Open and close *Bộ lọc* as a context manager"
     d.clicking("#base-search_component .ant-col:nth-child(1) button", "Bộ lọc button")
     d.waiting(BOLOC_POPOVER)
     try:
         yield
     finally:
         d.clicking(f"{BOLOC_POPOVER} form +div button", "Tìm button")
-        d.wait_closing(BOLOC_POPOVER)
+        d.wait_disappearing(BOLOC_POPOVER)
 
 
 @_trace
@@ -138,7 +136,7 @@ def filter_patient(d: Driver, ma_hs: int):
     ele = d.clear_input(".base-search_component .ant-col:nth-child(2) input")
     ele.send_keys(str(ma_hs))
     ele.send_keys(Keys.ENTER)
-    d.wait_closing(f"{MAIN_TABLE} .ant-table-row:nth-child(3)")
+    d.wait_disappearing(f"{MAIN_TABLE} .ant-table-row:nth-child(3)")
 
 
 @_trace

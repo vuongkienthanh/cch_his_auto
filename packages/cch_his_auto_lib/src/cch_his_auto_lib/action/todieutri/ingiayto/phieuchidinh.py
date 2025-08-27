@@ -41,4 +41,4 @@ def sign_phieuchidinh(d: Driver):
             raise EndOfLoopException("can't assure phieuchidinh signed while in dialog")
     finally:
         d.clicking(f"{DIALOG} button.ant-modal-close")
-        d.wait_closing(DIALOG)
+        d.wait_disappearing(DIALOG)

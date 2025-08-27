@@ -28,7 +28,7 @@ def save(d: Driver):
         f"{DIALOG_CSS} .bottom-action-right button",
         "save button",
     )
-    d.wait_closing(DIALOG_CSS, "edit thongtinravien dialog")
+    d.wait_disappearing(DIALOG_CSS, "edit thongtinravien dialog")
 
 
 def set_bloodtype(d: Driver, value: str):

@@ -1,6 +1,8 @@
 from functools import partial
 from typing import Callable
 
+from rich import print
+
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.action.editor import sign_staff, sign_patient
 from . import _trace, goto
@@ -19,12 +21,14 @@ def _sign_phieuthuchienylenh(
 @_trace
 def sign_phieuthuchienylenh_bs(d: Driver, arr: tuple[bool, bool, bool, bool, bool]):
     "Inside *tờ điều trị*, try to sign *phiếu thực hiện y lệnh* (bs) in sequence"
+    print("[red]++++ doing phieuthuchienylenh_bs, may take a while")
     _sign_phieuthuchienylenh(d, arr=arr, sign_fn=sign_staff.phieuthuchienylenh_bs)
 
 
 @_trace
 def sign_phieuthuchienylenh_dd(d: Driver, arr: tuple[bool, bool, bool, bool, bool]):
     "Inside *tờ điều trị*, try to sign *phiếu thực hiện y lệnh* (dd) in sequence"
+    print("[red]++++ doing phieuthuchienylenh_dd, may take a while")
     _sign_phieuthuchienylenh(d, arr=arr, sign_fn=sign_staff.phieuthuchienylenh_dd)
 
 
@@ -33,6 +37,7 @@ def sign_phieuthuchienylenh_bn(
     d: Driver, arr: tuple[bool, bool, bool, bool, bool], signature: str
 ):
     "Inside *tờ điều trị*, try to sign *phiếu thực hiện y lệnh* (bn) in sequence"
+    print("[red]++++ doing phieuthuchienylenh_bs, may take a while")
     _sign_phieuthuchienylenh(
         d,
         arr=arr,

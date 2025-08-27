@@ -64,4 +64,4 @@ def open_nearest_todieutri_to_datetime(d:Driver, _dt: dt.datetime):
     ).click()
     d.waiting(f"{ACTIVE_PANE} .ant-collapse-item .actived")
     d.clicking2(f"{ACTIVE_PANE} .ant-collapse-item .actived .right svg:last-child")
-    d.wait_closing(f"{ACTIVE_PANE} .ant-collapse-item .actived")
+    d.wait_disappearing(f"{ACTIVE_PANE} .ant-collapse-item .actived")

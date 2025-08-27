@@ -79,7 +79,7 @@ class Driver(webdriver.Chrome):
             _lgr.debug(f"-> done waiting {name or css}")
             return self.find(css)
 
-    def wait_closing(self, css: str, /, name: str = "") -> None:
+    def wait_disappearing(self, css: str, /, name: str = "") -> None:
         """
         Wait element by `css` to be closed.
         You can also provide a `name` for logging
@@ -92,7 +92,7 @@ class Driver(webdriver.Chrome):
             _lgr.error(f"-> can't close {name or css}")
             raise WaitClosingException(f"can't close {name or css}")
         except StaleElementReferenceException:
-            return self.wait_closing(css, name)
+            return self.wait_disappearing(css, name)
         else:
             _lgr.debug(f"-> done closing {name or css}")
 
@@ -350,9 +350,30 @@ class Driver(webdriver.Chrome):
         time.sleep(2)
         return ele
 
+    def get_input_value(self, css: str, /, name="") -> str:
+        """
+        Get value attr of an input
+        You can also provide a `name` for logging
+        Can raise NoSuchElementException
+        """
+        for _ in range(30):
+            time.sleep(1)
+            try:
+                value = self.find(css).get_attribute("value")
+                assert value is not None
+                if value == "":
+                    continue
+                else:
+                    _lgr.info(f"-> found {name}={value}")
+                    return value
+            except NoSuchElementException:
+                ...
+        else:
+            raise NoSuchElementException(f"-> can't find {name}")
+
     @contextmanager
     def iframe(self, iframe_css: str, close_btn_cs: str):
-        "use as contextmanager for going in and out an iframe inside a modal"
+        "Use as contextmanager for going in and out an iframe inside a modal with close button"
         try:
             _lgr.debug("go into iframe")
             iframe = self.waiting(iframe_css)
@@ -362,7 +383,7 @@ class Driver(webdriver.Chrome):
             _lgr.debug("go back to parent frame")
             self.switch_to.parent_frame()
             self.find(close_btn_cs).click()
-            self.wait_closing(iframe_css)
+            self.wait_disappearing(iframe_css)
 
 
 class DriverFn(Protocol):

@@ -5,8 +5,9 @@ from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tracing import tracing
-from cch_his_auto_lib.action.chitietnguoibenhnoitru import (
-    top_chitietthongtin,
+from cch_his_auto_lib.action.chitietnguoibenhnoitru import get_patient_info
+from cch_his_auto_lib.action.chitietnguoibenhnoitru.top import (
+    chitietthongtin,
 )
 
 URL = "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
@@ -16,6 +17,20 @@ _trace = tracing(_lgr)
 
 from .helper import build_machedo
 from .phieusangloc import save_new_phieusangloc
+
+
+def calculate_age_in_months(birth_date):
+    today = dt.date.today()
+
+    years_diff = today.year - birth_date.year
+    months_diff = today.month - birth_date.month
+
+    if today.day < birth_date.day:
+        months_diff -= 1
+
+    total_months = (years_diff * 12) + months_diff
+
+    return total_months
 
 
 def open_dialog(d: Driver) -> bool:
@@ -44,7 +59,7 @@ def close_dialog(d: Driver):
         ".ant-modal-close:has(~.ant-modal-body .ant-table)",
         "close Sàng lọc dinh dưỡng dialog",
     )
-    d.wait_closing(".ant-modal-body .ant-table")
+    d.wait_disappearing(".ant-modal-body .ant-table")
 
 
 def get_last_date(d: Driver) -> dt.date:
@@ -77,13 +92,15 @@ def add_new(d: Driver):
 @_trace
 def add_all_phieusanglocdinhduong(d: Driver, admission_date: dt.date):
     "Complete all *Phiếu sàng lọc* from admission_date up til today"
-    with top_chitietthongtin.session(d):
-        cannang = top_chitietthongtin.get_cannang(d)
-        age_in_month = top_chitietthongtin.get_age_in_month(d)
+    with chitietthongtin.session(d):
+        cannang = chitietthongtin.get_cannang(d)
+        age_in_months = calculate_age_in_months(
+            dt.datetime.strptime(get_patient_info(d)["birthdate"], "%d/%m/%Y")
+        )
         if not cannang:
             _lgr.warning("cannang is empty -> skip Sàng lọc dinh dưỡng")
             return
-        chieucao = top_chitietthongtin.get_chieucao(d)
+        chieucao = chitietthongtin.get_chieucao(d)
         if not chieucao:
             _lgr.warning("chieucao is empty -> skip Sàng lọc dinh dưỡng")
             return
@@ -101,7 +118,7 @@ def add_all_phieusanglocdinhduong(d: Driver, admission_date: dt.date):
     else:
         next_date = admission_date
 
-    save_new_phieusangloc(d, next_date, cannang, chieucao, build_machedo(age_in_month))
+    save_new_phieusangloc(d, next_date, cannang, chieucao, build_machedo(age_in_months))
     next_date = next_date + dt.timedelta(days=7)
 
     while next_date <= today:
@@ -113,6 +130,6 @@ def add_all_phieusanglocdinhduong(d: Driver, admission_date: dt.date):
             next_date,
             cannang,
             chieucao,
-            build_machedo(age_in_month),
+            build_machedo(age_in_months),
         )
         next_date = next_date + dt.timedelta(days=7)
