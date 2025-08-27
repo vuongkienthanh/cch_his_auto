@@ -8,7 +8,7 @@ from cch_his_auto_lib.tracing import tracing
 from cch_his_auto_lib.errors import EndOfLoopException
 from .. import _lgr, ACTIVE_PANE
 
-TAB_NUMBER = 3
+TAB_NUMBER = 2
 
 _lgr = logging.getLogger("tab_todieutri")
 _trace = tracing(_lgr)
