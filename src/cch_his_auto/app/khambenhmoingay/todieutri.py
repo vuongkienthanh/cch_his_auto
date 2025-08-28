@@ -10,8 +10,6 @@ from .config import Todieutri
 HEADERS_STATS = [
     ("url", 200, 1),
     ("XN", 80, 0),
-    ("CT", 80, 0),
-    ("MRI", 80, 0),
     ("tờ ĐT", 80, 0),
     ("Vị trí ký 3tra", 180, 0),
     ("Xóa", 80, 0),
@@ -69,8 +67,6 @@ class Line(ListItem):
         self.url_var.set(item["url"])
         self.note_var.set(item["note"])
         self.xn_var.set(item["ky_xn"])
-        self.ct_var.set(item["ky_ct"])
-        self.mri_var.set(item["ky_mri"])
         self.tdt_var.set(item["ky_todieutri"])
         self.k3t_bs.set_vitri(item["ky_3tra"]["bacsi"])
         self.k3t_dd.set_vitri(item["ky_3tra"]["dieuduong"])
@@ -81,8 +77,6 @@ class Line(ListItem):
             "url": self.url_var.get(),
             "note": self.note_var.get(),
             "ky_xn": self.xn_var.get(),
-            "ky_ct": self.ct_var.get(),
-            "ky_mri": self.mri_var.get(),
             "ky_todieutri": self.tdt_var.get(),
             "ky_3tra": {
                 "bacsi": self.k3t_bs.get_vitri(),

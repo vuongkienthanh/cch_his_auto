@@ -11,24 +11,16 @@ DIALOG_CSS = ".ant-modal:has(.ant-col:nth-child(6) textarea)"
 
 @contextmanager
 def session(d: Driver):
-    open_dialog(d)
+    d.clicking2(f"{THONGTINVAOVIEN_CSS} .title svg", "edit thongtinvaovien button")
+    d.waiting(DIALOG_CSS, "edit thongtinvaovien dialog")
     try:
         yield
     finally:
-        save(d)
-
-
-def open_dialog(d: Driver):
-    d.clicking2(f"{THONGTINVAOVIEN_CSS} .title svg", "edit thongtinvaovien button")
-    d.waiting(DIALOG_CSS, "edit thongtinvaovien dialog")
-
-
-def save(d: Driver):
-    d.clicking(
-        f"{DIALOG_CSS} .bottom-action-right button",
-        "save button",
-    )
-    d.wait_disappearing(DIALOG_CSS, "edit thongtinravien dialog")
+        d.clicking(
+            f"{DIALOG_CSS} .bottom-action-right button",
+            "save button",
+        )
+        d.wait_disappearing(DIALOG_CSS, "edit thongtinravien dialog")
 
 
 def set_bloodtype(d: Driver, value: str):

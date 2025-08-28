@@ -8,28 +8,20 @@ DIALOG_CSS = ".ant-modal:has(.ant-row:first-child+.more-info)"
 
 @contextmanager
 def session(d: Driver):
-    open_dialog(d)
+    d.clicking2(f"{THONGTINRAVIEN_CSS} .title svg", "edit thongtinravien button")
+    d.waiting(DIALOG_CSS, "edit thongtinravien dialog")
     try:
         yield
     finally:
-        save(d)
-
-
-def open_dialog(d: Driver):
-    d.clicking2(f"{THONGTINRAVIEN_CSS} .title svg", "edit thongtinravien button")
-    d.waiting(DIALOG_CSS, "edit thongtinravien dialog")
-
-
-def save(d: Driver):
-    d.clicking(
-        f"{DIALOG_CSS} .bottom-action-right button:nth-child(2)",
-        "save button",
-    )
-    d.clicking2(
-        f"{DIALOG_CSS} .ant-modal-close",
-        "close button",
-    )
-    d.wait_disappearing(DIALOG_CSS, "edit thongtinravien dialog")
+        d.clicking(
+            f"{DIALOG_CSS} .bottom-action-right button:nth-child(2)",
+            "save button",
+        )
+        d.clicking2(
+            f"{DIALOG_CSS} .ant-modal-close",
+            "close button",
+        )
+        d.wait_disappearing(DIALOG_CSS, "edit thongtinravien dialog")
 
 
 def set_discharge_diagnosis_detail(d: Driver, value: str):

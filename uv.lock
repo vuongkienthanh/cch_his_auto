@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.13"
 
 [manifest]
@@ -56,6 +56,7 @@ name = "cch-his-auto-lib"
 version = "0.1.0"
 source = { editable = "packages/cch_his_auto_lib" }
 dependencies = [
+    { name = "rich" },
     { name = "selenium" },
 ]
 
@@ -65,7 +66,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "selenium", specifier = ">=4.29.0" }]
+requires-dist = [
+    { name = "rich", specifier = ">=14.1.0" },
+    { name = "selenium", specifier = ">=4.29.0" },
+]
 
 [package.metadata.requires-dev]
 dev = [{ name = "pdoc", specifier = ">=15.0.1" }]

@@ -1,34 +1,27 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
-import datetime as dt
-from typing import Literal, get_args
+
 
 from cch_his_auto.app import PROFILE_PATH, _lgr
 from cch_his_auto.global_db import create_connection
 from cch_his_auto.common_ui.staff_info import UsernamePasswordFrame
 from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig
 from cch_his_auto.common_tasks.signature import try_get_signature
+from cch_his_auto.common_tasks.navigation import pprint_patient_info
 
 from . import config, todieutri
 from .tabbed_listframe import TabbedListFrame
 
 from cch_his_auto_lib.driver import Driver, start_driver
-from cch_his_auto_lib.task import auth
-from cch_his_auto_lib.action.todieutri.bot_ingiayto import (
+from cch_his_auto_lib.action import auth
+from cch_his_auto_lib.action.todieutri.ingiayto import (
     sign_todieutri,
     sign_phieuchidinh,
     sign_phieuthuchienylenh_bn,
     sign_phieuthuchienylenh_bs,
     sign_phieuthuchienylenh_dd,
 )
-from cch_his_auto_lib.action.chitietnguoibenhnoitru import (
-    top_hosobenhan,
-)
-from cch_his_auto_lib.action.chitietnguoibenhnoitru.top_hosobenhan.tab_hosokhamchuabenh.helper import (
-    filter_check_expand_sign,
-    goto_row_then_tabdo,
-)
-from cch_his_auto_lib.action.editor import sign_staff
+from cch_his_auto_lib.action.chitietnguoibenhnoitru import get_patient_info
 
 
 TITLE = "Khám bệnh mỗi ngày"
@@ -43,8 +36,10 @@ class App(tk.Frame):
         info = tk.LabelFrame(self, text="Thông tin đăng nhập")
         bacsi = UsernamePasswordFrame(info, text="Bác sĩ")
         dieuduong = UsernamePasswordFrame(info, text="Điều dưỡng")
+        truongkhoa = UsernamePasswordFrame(info, text="Trưởng khoa")
         bacsi.grid(row=0, column=0)
         dieuduong.grid(row=0, column=1)
+        truongkhoa.grid(row=0, column=2)
         dept_var = tk.StringVar()
         tk.Label(info, text="Khoa lâm sàng:", justify="right").grid(
             row=1, column=0, sticky="E"
@@ -74,7 +69,9 @@ class App(tk.Frame):
             bacsi.set_username(cfg["bacsi"]["username"])
             bacsi.set_password(cfg["bacsi"]["password"])
             dieuduong.set_username(cfg["dieuduong"]["username"])
-            dieuduong.set_password(cfg["dieuduong"]["password"])
+            dieuduong.set_username(cfg["dieuduong"]["username"])
+            truongkhoa.set_password(cfg["truongkhoa"]["password"])
+            truongkhoa.set_password(cfg["truongkhoa"]["password"])
             dept_var.set(cfg["department"])
 
             todieutri_frame.clear()
@@ -90,6 +87,10 @@ class App(tk.Frame):
                     "password": bacsi.get_password(),
                 },
                 "dieuduong": {
+                    "username": dieuduong.get_username(),
+                    "password": dieuduong.get_password(),
+                },
+                "truongkhoa": {
                     "username": dieuduong.get_username(),
                     "password": dieuduong.get_password(),
                 },
@@ -110,7 +111,7 @@ class App(tk.Frame):
 
 def run(cfg: config.Config, run_cfg: RunConfig):
     if not config.is_patient_list_valid(cfg):
-        messagebox.showerror(message="Sai data đầu vào")
+        messagebox.showerror(message="Sai/Trống link bệnh nhân")
         return
 
     with start_driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH) as d:
@@ -123,37 +124,25 @@ def run(cfg: config.Config, run_cfg: RunConfig):
             ):
                 run_bs(d, cfg)
 
-        if any(any(p["ky_3tra"]["dieuduong"]) for p in cfg["todieutri"]):
-            if config.is_valid(cfg, "dieuduong"):
-                with auth.session(
-                    d,
-                    cfg["dieuduong"]["username"],
-                    cfg["dieuduong"]["password"],
-                    cfg["department"],
-                ):
-                    run_dd(d, cfg)
-
-        if any(any(p["ky_3tra"]["benhnhan"]) for p in cfg["todieutri"]):
-            for user in get_args(Literal["bacsi", "dieuduong"]):
-                if config.is_valid(cfg, user):
-                    with auth.session(
-                        d,
-                        cfg[user]["username"],
-                        cfg[user]["password"],
-                        cfg["department"],
-                    ):
-                        run_bn(d, cfg)
-                    break
+        if config.is_valid(cfg, "dieuduong"):
+            with auth.session(
+                d,
+                cfg["dieuduong"]["username"],
+                cfg["dieuduong"]["password"],
+                cfg["department"],
+            ):
+                run_dd(d, cfg)
+                if any(any(p["ky_3tra"]["benhnhan"]) for p in cfg["todieutri"]):
+                    run_bn(d, cfg)
     messagebox.showinfo(message="finish")
 
 
 def run_bs(d: Driver, cfg: config.Config):
-    today = dt.date.today()
-
     _lgr.info("~~~~~ TỜ ĐIỀU TRỊ ~~~~~")
     for tdt in cfg["todieutri"]:
         d.goto(tdt["url"])
-        _log_patient_name(d.waiting(".name span").text)
+        pinfo = get_patient_info(d)
+        pprint_patient_info(pinfo)
 
         if tdt["ky_xn"]:
             sign_phieuchidinh(d)
@@ -161,33 +150,14 @@ def run_bs(d: Driver, cfg: config.Config):
             sign_todieutri(d)
         if any(tdt["ky_3tra"]["bacsi"]):
             sign_phieuthuchienylenh_bs(d, tdt["ky_3tra"]["bacsi"])
-        if any([tdt["ky_ct"], tdt["ky_mri"]]):
-            with top_hosobenhan.session(d):
-                if tdt["ky_ct"]:
-                    filter_check_expand_sign(
-                        d,
-                        name="Phiếu chỉ định chụp cắt lớp vi tính (CT)",
-                        chuaky_fn=lambda d, i: goto_row_then_tabdo(
-                            d, i, sign_staff.phieuCT_bschidinh
-                        ),
-                        date=today,
-                    )
-                if tdt["ky_mri"]:
-                    filter_check_expand_sign(
-                        d,
-                        name="Phiếu chỉ định chụp cộng hưởng từ (MRI)",
-                        chuaky_fn=lambda d, i: goto_row_then_tabdo(
-                            d, i, sign_staff.phieuMRI_bschidinh
-                        ),
-                        date=today,
-                    )
 
 
 def run_dd(d: Driver, cfg: config.Config):
     for p in cfg["todieutri"]:
         if any(p["ky_3tra"]["dieuduong"]):
             d.goto(p["url"])
-            _log_patient_name(d.waiting(".name span").text)
+            pinfo = get_patient_info(d)
+            pprint_patient_info(pinfo)
             sign_phieuthuchienylenh_dd(d, p["ky_3tra"]["dieuduong"])
 
 
@@ -195,26 +165,9 @@ def run_bn(d: Driver, cfg: config.Config):
     with create_connection() as con:
         for p in cfg["todieutri"]:
             d.goto(p["url"])
-            _log_patient_name(d.waiting(".name span").text)
-            ma_hs = int(
-                d.waiting(
-                    ".patient-information .additional-item:nth-child(2) .info",
-                    "ma ho so",
-                ).text
-            )
+            pinfo = get_patient_info(d)
+            pprint_patient_info(pinfo)
+            ma_hs = int(pinfo["ma_hs"])
             if signature := try_get_signature(d, con, ma_hs):
                 if any(p["ky_3tra"]["benhnhan"]):
                     sign_phieuthuchienylenh_bn(d, p["ky_3tra"]["benhnhan"], signature)
-
-
-def _log_patient_name(name: str):
-    _lgr.info(
-        "\n".join(
-            [
-                "",
-                "~" * 50,
-                f"patient: {name}",
-                "~" * 50,
-            ]
-        )
-    )

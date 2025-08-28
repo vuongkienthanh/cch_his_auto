@@ -4,7 +4,7 @@ import datetime as dt
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.action.chitietnguoibenhnoitru import _lgr, ACTIVE_PANE
+from cch_his_auto_lib.action.chitietnguoibenhnoitru.tabs import _lgr, ACTIVE_PANE
 
 TAB_NUMBER = 0
 

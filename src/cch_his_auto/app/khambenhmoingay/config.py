@@ -1,13 +1,12 @@
 from typing import Literal, TypedDict
 import json
-import os.path
+from pathlib import PurePath
 import os
 
 from validators import url
 
-APP_PATH = os.path.dirname(os.path.abspath(__file__))
-FILEPATH = os.path.join(APP_PATH, "config.json")
-PHCN_ORDER = ["bú nuốt", "giao tiếp", "hô hấp", "vận động"]
+APP_PATH = PurePath(__file__).parent
+FILEPATH = APP_PATH / "config.json"
 
 
 class LogInfo(TypedDict):
@@ -25,8 +24,6 @@ class Todieutri(TypedDict):
     url: str
     note: str
     ky_xn: bool
-    ky_ct: bool
-    ky_mri: bool
     ky_todieutri: bool
     ky_3tra: Ky_3tra
 
@@ -34,6 +31,7 @@ class Todieutri(TypedDict):
 class Config(TypedDict):
     bacsi: LogInfo
     dieuduong: LogInfo
+    truongkhoa: LogInfo
     department: str
     todieutri: list[Todieutri]
 
@@ -58,6 +56,10 @@ def load() -> Config:
                 "username": "",
                 "password": "",
             },
+            "truongkhoa": {
+                "username": "",
+                "password": "",
+            },
             "department": "",
             "todieutri": [],
         }
@@ -70,5 +72,5 @@ def is_patient_list_valid(config: Config) -> bool:
     )
 
 
-def is_valid(config: Config, kind: Literal["bacsi", "dieuduong"]) -> bool:
+def is_valid(config: Config, kind: Literal["bacsi", "dieuduong", "truongkhoa"]) -> bool:
     return config[kind]["username"] != "" and config[kind]["password"] != ""

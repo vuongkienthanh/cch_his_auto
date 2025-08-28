@@ -5,7 +5,10 @@ description = "Library for automating your HIS workflow at CCH"
 readme = "README.md"
 authors = [{ name = "vuongkienthanh", email = "thanhstardust@outlook.com" }]
 requires-python = ">=3.13"
-dependencies = ["selenium>=4.29.0"]
+dependencies = [
+    "rich>=14.1.0",
+    "selenium>=4.29.0",
+]
 
 [build-system]
 requires = ["hatchling"]
