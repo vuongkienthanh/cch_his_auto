@@ -29,6 +29,5 @@ def get_dienbien(d: Driver) -> str | None:
 
 
 def back_to_chitietthongtin(d: Driver):
-    ma_hs = get_patient_info(d)["ma_hs"]
     d.clicking(".footer-btn .right button:nth-child(2)", "go back button")
-    wait_patient_page_loaded(d, int(ma_hs))
+    wait_patient_page_loaded(d)

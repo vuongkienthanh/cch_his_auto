@@ -43,4 +43,4 @@ def goto_patient(d: Driver, ma_hs: int):
         ele.send_keys(Keys.ENTER)
         d.wait_disappearing(f"{DRAWER_CSS} tbody tr:nth-child(3)")
         d.clicking(f"{DRAWER_CSS} tbody tr:nth-child(2)", "first row")
-        wait_patient_page_loaded(d, ma_hs)
+        wait_patient_page_loaded(d)

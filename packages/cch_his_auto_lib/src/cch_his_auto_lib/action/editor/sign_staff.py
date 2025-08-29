@@ -88,9 +88,9 @@ def phieuCT_bschidinh(d: Driver):
 def phieuCT_bsthuchien(d: Driver):
     "*Phiếu chỉ định CT, bs thực hiện*"
     d.sign_staff_signature(
-        btn_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(20) .sign-image button:nth-child(1)",
+        btn_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(22) .sign-image button:nth-child(1)",
         btn_txt="Xác nhận ký Bác sĩ Chẩn đoán hình ảnh",
-        img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(20) .sign-image img",
+        img_css=".layout-line-item:nth-child(1) .layout-line-item:nth-child(22) .sign-image img",
         name="phieu CT bs thuc hien",
     )
 

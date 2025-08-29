@@ -319,7 +319,7 @@ class Driver(webdriver.Chrome):
             _lgr.error("-> can't go to new tab")
             raise Exception("can't go to new tab")
 
-    def goto_newtab_do_smth_then_goback(self, main_tab: str, f: "DriverFn") -> None:
+    def goto_newtab_do_smth_then_goback(self, main_tab: str, f: "DriverFn"):
         """
         Go to a tab different than `main_tab` and execute `f`.
         - `main_tab`: you can get this by `driver.current_window_handle`
@@ -333,13 +333,19 @@ class Driver(webdriver.Chrome):
             self.switch_to.window(main_tab)
             time.sleep(2)
 
-    def duplicate_tab(self) -> str:
-        "Duplicate and return the current tab"
+    def duplicate_tab_do_smth_then_goback(self, f: "DriverFn"):
+        "Duplicate the current tab and execute `f`."
         current_tab = self.current_window_handle
         url = self.current_url
         self.switch_to.new_window("tab")
         self.goto(url)
-        return current_tab
+        try:
+            f(self)
+        finally:
+            _lgr.info("---going back to main tab")
+            self.close()
+            self.switch_to.window(current_tab)
+            time.sleep(2)
 
     def clear_input(self, css: str) -> WebElement:
         "Find element by `css` then clear it"

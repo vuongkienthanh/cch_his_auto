@@ -2,10 +2,11 @@ import logging
 import time
 import datetime as dt
 from contextlib import contextmanager
+from functools import partial
 
 from selenium.webdriver.common.keys import Keys
 
-from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.driver import Driver, DriverFn
 from cch_his_auto_lib.tracing import tracing
 from cch_his_auto_lib.action.chitietnguoibenhnoitru import wait_patient_page_loaded
 
@@ -142,10 +143,16 @@ def filter_patient(d: Driver, ma_hs: int):
 @_trace
 def goto_patient(d: Driver, ma_hs: int):
     "Filter patient based on `ma_hs`, then open that patient"
-    _lgr.info(f"goto patient ma_hs={ma_hs}")
     filter_patient(d, ma_hs)
-    d.clicking2(
-        f"{MAIN_TABLE} .ant-table-row:nth-child(2) td:last-child svg",
-        "first row",
-    )
-    wait_patient_page_loaded(d, ma_hs)
+    d.clicking2(f"{MAIN_TABLE} tr.ant-table-row:nth-child(2) td:last-child svg", "first row")
+    wait_patient_page_loaded(d)
+
+
+def iterate_all_patient_and_do(d: Driver, f: DriverFn):
+    def do(d, i):
+        d.clicking2(f"{MAIN_TABLE} tr.ant-table-row:nth-child({i}) td:last-child svg")
+        wait_patient_page_loaded(d)
+        f(d)
+
+    for i in range(2, len(d.find_all(f"{MAIN_TABLE} tr.ant-table-row")) + 2):
+        d.duplicate_tab_do_smth_then_goback(partial(do, i=i))
