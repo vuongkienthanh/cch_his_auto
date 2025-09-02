@@ -1,0 +1,33 @@
+import logging
+from typing import Callable
+import sys
+
+
+def set_up_root_logger():
+    root_logger = logging.getLogger()
+    _out = logging.StreamHandler(sys.stdout)
+    _out.setFormatter(
+        logging.Formatter(fmt="{asctime} {name} {levelname}: {message}", style="{")
+    )
+    root_logger.addHandler(_out)
+
+
+def tracing(logger: logging.Logger) -> Callable:
+    "Add logging to functions"
+
+    def inner(f: Callable):
+        def inner2(*args, **kwargs):
+            name = f.__qualname__
+            logger.debug(f"+++ start {name}")
+            try:
+                ret = f(*args, **kwargs)
+            except:
+                logger.error(f"??? error running {name}")
+                raise
+            else:
+                logger.info(f">>> finish {name}")
+                return ret
+
+        return inner2
+
+    return inner

@@ -1,0 +1,7 @@
+**/__pycache__
+**/config.json
+**/run_config.json
+**/Profile/
+**/.db
+build/
+dist/
