@@ -150,13 +150,13 @@ def filter_patient(d: Driver, ma_hs: int):
     d.wait_disappearing(f"{MAIN_TABLE} .ant-table-row:nth-child(3)")
 
 
-@_trace
 def goto_patient(d: Driver, ma_hs: int):
     "Filter patient based on `ma_hs`, then open that patient"
     filter_patient(d, ma_hs)
     open_patient(d, 2)
 
 
+@_trace
 def open_patient(d: Driver, i: int):
     d.clicking2(f"{MAIN_TABLE} tr.ant-table-row:nth-child({i}) td:last-child svg")
     chitietnguoibenhnoitru.wait_loaded(d)

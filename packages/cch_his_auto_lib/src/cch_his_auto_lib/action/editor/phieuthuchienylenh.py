@@ -1,10 +1,12 @@
 from cch_his_auto_lib.driver import Driver
 from . import wait_loaded
+from rich import print
 
 
 def bs(d: Driver, arr: tuple[bool, bool, bool, bool, bool]):
     "*Phiếu thực hiện y lệnh (bác sĩ)*"
     wait_loaded(d)
+    print("[red] signing phieu thuc hien y lenh, may take a while")
     d.waiting(".table-tbody")
     for col in map(lambda x: x[0], filter(lambda x: x[1], zip([3, 4, 5, 6, 7], arr))):
         d.sign_staff_signature(
@@ -24,6 +26,7 @@ def bs(d: Driver, arr: tuple[bool, bool, bool, bool, bool]):
 def dd(d: Driver, arr: tuple[bool, bool, bool, bool, bool]):
     "*Phiếu thực hiện y lệnh (điều dưỡng)*"
     wait_loaded(d)
+    print("[red] signing phieu thuc hien y lenh, may take a while")
     d.waiting(".table-tbody")
     for col in map(lambda x: x[0], filter(lambda x: x[1], zip([3, 4, 5, 6, 7], arr))):
         d.sign_staff_signature(
@@ -39,6 +42,7 @@ def bn(d: Driver, arr: tuple[bool, bool, bool, bool, bool], signature: str | Non
     if signature is None:
         return
     wait_loaded(d)
+    print("[red] signing phieu thuc hien y lenh, may take a while")
     d.waiting(".table-tbody")
     for col in map(lambda x: x[0], filter(lambda x: x[1], zip([3, 4, 5, 6, 7], arr))):
         d.sign_patient_signature(

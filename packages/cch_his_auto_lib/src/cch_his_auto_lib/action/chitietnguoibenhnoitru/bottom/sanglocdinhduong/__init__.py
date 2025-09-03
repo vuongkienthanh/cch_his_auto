@@ -1,19 +1,16 @@
 import datetime as dt
-import logging
 
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.tracing import tracing
 from cch_his_auto_lib.action.chitietnguoibenhnoitru import get_patient_info
 from cch_his_auto_lib.action.chitietnguoibenhnoitru.top import (
     chitietthongtin,
 )
+from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom import _lgr, _trace
 
 URL = "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
 
-_lgr = logging.getLogger("bot_sanglocdinhduong")
-_trace = tracing(_lgr)
 
 from .helper import machedo
 from .phieusangloc import save_new_phieusangloc

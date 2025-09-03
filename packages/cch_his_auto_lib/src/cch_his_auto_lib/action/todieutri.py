@@ -60,7 +60,6 @@ def ingiayto(d: Driver, name: str):
         raise EndOfLoopException(f"can't find ingiayto -> {name}")
 
 
-@_trace
 def phieuchidinh(d: Driver):
     "Inside *tờ điều trị*, try to sign *phiếu chỉ định*"
 

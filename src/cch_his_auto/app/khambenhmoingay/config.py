@@ -1,17 +1,12 @@
-from typing import Literal, TypedDict
+from typing import TypedDict
 import json
 from pathlib import PurePath
 import os
 
-from validators import url
+from cch_his_auto.structs import LogInfo
 
 APP_PATH = PurePath(__file__).parent
 FILEPATH = APP_PATH / "config.json"
-
-
-class LogInfo(TypedDict):
-    username: str
-    password: str
 
 
 class Ky_3tra(TypedDict):
@@ -81,23 +76,3 @@ def load() -> Config:
         }
 
 
-def is_patient_list_valid(cfg: Config) -> bool:
-    return (
-        len(cfg["todieutri"]) > 0
-        and all(
-            url(tdt["url"])
-            and ("chi-tiet-nguoi-benh-noi-tru/to-dieu-tri/" in tdt["url"])
-            for tdt in cfg["todieutri"]
-        )
-        and all(
-            url(bbhc["url"])
-            and ("chi-tiet-nguoi-benh-noi-tru/bien-ban-hoi-chan/" in bbhc["url"])
-            for bbhc in cfg["bienbanhoichan"]
-        )
-    )
-
-
-def is_valid(
-    config: Config, kind: Literal["bacsi", "dieuduong", "truongkhoa", "thanhvienkhac"]
-) -> bool:
-    return config[kind]["username"] != "" and config[kind]["password"] != ""

@@ -1,12 +1,9 @@
-from selenium.webdriver import ActionChains, Keys
 from cch_his_auto_lib.driver import Driver
 
 
 def check_than_click(d: Driver, css):
     if d.waiting(f"{css} span").text.strip() == "":
         d.clicking(css)
-
-
 
 
 def phieudutrucungcapmau_fill_info(

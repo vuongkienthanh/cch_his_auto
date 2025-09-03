@@ -2,7 +2,7 @@ import time
 import logging
 from pathlib import PurePath
 from contextlib import contextmanager
-from typing import Protocol, Any
+from typing import Protocol
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -319,13 +319,13 @@ class Driver(webdriver.Chrome):
             _lgr.error("-> can't go to new tab")
             raise Exception("can't go to new tab")
 
-    def do_next_tab_do(self, f1: "DriverFn", f2: "DriverFn"):
+    def do_next_tab_do[T](self, f1: "DriverFn", f2: "DriverFn[T]") -> T:
         "Execute `f1` which open a new tab, execute `f2` then go back"
         current_tab = self.current_window_handle
         f1(self)
         self.goto_newtab(current_tab)
         try:
-            f2(self)
+            return f2(self)
         finally:
             _lgr.debug("---go back to current tab")
             self.close()
@@ -391,10 +391,10 @@ class Driver(webdriver.Chrome):
             self.wait_disappearing(iframe_css)
 
 
-class DriverFn(Protocol):
+class DriverFn[T](Protocol):
     "A function typing hint that accepts Driver as first argument"
 
-    def __call__(self, driver: "Driver", /, *args, **kwargs) -> Any: ...
+    def __call__(self, driver: Driver, /, *args, **kwargs) -> T: ...
 
 
 @contextmanager

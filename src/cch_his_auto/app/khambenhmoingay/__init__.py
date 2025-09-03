@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 
+from validators import url
 
 from cch_his_auto.app import PROFILE_PATH, _lgr
 from cch_his_auto.global_db import create_connection
@@ -8,6 +9,7 @@ from cch_his_auto.common_ui.staff_info import UsernamePasswordFrame
 from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig
 from cch_his_auto.common_tasks.signature import try_get_signature
 from cch_his_auto.common_tasks.navigation import pprint_patient_info
+from cch_his_auto.structs import is_user_valid
 
 from . import config, todieutri_tab, bienbanhoichan_tab
 from .tabbed_listframe import TabbedListFrame
@@ -88,8 +90,8 @@ class App(tk.Frame):
 
             button_frame.load_config()
 
-        def get_config() -> config.Config:
-            return {
+        def get_config() -> config.Config | None:
+            cfg = {
                 "bacsi": {
                     "username": bacsi.get_username(),
                     "password": bacsi.get_password(),
@@ -110,6 +112,25 @@ class App(tk.Frame):
                 "todieutri": todieutri_frame.get_items(),
                 "bienbanhoichan": bienbanhoichan_frame.get_items(),
             }
+            if (
+                len(cfg["todieutri"]) > 0
+                and all(
+                    url(tdt["url"])
+                    and ("chi-tiet-nguoi-benh-noi-tru/to-dieu-tri/" in tdt["url"])
+                    for tdt in cfg["todieutri"]
+                )
+                and all(
+                    url(bbhc["url"])
+                    and (
+                        "chi-tiet-nguoi-benh-noi-tru/bien-ban-hoi-chan/" in bbhc["url"]
+                    )
+                    for bbhc in cfg["bienbanhoichan"]
+                )
+            ):
+                return cfg
+            else:
+                messagebox.showerror(message="Sai/Trống link bệnh nhân")
+                return
 
         def save():
             if messagebox.askyesno(message="Save?"):
@@ -123,12 +144,8 @@ class App(tk.Frame):
 
 
 def run(cfg: config.Config, run_cfg: RunConfig):
-    if not config.is_patient_list_valid(cfg):
-        messagebox.showerror(message="Sai/Trống link bệnh nhân")
-        return
-
     with start_driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH) as d:
-        if config.is_valid(cfg, "bacsi"):
+        if is_user_valid(cfg["bacsi"]):
             with auth.session(
                 d,
                 cfg["bacsi"]["username"],
@@ -137,7 +154,7 @@ def run(cfg: config.Config, run_cfg: RunConfig):
             ):
                 run_bs(d, cfg)
 
-        if config.is_valid(cfg, "dieuduong"):
+        if is_user_valid(cfg["dieuduong"]):
             with auth.session(
                 d,
                 cfg["dieuduong"]["username"],
@@ -147,7 +164,7 @@ def run(cfg: config.Config, run_cfg: RunConfig):
                 run_dd(d, cfg)
                 if any(any(p["ky_3tra"]["benhnhan"]) for p in cfg["todieutri"]):
                     run_bn(d, cfg)
-        if config.is_valid(cfg, "truongkhoa"):
+        if is_user_valid(cfg["truongkhoa"]):
             with auth.session(
                 d,
                 cfg["truongkhoa"]["username"],
