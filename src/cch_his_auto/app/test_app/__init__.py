@@ -5,7 +5,7 @@ import datetime as dt
 
 from cch_his_auto.app import PROFILE_PATH
 
-from cch_his_auto.common_ui.staff_info import UsernamePasswordDeptFrame
+from cch_his_auto.common_ui.user_frame import UsernamePasswordDeptFrame
 from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig
 
 
@@ -36,7 +36,7 @@ class App(tk.Frame):
         def load():
             cfg = config.load()
 
-            bacsi.set_username(cfg["username"])
+            bacsi.set_name(cfg["username"])
             bacsi.set_password(cfg["password"])
             bacsi.set_department(cfg["department"])
 
@@ -44,7 +44,7 @@ class App(tk.Frame):
 
         def get_config() -> config.Config:
             return {
-                "username": bacsi.get_username(),
+                "username": bacsi.get_name(),
                 "password": bacsi.get_password(),
                 "department": bacsi.get_department(),
             }

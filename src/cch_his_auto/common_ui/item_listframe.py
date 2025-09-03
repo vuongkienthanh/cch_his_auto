@@ -77,11 +77,11 @@ class ListFrame[T](tk.Frame):
         line = self.add_new()
         line.set_item(item)
 
-    def get_items(self) -> list[T]:
-        return [
+    def get_items(self) -> tuple[T]:
+        return tuple(
             cast(ListItem, gs).get_item()
             for gs in self.listframe.viewPort.grid_slaves()[::-1]
-        ]
+        )
 
     def count(self) -> int:
         return len(self.listframe.viewPort.grid_slaves())

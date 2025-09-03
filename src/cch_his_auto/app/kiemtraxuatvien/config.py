@@ -1,28 +1,31 @@
-from typing import TypedDict
-import json
-import os.path
-import os
+from dataclasses import dataclass
+from typing import Self
+from pathlib import PurePath
 
-APP_PATH = os.path.dirname(os.path.abspath(__file__))
-FILEPATH = os.path.join(APP_PATH, "config.json")
+from cch_his_auto.common_structs import User, ABCConfig
 
 
-class Config(TypedDict):
-    username: str
-    password: str
-    department: str
-    listing: list[int]
+@dataclass(repr=False, eq=False)
+class Config(ABCConfig):
+    APP_PATH = PurePath(__file__).parent
+    FILEPATH = APP_PATH / "config.json"
 
+    user: User = User()
+    department: str = ""
+    listing: tuple[int, ...] = ()
 
-def save(cfg: Config):
-    os.makedirs(APP_PATH, exist_ok=True)
-    with open(FILEPATH, "w") as f:
-        json.dump(cfg, f, indent=4)
+    def to_dict(self):
+        return {
+            "user": self.user.to_dict(),
+            "department": self.department,
+            "listing": self.listing,
+        }
 
+    @classmethod
+    def from_dict(cls, value) -> Self:
+        return cls(
+            User.from_dict(value["user"]), value["department"], tuple(value["listing"])
+        )
 
-def load() -> Config:
-    try:
-        with open(FILEPATH, "r") as f:
-            return json.load(f)
-    except Exception as _:
-        return {"username": "", "password": "", "department": "", "listing": []}
+    def is_valid(self) -> bool:
+        return (len(self.department) > 0) and (len(self.listing) > 0)

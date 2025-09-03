@@ -1,4 +1,5 @@
 import tkinter as tk
+from cch_his_auto.common_structs import User
 
 
 class UsernamePasswordFrame(tk.LabelFrame):
@@ -6,24 +7,19 @@ class UsernamePasswordFrame(tk.LabelFrame):
         super().__init__(parent, text=text, *args, **kwargs)
         self.columnconfigure(1, weight=1)
 
-        self.username_var = tk.StringVar()
+        self.name_var = tk.StringVar()
         self.password_var = tk.StringVar()
-        tk.Label(self, text="username").grid(row=0, column=0)
-        tk.Entry(self, textvariable=self.username_var).grid(row=0, column=1)
+        tk.Label(self, text="name").grid(row=0, column=0)
+        tk.Entry(self, textvariable=self.name_var).grid(row=0, column=1)
         tk.Label(self, text="password").grid(row=1, column=0)
         tk.Entry(self, textvariable=self.password_var).grid(row=1, column=1)
 
-    def get_username(self):
-        return self.username_var.get()
+    def get_user(self) -> User:
+        return User(self.name_var.get(), self.password_var.get())
 
-    def set_username(self, value: str):
-        return self.username_var.set(value)
-
-    def get_password(self):
-        return self.password_var.get()
-
-    def set_password(self, value: str):
-        return self.password_var.set(value)
+    def set_user(self, value: User):
+        self.name_var.set(value.name)
+        self.password_var.set(value.password)
 
 
 class UsernamePasswordDeptFrame(UsernamePasswordFrame):

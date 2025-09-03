@@ -1,26 +1,39 @@
 """
 This is the right side (tk.Frame) of an app.
 Its layout consists of 3 buttons [Save, Load, Run] and 2 checkboxes [Headless, Debug].
-Its config is typed hint to `RunConfig`.
-The frame provides `save_config`, and `load_config` for `RunConfig`.
+Its config is the class `RunConfig` with save load methods.
 You can `bind_save`, `bind_load`, `bind_run` functions onto the corresponding buttons.
 """
 
+from dataclasses import dataclass
+from typing import Self
 import tkinter as tk
-from typing import TypedDict
 from pathlib import PurePath
-import os
-import json
 import logging
 
-
-APP_PATH = PurePath(__file__).parent.parent
-FILEPATH = APP_PATH / "run_config.json"
+from cch_his_auto.common_structs import ABCConfig
 
 
-class RunConfig(TypedDict):
-    headless: bool
-    debug: bool
+@dataclass(repr=False, eq=False, frozen=True)
+class RunConfig(ABCConfig):
+    APP_PATH = PurePath(__file__).parent.parent
+    FILEPATH = APP_PATH / "run_config.json"
+
+    headless: bool = True
+    debug: bool = False
+
+    def to_dict(self):
+        return {
+            "headless": self.headless,
+            "debug": self.debug,
+        }
+
+    @classmethod
+    def from_dict(cls, value) -> Self:
+        return cls(value["headless"], value["debug"])
+
+    def is_valid(self) -> bool:
+        return True
 
 
 class ButtonFrame(tk.Frame):
@@ -70,26 +83,16 @@ class ButtonFrame(tk.Frame):
 
     def get_config(self) -> RunConfig:
         self.setLogLevel()
-        return {
-            "headless": self.headless.get(),
-            "debug": self.debug.get(),
-        }
+        return RunConfig(
+            self.headless.get(),
+            self.debug.get(),
+        )
 
     def save_config(self):
-        cfg = self.get_config()
-        os.makedirs(APP_PATH, exist_ok=True)
-        with open(FILEPATH, "w") as f:
-            json.dump(cfg, f, indent=4)
+        self.get_config().save()
 
     def load_config(self):
-        try:
-            with open(FILEPATH, "r") as f:
-                cfg = json.load(f)
-        except Exception as _:
-            cfg = {
-                "headless": False,
-                "debug": False,
-            }
+        cfg = RunConfig.load()
 
-        self.headless.set(cfg["headless"])
-        self.debug.set(cfg["debug"])
+        self.headless.set(cfg.headless)
+        self.debug.set(cfg.debug)

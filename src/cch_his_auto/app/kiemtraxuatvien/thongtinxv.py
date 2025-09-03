@@ -13,11 +13,11 @@ from cch_his_auto_lib.action.chitietnguoibenhnoitru.tabs.thongtinchung import (
     edit_thongtinravien,
 )
 
-from . import config
+from .config import Config
 
 
-def run(cfg: config.Config, run_cfg: RunConfig):
-    if not config.is_valid(cfg):
+def run(cfg: Config, run_cfg: RunConfig):
+    if not cfg.is_valid():
         messagebox.showerror(message="chưa đủ thông tin")
         return
 
@@ -75,16 +75,15 @@ def run(cfg: config.Config, run_cfg: RunConfig):
         expand_abbrv()
 
     with start_driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH) as d:
-        with auth.session(d, cfg["username"], cfg["password"], cfg["department"]):
+        with auth.session(d, cfg.user.name, cfg.user.password, cfg.department):
             with create_connection() as con:
                 danhsachnguoibenhnoitru.filter_trangthainguoibenh_check_all(d)
 
-                ma_hs = cfg["listing"].pop()
+                ma_hs = cfg.listing[0]
                 first_patient(d, con, ma_hs)
                 check(ma_hs)
 
-                while len(cfg["listing"]) > 0:
-                    ma_hs = cfg["listing"].pop()
+                for ma_hs in cfg.listing[1:]:
                     next_patient(d, con, ma_hs)
                     check(ma_hs)
 

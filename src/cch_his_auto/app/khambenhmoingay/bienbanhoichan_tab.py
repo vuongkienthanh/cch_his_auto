@@ -13,7 +13,7 @@ HEADERS_STATS = [
     ("Khác note", 200, 0),
     ("Xóa", 80, 0),
 ]
-type Item = Bienbanhoichan
+TITLE = "Biên bản hội chẩn"
 
 
 class Line(ListItem):
@@ -58,20 +58,20 @@ class Line(ListItem):
         self.destroy()
         cast(TabbedListFrame, tab_frame).change_tab_text()
 
-    def set_item(self, item: Item):
-        self.url_var.set(item["url"])
-        self.note_var.set(item["note"])
-        self.ky_thuky_var.set(item["ky_thuky"])
-        self.ky_truongkhoa_var.set(item["ky_truongkhoa"])
-        self.kt_thanhvienkhac_var.set(item["ky_thanhvienkhac"])
-        self.khac_note_var.set(item["khac_note"])
+    def set_item(self, item: Bienbanhoichan):
+        self.url_var.set(item.url)
+        self.note_var.set(item.note)
+        self.ky_thuky_var.set(item.ky_thuky)
+        self.ky_truongkhoa_var.set(item.ky_truongkhoa)
+        self.kt_thanhvienkhac_var.set(item.ky_thanhvienkhac)
+        self.khac_note_var.set(item.khac_note)
 
-    def get_item(self) -> Item:
-        return {
-            "url": self.url_var.get(),
-            "note": self.note_var.get(),
-            "ky_thuky": self.ky_thuky_var.get(),
-            "ky_truongkhoa": self.ky_truongkhoa_var.get(),
-            "ky_thanhvienkhac": self.kt_thanhvienkhac_var.get(),
-            "khac_note": self.khac_note_var.get(),
-        }
+    def get_item(self) -> Bienbanhoichan:
+        return Bienbanhoichan(
+            self.url_var.get(),
+            self.note_var.get(),
+            self.ky_thuky_var.get(),
+            self.ky_truongkhoa_var.get(),
+            self.kt_thanhvienkhac_var.get(),
+            self.khac_note_var.get(),
+        )

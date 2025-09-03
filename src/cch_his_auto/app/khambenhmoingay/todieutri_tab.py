@@ -9,7 +9,7 @@ from typing import cast
 from cch_his_auto.common_ui.item_listframe import ListItem
 
 from .tabbed_listframe import TabbedListFrame
-from .config import Todieutri
+from .config import Todieutri, Ky_3tra
 
 HEADERS_STATS = [
     ("url", 200, 1),
@@ -18,7 +18,8 @@ HEADERS_STATS = [
     ("Vị trí ký 3tra", 180, 0),
     ("Xóa", 80, 0),
 ]
-type Item = Todieutri
+TITLE = " Tờ điều trị"
+type k3 = tuple[bool, bool, bool, bool, bool]
 
 
 class Line(ListItem):
@@ -67,27 +68,27 @@ class Line(ListItem):
         self.destroy()
         cast(TabbedListFrame, tab_frame).change_tab_text()
 
-    def set_item(self, item: Item):
-        self.url_var.set(item["url"])
-        self.note_var.set(item["note"])
-        self.xn_var.set(item["ky_xn"])
-        self.tdt_var.set(item["ky_todieutri"])
-        self.k3t_bs.set_vitri(item["ky_3tra"]["bacsi"])
-        self.k3t_dd.set_vitri(item["ky_3tra"]["dieuduong"])
-        self.k3t_bn.set_vitri(item["ky_3tra"]["benhnhan"])
+    def set_item(self, item: Todieutri):
+        self.url_var.set(item.url)
+        self.note_var.set(item.note)
+        self.xn_var.set(item.ky_xn)
+        self.tdt_var.set(item.ky_todieutri)
+        self.k3t_bs.set_vitri(item.ky_3tra.bacsi)
+        self.k3t_dd.set_vitri(item.ky_3tra.dieuduong)
+        self.k3t_bn.set_vitri(item.ky_3tra.benhnhan)
 
-    def get_item(self) -> Item:
-        return {
-            "url": self.url_var.get(),
-            "note": self.note_var.get(),
-            "ky_xn": self.xn_var.get(),
-            "ky_todieutri": self.tdt_var.get(),
-            "ky_3tra": {
-                "bacsi": self.k3t_bs.get_vitri(),
-                "dieuduong": self.k3t_dd.get_vitri(),
-                "benhnhan": self.k3t_bn.get_vitri(),
-            },
-        }
+    def get_item(self) -> Todieutri:
+        return Todieutri(
+            self.url_var.get(),
+            self.note_var.get(),
+            self.xn_var.get(),
+            self.tdt_var.get(),
+            Ky_3tra(
+                self.k3t_bs.get_vitri(),
+                self.k3t_dd.get_vitri(),
+                self.k3t_bn.get_vitri(),
+            ),
+        )
 
 
 class Ky3Tra(tk.LabelFrame):
@@ -101,7 +102,7 @@ class Ky3Tra(tk.LabelFrame):
         for i, v in enumerate([self.v0, self.v1, self.v2, self.v3, self.v4]):
             tk.Checkbutton(self, variable=v).grid(row=0, column=i)
 
-    def get_vitri(self) -> tuple[bool, bool, bool, bool, bool]:
+    def get_vitri(self) -> k3:
         return (
             self.v0.get(),
             self.v1.get(),
@@ -110,7 +111,7 @@ class Ky3Tra(tk.LabelFrame):
             self.v4.get(),
         )
 
-    def set_vitri(self, v: tuple[bool, bool, bool, bool, bool]):
+    def set_vitri(self, v: k3):
         self.v0.set(v[0])
         self.v1.set(v[1])
         self.v2.set(v[2])
