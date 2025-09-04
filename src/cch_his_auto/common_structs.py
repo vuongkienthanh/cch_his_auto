@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from pathlib import PurePath
 from typing import ClassVar, Self
 from abc import ABC, abstractmethod
@@ -27,9 +27,6 @@ class ABCConfig(ABC):
     APP_PATH: ClassVar[PurePath]
     FILE_PATH: ClassVar[PurePath]
 
-    @abstractmethod
-    def to_dict(self): ...
-
     @classmethod
     @abstractmethod
     def from_dict(cls, value) -> Self: ...
@@ -39,7 +36,7 @@ class ABCConfig(ABC):
     def save(self):
         os.makedirs(self.APP_PATH, exist_ok=True)
         with open(self.FILE_PATH, "w") as f:
-            json.dump(self.to_dict(), f, indent=4)
+            json.dump(asdict(self), f, indent=4)
 
     @classmethod
     def load(cls) -> Self:

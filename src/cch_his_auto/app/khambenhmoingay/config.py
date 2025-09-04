@@ -16,13 +16,6 @@ class Ky_3tra:
     dieuduong: k3 = k3_default
     benhnhan: k3 = k3_default
 
-    def to_dict(self):
-        return {
-            "bacsi": self.bacsi,
-            "dieuduong": self.dieuduong,
-            "benhnhan": self.benhnhan,
-        }
-
     @classmethod
     def from_dict(cls, value) -> Self:
         return cls(value["bacsi"], value["dieuduong"], value["benhnhan"])
@@ -35,15 +28,6 @@ class Todieutri:
     ky_xn: bool = False
     ky_todieutri: bool = True
     ky_3tra: Ky_3tra = Ky_3tra()
-
-    def to_dict(self):
-        return {
-            "url": self.url,
-            "note": self.note,
-            "ky_xn": self.ky_xn,
-            "ky_todieutri": self.ky_todieutri,
-            "ky_3tra": self.ky_3tra.to_dict(),
-        }
 
     @classmethod
     def from_dict(cls, value) -> Self:
@@ -65,16 +49,6 @@ class Bienbanhoichan:
     ky_thanhvienkhac: bool = False
     khac_note: str = ""
 
-    def to_dict(self):
-        return {
-            "url": self.url,
-            "note": self.note,
-            "ky_thuky": self.ky_thuky,
-            "ky_truongkhoa": self.ky_truongkhoa,
-            "ky_thanhvienkhac": self.ky_thanhvienkhac,
-            "khac_note": self.khac_note,
-        }
-
     @classmethod
     def from_dict(cls, value) -> Self:
         return cls(
@@ -90,7 +64,7 @@ class Bienbanhoichan:
 @dataclass(eq=False, repr=False, frozen=True)
 class Config(ABCConfig):
     APP_PATH = PurePath(__file__).parent
-    FILEPATH = APP_PATH / "config.json"
+    FILE_PATH = APP_PATH / "config.json"
 
     bacsi: User = User()
     dieuduong: User = User()
@@ -99,17 +73,6 @@ class Config(ABCConfig):
     department: str = ""
     todieutri: tuple[Todieutri, ...] = ()
     bienbanhoichan: tuple[Bienbanhoichan, ...] = ()
-
-    def to_dict(self):
-        return {
-            "bacsi": self.bacsi.to_dict(),
-            "dieuduong": self.dieuduong.to_dict(),
-            "truongkhoa": self.truongkhoa.to_dict(),
-            "thanhvienkhac": self.thanhvienkhac.to_dict(),
-            "department": self.department,
-            "todieutri": [tdt.to_dict() for tdt in self.todieutri],
-            "bienbanhoichan": [bbhc.to_dict() for bbhc in self.bienbanhoichan],
-        }
 
     @classmethod
     def from_dict(cls, value) -> Self:

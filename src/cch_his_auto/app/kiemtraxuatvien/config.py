@@ -5,21 +5,14 @@ from pathlib import PurePath
 from cch_his_auto.common_structs import User, ABCConfig
 
 
-@dataclass(repr=False, eq=False)
+@dataclass(repr=False, eq=False, frozen=True)
 class Config(ABCConfig):
     APP_PATH = PurePath(__file__).parent
-    FILEPATH = APP_PATH / "config.json"
+    FILE_PATH = APP_PATH / "config.json"
 
     user: User = User()
     department: str = ""
     listing: tuple[int, ...] = ()
-
-    def to_dict(self):
-        return {
-            "user": self.user.to_dict(),
-            "department": self.department,
-            "listing": self.listing,
-        }
 
     @classmethod
     def from_dict(cls, value) -> Self:

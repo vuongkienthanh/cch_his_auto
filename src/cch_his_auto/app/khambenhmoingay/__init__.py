@@ -54,12 +54,14 @@ class App(tk.Frame):
         todieutri_frame = TabbedListFrame(
             nb,
             title=todieutri_tab.TITLE,
+            tab_index=0,
             item_type=todieutri_tab.Line,
             stats=todieutri_tab.HEADERS_STATS,
         )
         bienbanhoichan_frame = TabbedListFrame(
             nb,
             title=bienbanhoichan_tab.TITLE,
+            tab_index=1,
             item_type=bienbanhoichan_tab.Line,
             stats=bienbanhoichan_tab.HEADERS_STATS,
         )

@@ -17,16 +17,10 @@ from cch_his_auto.common_structs import ABCConfig
 @dataclass(repr=False, eq=False, frozen=True)
 class RunConfig(ABCConfig):
     APP_PATH = PurePath(__file__).parent.parent
-    FILEPATH = APP_PATH / "run_config.json"
+    FILE_PATH = APP_PATH / "run_config.json"
 
     headless: bool = True
     debug: bool = False
-
-    def to_dict(self):
-        return {
-            "headless": self.headless,
-            "debug": self.debug,
-        }
 
     @classmethod
     def from_dict(cls, value) -> Self:

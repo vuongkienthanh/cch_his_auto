@@ -7,20 +7,12 @@ from pathlib import PurePath
 @dataclass(repr=False, eq=False, frozen=True)
 class Config(ABCConfig):
     APP_PATH = PurePath(__file__).parent
-    FILEPATH = APP_PATH / "config.json"
+    FILE_PATH = APP_PATH / "config.json"
 
     user: User = User()
     department: str = ""
     dinhduong: bool = True
     nhommau: bool = True
-
-    def to_dict(self):
-        return {
-            "user": self.user.to_dict(),
-            "department": self.department,
-            "dinhduong": self.dinhduong,
-            "nhommau": self.nhommau,
-        }
 
     @classmethod
     def from_dict(cls, value) -> Self:
