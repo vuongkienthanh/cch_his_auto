@@ -4,7 +4,7 @@ from rich import print
 from cch_his_auto.global_db import save_db, get_signature_from_db
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom.dieuduong.camketchungvenhapvien import (
+from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom.indieuduong.camketchungvenhapvien import (
     get_signature_from_HIS,
 )
 from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom import indieuduong

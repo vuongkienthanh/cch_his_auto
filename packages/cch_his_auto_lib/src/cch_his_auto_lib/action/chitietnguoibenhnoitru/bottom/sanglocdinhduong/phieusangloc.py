@@ -1,19 +1,26 @@
-import time
 import datetime as dt
 
 from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.action import top_patient_info
 from . import _lgr, _trace
 
 
 def back(d: Driver):
     d.clicking(".footer-btn .left button", "go back button")
-    d.waiting(".thong-tin-benh-nhan", "chi tiết bệnh nhân")
-    time.sleep(5)
+    top_patient_info.wait_loaded(d)
 
 
 def set_date(d: Driver, date: dt.date):
     d.clear_input(".input-date").send_keys(date.strftime("%d/%m/%Y"))
     _lgr.debug(f"set date to {date}")
+
+
+def get_cannang(d: Driver) -> str | None:
+    return d.waiting("#canNang").get_attribute("value")
+
+
+def get_chieucao(d: Driver) -> str | None:
+    return d.waiting("#chieuCao").get_attribute("value")
 
 
 def set_cannang(d: Driver, value: str):
@@ -27,6 +34,7 @@ def set_chieucao(d: Driver, value: str):
 
 
 def set_machedo(d: Driver, value: str):
+    d.clicking("#dsDuongNuoiAn>.ant-row>.ant-col:last-child>div>label input")
     d.clear_input("#dsDuongNuoiAn>.ant-row>.ant-col:last-child>div>input").send_keys(
         value
     )
@@ -43,6 +51,7 @@ def save_new_phieusangloc(
 ):
     "Complete this *Phiếu sàng lọc* then go back"
     _lgr.info(f"new phieusangloc: date= {date}")
+    top_patient_info.wait_loaded(d)
     set_date(d, date)
     set_cannang(d, cannang)
     set_chieucao(d, chieucao)

@@ -5,7 +5,7 @@ from rich import print
 from cch_his_auto.global_db import get_url_from_db
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.action.chitietnguoibenhnoitru.top import (
+from cch_his_auto_lib.action.top_patient_info import (
     danhsachnguoibenh,
 )
 from cch_his_auto_lib.action import danhsachnguoibenhnoitru
@@ -18,10 +18,10 @@ def pprint_patient_info(p: dict[str, str]):
                 "",
                 "[red]" + "~" * 50 + "[/red]",
                 "[red]~"
-                + f"[white bold]patient: {p['name']}[/white bold]".center(50)
+                + f"[white bold]patient: {p['name']}[/white bold]".center(72)
                 + "~[/red]",
                 "[red]~"
-                + f"[white bold]ma_hs: {p['ma_hs']}[/white bold]".center(50)
+                + f"[white bold]ma_hs: {p['ma_hs']}[/white bold]".center(72)
                 + "~[/red]",
                 "[red]" + "~" * 50 + "[/red]",
                 "",

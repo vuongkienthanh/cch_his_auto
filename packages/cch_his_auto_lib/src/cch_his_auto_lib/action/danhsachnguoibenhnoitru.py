@@ -8,7 +8,7 @@ from selenium.webdriver.common.keys import Keys
 
 from cch_his_auto_lib.driver import Driver, DriverFn
 from cch_his_auto_lib.tracing import tracing
-from cch_his_auto_lib.action import chitietnguoibenhnoitru
+from cch_his_auto_lib.action import top_patient_info
 
 URL = "http://emr.ndtp.org/quan-ly-noi-tru/danh-sach-nguoi-benh-noi-tru"
 
@@ -159,7 +159,7 @@ def goto_patient(d: Driver, ma_hs: int):
 @_trace
 def open_patient(d: Driver, i: int):
     d.clicking2(f"{MAIN_TABLE} tr.ant-table-row:nth-child({i}) td:last-child svg")
-    chitietnguoibenhnoitru.wait_loaded(d)
+    top_patient_info.wait_loaded(d)
 
 
 def iterate_all_and_do(d: Driver, f: DriverFn):

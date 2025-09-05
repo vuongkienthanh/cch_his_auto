@@ -5,11 +5,7 @@ from selenium.webdriver import Keys
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tracing import tracing
-from cch_his_auto_lib.action.chitietnguoibenhnoitru import (
-    wait_loaded,
-    get_patient_info,
-)
-from . import TOP_BTN_CSS
+from . import TOP_BTN_CSS, wait_loaded, get_patient_info
 
 
 _lgr = logging.getLogger("top_danhsachnguoibenh")

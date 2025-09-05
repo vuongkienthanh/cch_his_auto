@@ -4,7 +4,7 @@ import logging
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.action.chitietnguoibenhnoitru.top import TOP_BTN_CSS
+from .. import TOP_BTN_CSS
 
 _lgr = logging.getLogger("top_hosobenhan")
 
@@ -38,9 +38,7 @@ def change_tab(d: Driver, tab: int):
 
 def is_tab_active(d: Driver, tab: int) -> bool:
     try:
-        d.waiting(
-            f"{NAV_CSS}>.ant-tabs-tab-active:nth-child({tab})"
-        )
+        d.waiting(f"{NAV_CSS}>.ant-tabs-tab-active:nth-child({tab})")
         return True
     except NoSuchElementException:
         return False

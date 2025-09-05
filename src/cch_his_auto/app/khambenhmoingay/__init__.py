@@ -19,7 +19,7 @@ from cch_his_auto_lib.action.editor import (
     phieuthuchienylenh as editor_phieuthuchienylenh,
     bienbanhoichan as editor_bienbanhoichan,
 )
-from cch_his_auto_lib.action.chitietnguoibenhnoitru import get_patient_info
+from cch_his_auto_lib.action.top_patient_info import get_patient_info, wait_loaded
 
 
 TITLE = "Khám bệnh mỗi ngày"
@@ -161,6 +161,7 @@ def run_bs(d: Driver, cfg: Config):
             continue
 
         d.goto(tdt.url)
+        wait_loaded(d)
         pinfo = get_patient_info(d)
         pprint_patient_info(pinfo)
 
@@ -182,6 +183,7 @@ def run_bs(d: Driver, cfg: Config):
             continue
 
         d.goto(bbhc.url)
+        wait_loaded(d)
         pinfo = get_patient_info(d)
         pprint_patient_info(pinfo)
 
@@ -196,6 +198,7 @@ def run_dd(d: Driver, cfg: Config):
             continue
 
         d.goto(p.url)
+        wait_loaded(d)
         pinfo = get_patient_info(d)
         pprint_patient_info(pinfo)
 
@@ -212,6 +215,7 @@ def run_bn(d: Driver, cfg: Config):
                 continue
 
             d.goto(p.url)
+            wait_loaded(d)
             pinfo = get_patient_info(d)
             pprint_patient_info(pinfo)
 
@@ -231,6 +235,7 @@ def run_tk(d: Driver, cfg: Config):
             continue
 
         d.goto(bbhc.url)
+        wait_loaded(d)
         pinfo = get_patient_info(d)
         pprint_patient_info(pinfo)
 

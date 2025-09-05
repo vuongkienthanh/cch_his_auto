@@ -3,8 +3,8 @@ from cch_his_auto_lib.action.chitietnguoibenhnoitru.tabs import (
     thongtinchung,
     change_tab,
 )
-from cch_his_auto_lib.action.chitietnguoibenhnoitru.top import hosobenhan
-from cch_his_auto_lib.action.chitietnguoibenhnoitru.top.hosobenhan import tab_dvkt
+from cch_his_auto_lib.action.top_patient_info import hosobenhan
+from cch_his_auto_lib.action.top_patient_info.hosobenhan import tab_dvkt
 from cch_his_auto_lib.action.chitietnguoibenhnoitru.tabs.thongtinchung import (
     edit_thongtinvaovien,
 )

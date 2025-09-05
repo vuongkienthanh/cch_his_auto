@@ -10,5 +10,4 @@ from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom.sanglocdinhduong impo
 
 def run(d: Driver):
     change_tab(d, thongtinchung.TAB_NUMBER)
-    admission_date = thongtinchung.get_admission_date(d)
-    add_all_phieusanglocdinhduong(d, admission_date)
+    add_all_phieusanglocdinhduong(d)

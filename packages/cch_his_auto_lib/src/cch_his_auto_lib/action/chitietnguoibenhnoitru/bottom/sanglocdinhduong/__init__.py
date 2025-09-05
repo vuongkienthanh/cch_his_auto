@@ -2,61 +2,59 @@ import datetime as dt
 
 from selenium.common import NoSuchElementException
 
+from cch_his_auto_lib.action import top_patient_info
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.action.chitietnguoibenhnoitru import get_patient_info
-from cch_his_auto_lib.action.chitietnguoibenhnoitru.top import (
-    chitietthongtin,
-)
 from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom import _lgr, _trace
 
+
+from .helper import machedo, calculate_age_in_months
+from . import phieusangloc
+
 URL = "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
-
-
-from .helper import machedo
-from .phieusangloc import save_new_phieusangloc
-
-
-def calculate_age_in_months(birth_date):
-    today = dt.date.today()
-
-    years_diff = today.year - birth_date.year
-    months_diff = today.month - birth_date.month
-
-    if today.day < birth_date.day:
-        months_diff -= 1
-
-    total_months = (years_diff * 12) + months_diff
-
-    return total_months
+DIALOG_CSS = ".ant-modal:has(.rightTitle):has(table)"
 
 
 def open_dialog(d: Driver) -> bool:
-    "Open *Sàng lọc dinh dưỡng* dialog from *Chi tiết người bệnh nội trú*"
-    d.clicking(
-        ".footer-btn .right button:nth-child(1)", "open Sàng lọc dinh dưỡng button"
-    )
+    "Open *Sàng lọc dinh dưỡng* dialog"
+    d.clicking(".footer-btn .right button:nth-child(1)")
     try:
-        d.waiting(".ant-modal-body .ant-table", "Sàng lọc dinh dưỡng dialog")
+        d.waiting(DIALOG_CSS, "Sàng lọc dinh dưỡng dialog")
+        return True
     except NoSuchElementException:
-        _lgr.info("-> can't find sàng lọc dinh dưỡng dialog")
+        _lgr.warning("-> can't find sàng lọc dinh dưỡng dialog")
         if d.current_url.startswith(URL):
-            _lgr.info("-> found new phieu sàng lọc dinh dưỡng")
             return False
         else:
-            raise Exception("should have a dialog or new phieusangloc")
-    else:
-        d.waiting("tbody tr:nth-child(2) td:nth-child(3)")
-        _lgr.info("-> found sàng lọc dinh dưỡng dialog")
-        return True
+            raise Exception(
+                "open sanglocdinhduong but not dialog nor newphieusangloc, something wrong"
+            )
 
 
 def close_dialog(d: Driver):
     "Close *Sàng lọc dinh dưỡng* dialog"
-    d.clicking(
-        ".ant-modal-close:has(~.ant-modal-body .ant-table)",
-        "close Sàng lọc dinh dưỡng dialog",
-    )
-    d.wait_disappearing(".ant-modal-body .ant-table")
+    d.clicking(f"{DIALOG_CSS} button.ant-modal-close")
+    d.wait_disappearing(DIALOG_CSS)
+
+
+def open_phieusangloc(d: Driver, i: int):
+    "Open phieusangloc at `i` index, start at 2"
+    d.clicking2(f"{DIALOG_CSS} tbody tr:nth-child({i}) td:last-child svg")
+
+
+@_trace
+def get_chieucao_cannang_from_first_phieusangloc(d: Driver) -> tuple[str, str] | None:
+    if open_dialog(d):
+        open_phieusangloc(d, 2)
+        top_patient_info.wait_loaded(d)
+        cc = phieusangloc.get_chieucao(d)
+        cn = phieusangloc.get_cannang(d)
+        phieusangloc.back(d)
+        if (cc is None) or (cn is None):
+            return None
+        return (cc, cn)
+    else:
+        phieusangloc.back(d)
+        return None
 
 
 def get_last_date(d: Driver) -> dt.date:
@@ -65,7 +63,7 @@ def get_last_date(d: Driver) -> dt.date:
     max_i = 0
     for i in range(2, 12):
         try:
-            rank = d.find(f"tbody tr:nth-child({i}) td:nth-child(3)").text
+            rank = d.find(f"{DIALOG_CSS} tbody tr:nth-child({i}) td:nth-child(3)").text
             if (r := int(rank)) > max_rank:
                 max_rank = r
                 max_i = i
@@ -87,42 +85,32 @@ def add_new(d: Driver):
 
 
 @_trace
-def add_all_phieusanglocdinhduong(d: Driver, admission_date: dt.date):
+def add_all_phieusanglocdinhduong(d: Driver):
     "Complete all *Phiếu sàng lọc* from admission_date up til today"
-    with chitietthongtin.session(d):
-        cannang = chitietthongtin.get_cannang(d)
-        chieucao = chitietthongtin.get_chieucao(d)
-    if not (chieucao and cannang):
+    get_chieucao_cannang = get_chieucao_cannang_from_first_phieusangloc(d)
+    if get_chieucao_cannang:
+        chieucao, cannang = get_chieucao_cannang
+    else:
         return
 
     today = dt.date.today()
-    age_in_months = calculate_age_in_months(
-        dt.datetime.strptime(get_patient_info(d)["birthdate"], "%d/%m/%Y")
+    chedo = machedo(
+        calculate_age_in_months(
+            dt.datetime.strptime(
+                top_patient_info.get_patient_info(d)["birthdate"], "%d/%m/%Y"
+            )
+        )
     )
 
     if open_dialog(d):
         next_date = get_last_date(d) + dt.timedelta(days=7)
-        if next_date <= today:
-            _lgr.info(f"add new phieu sang loc for {next_date}")
-            add_new(d)
-        else:
-            close_dialog(d)
-            return
+        close_dialog(d)
     else:
-        next_date = admission_date
-
-    save_new_phieusangloc(d, next_date, cannang, chieucao, machedo(age_in_months))
-    next_date = next_date + dt.timedelta(days=7)
+        raise Exception("missing first phieusangloc")
 
     while next_date <= today:
         _lgr.info(f"add new phieu sang loc for {next_date}")
         open_dialog(d)
         add_new(d)
-        save_new_phieusangloc(
-            d,
-            next_date,
-            cannang,
-            chieucao,
-            machedo(age_in_months),
-        )
+        phieusangloc.save_new_phieusangloc(d, next_date, cannang, chieucao, chedo)
         next_date = next_date + dt.timedelta(days=7)

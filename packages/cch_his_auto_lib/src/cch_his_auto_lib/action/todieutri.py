@@ -7,21 +7,12 @@ from selenium.common import NoSuchElementException, StaleElementReferenceExcepti
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tracing import tracing
 from cch_his_auto_lib.errors import EndOfLoopException
-from cch_his_auto_lib.action.chitietnguoibenhnoitru import (
-    wait_loaded,
-    get_patient_info,
-)
+from cch_his_auto_lib.action import top_patient_info
 
 URL = "http://emr.ndtp.org/quan-ly-noi-tru/chi-tiet-nguoi-benh-noi-tru/to-dieu-tri"
 
 _lgr = logging.getLogger("todieutri")
 _trace = tracing(_lgr)
-
-
-def wait_loaded(d: Driver):
-    d.waiting("#root .patient-information")
-    p = get_patient_info(d)
-    _lgr.info(f"Patient page loaded: {p['name']} ,{p['ma_hs']}")
 
 
 def get_dienbien(d: Driver) -> str | None:
@@ -39,7 +30,7 @@ def get_dienbien(d: Driver) -> str | None:
 
 def back_to_chitietthongtin(d: Driver):
     d.clicking(".footer-btn .right button:nth-child(2)", "go back button")
-    wait_loaded(d)
+    top_patient_info.wait_loaded(d)
 
 
 @_trace

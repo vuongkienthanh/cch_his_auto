@@ -40,19 +40,15 @@ class Line(ListItem):
         )
 
         self.xn_var = tk.BooleanVar()
-        self.ct_var = tk.BooleanVar()
-        self.mri_var = tk.BooleanVar()
         self.tdt_var = tk.BooleanVar()
 
-        for i, v in enumerate(
-            [self.xn_var, self.ct_var, self.mri_var, self.tdt_var], 1
-        ):
+        for i, v in enumerate([self.xn_var, self.tdt_var], 1):
             tk.Checkbutton(self, variable=v).grid(row=0, column=i)
 
         self.tdt_var.set(True)
 
         k3t = tk.Frame(self, borderwidth=10)
-        k3t.grid(row=0, column=5)
+        k3t.grid(row=0, column=3)
         self.k3t_bs = Ky3Tra(k3t, text="Bác sĩ")
         self.k3t_dd = Ky3Tra(k3t, text="Điều dưỡng")
         self.k3t_bn = Ky3Tra(k3t, text="Bệnh nhân")
@@ -61,7 +57,7 @@ class Line(ListItem):
         self.k3t_bn.grid(row=2, column=0)
 
         del_btn = tk.Button(self, text="Xóa", command=self.on_del)
-        del_btn.grid(row=0, column=6)
+        del_btn.grid(row=0, column=4)
 
     def on_del(self):
         tab_frame = self.master.master.master.master  # pyright: ignore
