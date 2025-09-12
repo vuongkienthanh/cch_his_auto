@@ -3,13 +3,19 @@ from typing import Callable
 import sys
 
 
-def set_up_root_logger():
+def set_up_logging():
     root_logger = logging.getLogger()
     _out = logging.StreamHandler(sys.stdout)
     _out.setFormatter(
         logging.Formatter(fmt="{asctime} {name} {levelname}: {message}", style="{")
     )
     root_logger.addHandler(_out)
+    return _out
+
+
+def shutdown_logging(handler):
+    root_logger = logging.getLogger()
+    root_logger.removeHandler(handler)
 
 
 def tracing(logger: logging.Logger) -> Callable:

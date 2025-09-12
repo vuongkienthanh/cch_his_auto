@@ -16,7 +16,7 @@ from selenium.common import (
 )
 from selenium.webdriver import Keys
 
-from .tracing import set_up_root_logger
+from .tracing import set_up_logging, shutdown_logging
 from .errors import WaitClosingException
 
 
@@ -399,10 +399,11 @@ class DriverFn[T](Protocol):
 
 @contextmanager
 def start_driver(headless: bool, profile_path: str):
-    set_up_root_logger()
+    handler = set_up_logging()
     d = Driver(headless, profile_path)
     try:
         yield d
     finally:
         _lgr.info("---driver quiting")
+        shutdown_logging(handler)
         d.quit()

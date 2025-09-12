@@ -63,14 +63,14 @@ def get_last_date(d: Driver) -> dt.date:
     max_i = 0
     for i in range(2, 12):
         try:
-            rank = d.find(f"{DIALOG_CSS} tbody tr:nth-child({i}) td:nth-child(3)").text
+            rank = d.find(f"{DIALOG_CSS} tbody tr:nth-child({i}) td:nth-child(3)").text.strip()
             if (r := int(rank)) > max_rank:
                 max_rank = r
                 max_i = i
         except:
             break
     date = dt.datetime.strptime(
-        d.find(f"tbody tr:nth-child({max_i}) td:nth-child(2)").text,
+        d.find(f"tbody tr:nth-child({max_i}) td:nth-child(2)").text.strip(),
         "%d/%m/%Y %H:%M:%S",
     ).date()
     _lgr.info(f"-> found last_date = {date}")

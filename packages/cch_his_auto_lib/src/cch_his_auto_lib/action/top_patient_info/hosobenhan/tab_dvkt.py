@@ -24,14 +24,14 @@ def get_bloodtype(d: Driver) -> str | None:
     d.clicking2(f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:last-child svg")
     try:
         abo = d.waiting(
-            f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(8) td:nth-child(2)"
+            f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(7) td:nth-child(2)"
         ).text.strip()
         if abo == "KHÔNG XÁC ĐỊNH":
             return None
 
         if (
             d.waiting(
-                f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(12) td:nth-child(2)"
+                f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(11) td:nth-child(2)"
             ).text.strip()
             == "DƯƠNG TÍNH"
         ):

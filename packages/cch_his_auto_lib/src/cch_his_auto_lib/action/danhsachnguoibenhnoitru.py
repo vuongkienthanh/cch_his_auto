@@ -2,13 +2,14 @@ import logging
 import time
 import datetime as dt
 from contextlib import contextmanager
-from functools import partial
 
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.wait import WebDriverWait
 
 from cch_his_auto_lib.driver import Driver, DriverFn
 from cch_his_auto_lib.tracing import tracing
-from cch_his_auto_lib.action import top_patient_info
+from cch_his_auto_lib.action import top_patient_info, danhsachnguoibenhnoitru
+from cch_his_auto.common_tasks.navigation import pprint_patient_info
 
 URL = "http://emr.ndtp.org/quan-ly-noi-tru/danh-sach-nguoi-benh-noi-tru"
 
@@ -17,7 +18,9 @@ _trace = tracing(_lgr)
 
 
 def wait_loaded(d: Driver):
-    d.waiting(".main__container")
+    WebDriverWait(d, 30).until(
+        lambda _: len(d.find_all(".main__container tr.ant-table-row")) >= 1
+    )
 
 
 def load(d: Driver):
@@ -163,9 +166,10 @@ def open_patient(d: Driver, i: int):
 
 
 def iterate_all_and_do(d: Driver, f: DriverFn):
-    def do(d, i):
+    l = len(d.find_all(f"{MAIN_TABLE} tr.ant-table-row"))
+    for i in range(2, l + 2):
+        danhsachnguoibenhnoitru.load(d)
         open_patient(d, i)
+        pinfo = top_patient_info.get_patient_info(d)
+        pprint_patient_info(pinfo)
         f(d)
-
-    for i in range(2, len(d.find_all(f"{MAIN_TABLE} tr.ant-table-row")) + 2):
-        d.duplicate_tab_do(partial(do, i=i))

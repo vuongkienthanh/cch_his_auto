@@ -11,6 +11,7 @@ from cch_his_auto_lib.action.chitietnguoibenhnoitru.tabs.thongtinchung import (
 
 
 def run(d: Driver):
+    print("Start nhommau")
     change_tab(d, thongtinchung.TAB_NUMBER)
     bloodtype = thongtinchung.get_bloodtype(d)
     if bloodtype is None:

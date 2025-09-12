@@ -9,5 +9,6 @@ from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom.sanglocdinhduong impo
 
 
 def run(d: Driver):
+    print("Start dinhduong")
     change_tab(d, thongtinchung.TAB_NUMBER)
     add_all_phieusanglocdinhduong(d)
