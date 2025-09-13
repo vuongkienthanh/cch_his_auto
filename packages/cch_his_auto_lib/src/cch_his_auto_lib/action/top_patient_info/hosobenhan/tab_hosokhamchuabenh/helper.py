@@ -136,21 +136,17 @@ def filter_check_expand_sign(
         d: Driver, i: int, chuaky_fn: SIGN_AT_ROW_FN, dangky_fn: SIGN_AT_ROW_FN
     ):
         name = d.waiting(f"{RIGHT_PANEL} tr:nth-child({i}) td:nth-child(2)").text
-        row_date = dt.datetime.strptime(name.lstrip()[:10], "%d/%m/%Y").date()
         _lgr.debug(f"checking {name}")
-        if row_date <= dt.date.today():
-            if is_row_status(d, i, Status.CHUAKY):
-                _lgr.info(f"row condition not met -> {Status.CHUAKY}")
-                chuaky_fn(d, i)
-                time.sleep(3)
-            elif is_row_status(d, i, Status.DANGKY):
-                _lgr.info(f"row condition not met -> {Status.DANGKY}")
-                dangky_fn(d, i)
-                time.sleep(3)
-            else:
-                _lgr.info("row condition: OK")
+        if is_row_status(d, i, Status.CHUAKY):
+            _lgr.info(f"row condition not met -> {Status.CHUAKY}")
+            chuaky_fn(d, i)
+            time.sleep(3)
+        elif is_row_status(d, i, Status.DANGKY):
+            _lgr.info(f"row condition not met -> {Status.DANGKY}")
+            dangky_fn(d, i)
+            time.sleep(3)
         else:
-            _lgr.debug(f"-> {name} skipped")
+            _lgr.info("row condition: OK")
 
     def check_and_sign_date(
         d: Driver,
