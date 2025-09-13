@@ -1,39 +1,23 @@
-from typing import TypedDict
-import json
-import os.path
-import os
-
-APP_PATH = os.path.dirname(os.path.abspath(__file__))
-FILEPATH = os.path.join(APP_PATH, "config.json")
+from dataclasses import dataclass
+from typing import Self
+from cch_his_auto.common_structs import User, ABCConfig
+from pathlib import PurePath
 
 
-class Config(TypedDict):
-    username: str
-    password: str
-    department: str
+@dataclass(repr=False, eq=False, frozen=True)
+class Config(ABCConfig):
+    APP_PATH = PurePath(__file__).parent
+    FILE_PATH = APP_PATH / "config.json"
 
+    user: User = User()
+    department: str = ""
 
-def save(cfg: Config):
-    os.makedirs(APP_PATH, exist_ok=True)
-    with open(FILEPATH, "w") as f:
-        json.dump(cfg, f, indent=4)
+    @classmethod
+    def from_dict(cls, value) -> Self:
+        return cls(
+            User.from_dict(value["user"]),
+            value["department"],
+        )
 
-
-def load() -> Config:
-    try:
-        with open(FILEPATH, "r") as f:
-            return json.load(f)
-    except Exception as _:
-        return {
-            "username": "",
-            "password": "",
-            "department": "",
-        }
-
-
-def is_valid(cfg: Config) -> bool:
-    return (
-        cfg["username"] != ""
-        and cfg["password"] != ""
-        and cfg["department"] != ""
-    )
+    def is_valid(self) -> bool:
+        return len(self.department) > 0

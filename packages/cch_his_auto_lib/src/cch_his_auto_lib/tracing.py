@@ -2,20 +2,23 @@ import logging
 from typing import Callable
 import sys
 
+_out = logging.StreamHandler(sys.stdout)
+_out.setFormatter(
+    logging.Formatter(fmt="{asctime} {name} {levelname}: {message}", style="{")
+)
+
 
 def set_up_logging():
+    global _out
     root_logger = logging.getLogger()
-    _out = logging.StreamHandler(sys.stdout)
-    _out.setFormatter(
-        logging.Formatter(fmt="{asctime} {name} {levelname}: {message}", style="{")
-    )
     root_logger.addHandler(_out)
     return _out
 
 
-def shutdown_logging(handler):
+def shutdown_logging():
+    global _out
     root_logger = logging.getLogger()
-    root_logger.removeHandler(handler)
+    root_logger.removeHandler(_out)
 
 
 def tracing(logger: logging.Logger) -> Callable:

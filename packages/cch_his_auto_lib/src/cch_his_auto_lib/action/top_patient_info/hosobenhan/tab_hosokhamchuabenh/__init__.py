@@ -88,7 +88,7 @@ def phieuchidinhPTTT(d: Driver):
 
 
 @_trace
-def phieuCT(d: Driver, signature: str | None):
+def phieuCT(d: Driver, signature: str | None = None):
     "Filter and sign name: *Phiếu chỉ định chụp CT*"
 
     def chuaky_fn(d: Driver, i: int):
@@ -114,7 +114,7 @@ def phieuCT(d: Driver, signature: str | None):
 
 
 @_trace
-def phieuMRI(d: Driver, signature: str | None):
+def phieuMRI(d: Driver, signature: str | None = None):
     "Filter and sign name: *Phiếu chỉ định chụp MRI*"
 
     def chuaky_fn(d: Driver, i: int):

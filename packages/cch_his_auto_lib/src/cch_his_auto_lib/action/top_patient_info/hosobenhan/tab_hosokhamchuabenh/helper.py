@@ -15,6 +15,8 @@ from . import _lgr
 
 RIGHT_PANEL = f"{ACTIVE_PANE} .right-content"
 
+SIGN_AT_ROW_FN = Callable[[Driver, int], None]
+
 
 def do_nothing(_d: Driver, *_):
     _lgr.warning("do nothing")
@@ -51,8 +53,8 @@ def goto_row_and_click_edit(d: Driver, i: int):
 def filter_check_expand_sign(
     d: Driver,
     name: str,
-    chuaky_fn: Callable[[Driver, int], None] = do_nothing,
-    dangky_fn: Callable[[Driver, int], None] = do_nothing,
+    chuaky_fn: SIGN_AT_ROW_FN = do_nothing,
+    dangky_fn: SIGN_AT_ROW_FN = do_nothing,
     date: dt.date | None = None,
 ):
     """
@@ -61,7 +63,7 @@ def filter_check_expand_sign(
     """
 
     class Status(StrEnum):
-        "Possible status for each document"
+        "Possible statuses for each document"
 
         CHUAKY = "Chưa ký"
         DANGKY = "Đang ký"
@@ -83,9 +85,8 @@ def filter_check_expand_sign(
 
     def filter(d: Driver, name: str) -> bool:
         "Filter document based on `name`"
-        _lgr.debug(f"name={name}")
-        ele = d.clear_input(f"{RIGHT_PANEL} input")
-        _lgr.debug("+++++ typing name")
+        _lgr.debug(f"filter hosobenhan name={name}")
+        ele = d.clear_input(f"{RIGHT_PANEL} input:nth-child(3)")
         ele.send_keys(name)
         ele.send_keys(Keys.ENTER)
         for _ in range(60):  # 120 is too long
@@ -93,12 +94,12 @@ def filter_check_expand_sign(
             try:
                 ele = d.find(f"{RIGHT_PANEL} tr:nth-child(2) td:nth-child(2) div")
                 if ele.text.strip().startswith(name):
-                    _lgr.info(f"-> found {name}")
+                    _lgr.info(f"-> filter hosobenhan: found {name}")
                     return True
             except NoSuchElementException:
                 ...
         else:
-            _lgr.warning(f"-> filtered {name} with no result")
+            _lgr.warning(f"-> filter hosobenhan: can't find {name}")
             return False
 
     def is_row_expandable(d: Driver, idx: int) -> bool:
@@ -127,9 +128,13 @@ def filter_check_expand_sign(
             f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(2)", f"row {idx}"
         ).text
         _lgr.debug(f"expanding {name}")
-        d.clicking(f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(1) button")
+        d.clicking(
+            f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(1) button.ant-table-row-expand-icon-collapsed"
+        )
 
-    def check_and_sign(i: int):
+    def check_and_sign(
+        d: Driver, i: int, chuaky_fn: SIGN_AT_ROW_FN, dangky_fn: SIGN_AT_ROW_FN
+    ):
         name = d.waiting(f"{RIGHT_PANEL} tr:nth-child({i}) td:nth-child(2)").text
         row_date = dt.datetime.strptime(name.lstrip()[:10], "%d/%m/%Y").date()
         _lgr.debug(f"checking {name}")
@@ -147,7 +152,13 @@ def filter_check_expand_sign(
         else:
             _lgr.debug(f"-> {name} skipped")
 
-    def check_and_sign_date(i: int, date: dt.date):
+    def check_and_sign_date(
+        d: Driver,
+        i: int,
+        date: dt.date,
+        chuaky_fn: SIGN_AT_ROW_FN,
+        dangky_fn: SIGN_AT_ROW_FN,
+    ):
         name = d.waiting(f"{RIGHT_PANEL} tr:nth-child({i}) td:nth-child(2)").text
         row_date = dt.datetime.strptime(name.lstrip()[:10], "%d/%m/%Y").date()
         _lgr.debug(f"checking {name}")
@@ -176,6 +187,6 @@ def filter_check_expand_sign(
             for i in range(
                 3, len(d.find_all(f"{RIGHT_PANEL} .ant-table-row-level-1")) + 3
             ):
-                check_and_sign_fn(i)
+                check_and_sign_fn(d, i, chuaky_fn, dangky_fn)
         else:
-            check_and_sign(2)
+            check_and_sign(d, 2, chuaky_fn, dangky_fn)

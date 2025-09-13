@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import cast
 
-# from cch_his_auto.app import test_app
+from cch_his_auto.app import test_app
 from cch_his_auto.app import khambenhmoingay, kiemtrahosotoankhoa
 
 
@@ -20,7 +20,7 @@ class MainApp(tk.Tk):
         nb = ttk.Notebook(self)
         nb.grid(row=0, column=0, sticky="NSEW")
 
-        for m in [khambenhmoingay, kiemtrahosotoankhoa]:
+        for m in [khambenhmoingay, kiemtrahosotoankhoa, test_app]:
             nb.add(m.App(), text=m.TITLE, sticky="NSEW")
 
         # nb.add(test_app.App(), text=test_app.TITLE, sticky="NSEW")

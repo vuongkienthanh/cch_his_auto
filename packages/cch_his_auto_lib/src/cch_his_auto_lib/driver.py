@@ -399,11 +399,11 @@ class DriverFn[T](Protocol):
 
 @contextmanager
 def start_driver(headless: bool, profile_path: str):
-    handler = set_up_logging()
+    set_up_logging()
     d = Driver(headless, profile_path)
     try:
         yield d
     finally:
         _lgr.info("---driver quiting")
-        shutdown_logging(handler)
+        shutdown_logging()
         d.quit()

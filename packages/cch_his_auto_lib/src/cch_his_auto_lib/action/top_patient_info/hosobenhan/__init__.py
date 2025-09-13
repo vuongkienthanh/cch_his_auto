@@ -19,12 +19,12 @@ def session(d: Driver, tab: int = 1):
     assert tab > 0
     try:
         d.clicking(f"{TOP_BTN_CSS}>div:nth-child(3)", "xem ho so benh an")
-        d.waiting(
-            f"{DIALOG_CSS} .right-content tbody tr:nth-child(2)",
-            "Danh sách phiếu first item",
-        )
         if tab != 1:
             change_tab(d, tab)
+        # d.waiting(
+        #     f"{DIALOG_CSS} .right-content tbody tr:nth-child(2)",
+        #     "Danh sách phiếu first item",
+        # )
         yield
     finally:
         d.clicking(f"{DIALOG_CSS} .ant-modal-close", "close button")
@@ -32,7 +32,7 @@ def session(d: Driver, tab: int = 1):
 
 
 def change_tab(d: Driver, tab: int):
-    d.clicking(f"{NAV_CSS}>div:nth-child({tab})")
+    d.clicking(f"{NAV_CSS}>.ant-tabs-tab:nth-child({tab})")
     assert is_tab_active(d, tab)
 
 

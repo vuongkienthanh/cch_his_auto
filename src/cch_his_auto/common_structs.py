@@ -33,6 +33,7 @@ class ABCConfig(ABC):
 
     @abstractmethod
     def is_valid(self) -> bool: ...
+
     def save(self):
         os.makedirs(self.APP_PATH, exist_ok=True)
         with open(self.FILE_PATH, "w") as f:

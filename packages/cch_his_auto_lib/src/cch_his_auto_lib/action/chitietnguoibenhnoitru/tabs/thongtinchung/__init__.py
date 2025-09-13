@@ -21,7 +21,6 @@ def get_admission_date(d: Driver) -> dt.date:
             "admission date",
         ).text
     except NoSuchElementException:
-        _lgr.warning("=> can't find discharge_date")
         raise NoSuchElementException("should exist admission_date")
     else:
         date = dt.datetime.strptime(
@@ -39,7 +38,6 @@ def get_discharge_date(d: Driver) -> dt.date | None:
             "discharge date",
         ).text
     except NoSuchElementException:
-        _lgr.warning("=> can't find discharge_date")
         return None
     else:
         date = dt.datetime.strptime(
@@ -57,7 +55,6 @@ def get_appointment_date(d: Driver) -> dt.date | None:
             "appointment date",
         ).text
     except NoSuchElementException:
-        _lgr.warning("=> can't find appointment_date")
         return None
     else:
         date = dt.datetime.strptime(
@@ -75,7 +72,6 @@ def get_discharge_diagnosis(d: Driver) -> str | None:
             "discharge diagnosis",
         ).text
     except NoSuchElementException:
-        _lgr.warning("=> can't find discharge_diagnosis")
         return None
     else:
         _lgr.info(f"discharge_diagnosis={ele}")
@@ -89,7 +85,6 @@ def get_discharge_comorbid(d: Driver) -> list[str]:
             "discharge comormid",
         ).text
     except NoSuchElementException:
-        _lgr.warning("=> can't find discharge_comorbid")
         return []
     else:
         _lgr.info(f"discharge_comorbid={ele}")
@@ -103,7 +98,6 @@ def get_discharge_diagnosis_detail(d: Driver) -> str | None:
             "discharge diagnosis detail",
         ).text
     except NoSuchElementException:
-        _lgr.warning("=> can't find discharge_diagnosis_detail")
         return None
     else:
         _lgr.info(f"discharge_diagnosis_detail={ele}")
@@ -117,7 +111,6 @@ def get_treatment(d: Driver) -> str | None:
             "discharge diagnosis detail",
         ).text
     except NoSuchElementException:
-        _lgr.warning("=> can't find treatment")
         return None
     else:
         _lgr.info(f"treatment={ele}")
@@ -126,12 +119,10 @@ def get_treatment(d: Driver) -> str | None:
 
 def get_bloodtype(d: Driver) -> str | None:
     try:
-        ele = d.waiting(
+        ele = d.find(
             f"{THONGTINVAOVIEN_CSS} .ant-col:nth-child(1) .item-sub:nth-child(6) b",
-            "bloodtype",
         ).text
     except NoSuchElementException:
-        _lgr.warning("=> can't find bloodtype")
         return None
     else:
         _lgr.info(f"bloodtype={ele}")

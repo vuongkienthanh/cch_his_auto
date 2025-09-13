@@ -13,6 +13,7 @@ class Config(ABCConfig):
     department: str = ""
     dinhduong: bool = True
     nhommau: bool = True
+    kytenhosobenhan: bool = True
 
     @classmethod
     def from_dict(cls, value) -> Self:
@@ -21,6 +22,7 @@ class Config(ABCConfig):
             value["department"],
             value["dinhduong"],
             value["nhommau"],
+            value["kytenhosobenhan"],
         )
 
     def is_valid(self) -> bool:

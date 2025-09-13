@@ -16,18 +16,16 @@ DIALOG_CSS = ".ant-modal:has(.rightTitle):has(table)"
 
 def open_dialog(d: Driver) -> bool:
     "Open *Sàng lọc dinh dưỡng* dialog"
-    d.clicking(".footer-btn .right button:nth-child(1)")
+    current_url = d.current_url
     try:
+        d.clicking(".footer-btn .right button:nth-child(1)")
         d.waiting(DIALOG_CSS, "Sàng lọc dinh dưỡng dialog")
         return True
     except NoSuchElementException:
-        _lgr.warning("-> can't find sàng lọc dinh dưỡng dialog")
-        if d.current_url.startswith(URL):
-            return False
-        else:
-            raise Exception(
-                "open sanglocdinhduong but not dialog nor newphieusangloc, something wrong"
-            )
+        _lgr.warning("can't open sanglocdinhduong dialog")
+        d.goto(current_url)
+        top_patient_info.wait_loaded(d)
+        return False
 
 
 def close_dialog(d: Driver):
@@ -43,18 +41,17 @@ def open_phieusangloc(d: Driver, i: int):
 
 @_trace
 def get_chieucao_cannang_from_first_phieusangloc(d: Driver) -> tuple[str, str] | None:
-    if open_dialog(d):
-        open_phieusangloc(d, 2)
-        top_patient_info.wait_loaded(d)
-        cc = phieusangloc.get_chieucao(d)
-        cn = phieusangloc.get_cannang(d)
-        phieusangloc.back(d)
-        if (cc is None) or (cn is None):
-            return None
-        return (cc, cn)
-    else:
-        phieusangloc.back(d)
+    if not open_dialog(d):
         return None
+
+    open_phieusangloc(d, 2)
+    top_patient_info.wait_loaded(d)
+    cc = phieusangloc.get_chieucao(d)
+    cn = phieusangloc.get_cannang(d)
+    phieusangloc.back(d)
+    if (cc is None) or (cn is None):
+        return None
+    return (cc, cn)
 
 
 def get_last_date(d: Driver) -> dt.date:
@@ -63,7 +60,9 @@ def get_last_date(d: Driver) -> dt.date:
     max_i = 0
     for i in range(2, 12):
         try:
-            rank = d.find(f"{DIALOG_CSS} tbody tr:nth-child({i}) td:nth-child(3)").text.strip()
+            rank = d.find(
+                f"{DIALOG_CSS} tbody tr:nth-child({i}) td:nth-child(3)"
+            ).text.strip()
             if (r := int(rank)) > max_rank:
                 max_rank = r
                 max_i = i
@@ -91,6 +90,7 @@ def add_all_phieusanglocdinhduong(d: Driver):
     if get_chieucao_cannang:
         chieucao, cannang = get_chieucao_cannang
     else:
+        _lgr.warning("can't add all phieusanglocidinhduong")
         return
 
     today = dt.date.today()
@@ -101,12 +101,9 @@ def add_all_phieusanglocdinhduong(d: Driver):
             )
         )
     )
-
-    if open_dialog(d):
-        next_date = get_last_date(d) + dt.timedelta(days=7)
-        close_dialog(d)
-    else:
-        raise Exception("missing first phieusangloc")
+    open_dialog(d)
+    next_date = get_last_date(d) + dt.timedelta(days=7)
+    close_dialog(d)
 
     while next_date <= today:
         _lgr.info(f"add new phieu sang loc for {next_date}")

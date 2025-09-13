@@ -6,7 +6,7 @@ from cch_his_auto_lib.driver import Driver
 from . import THONGTINVAOVIEN_CSS, _lgr
 
 
-DIALOG_CSS = ".ant-modal:has(.ant-col:nth-child(6) textarea)"
+DIALOG_CSS = ".ant-modal:has(.ant-col:nth-child(7) textarea)"
 
 
 @contextmanager

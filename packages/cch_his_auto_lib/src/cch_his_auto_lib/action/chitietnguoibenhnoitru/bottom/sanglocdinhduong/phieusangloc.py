@@ -34,7 +34,7 @@ def set_chieucao(d: Driver, value: str):
 
 
 def set_machedo(d: Driver, value: str):
-    d.clicking("#dsDuongNuoiAn>.ant-row>.ant-col:last-child>div>label input")
+    d.clicking("#dsDuongNuoiAn>.ant-row>.ant-col:last-child>div>label span")
     d.clear_input("#dsDuongNuoiAn>.ant-row>.ant-col:last-child>div>input").send_keys(
         value
     )

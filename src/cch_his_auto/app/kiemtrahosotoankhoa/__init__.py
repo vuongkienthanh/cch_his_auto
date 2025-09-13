@@ -11,7 +11,7 @@ from cch_his_auto_lib.driver import start_driver
 from cch_his_auto_lib.action import danhsachnguoibenhnoitru
 from cch_his_auto_lib.action import auth
 
-from . import dinhduong, nhommau
+from . import dinhduong, nhommau, kytenhosobenhan
 from .config import Config
 
 
@@ -31,6 +31,7 @@ class App(tk.Frame):
 
         dinhduong_var = tk.BooleanVar()
         nhommau_var = tk.BooleanVar()
+        kytenhosobenhan_var = tk.BooleanVar()
 
         optionframe = tk.Frame(self)
         optionframe.grid(row=1, column=0, sticky="NSEW", padx=10)
@@ -41,6 +42,9 @@ class App(tk.Frame):
         tk.Checkbutton(
             optionframe, text="Nhóm máu", variable=nhommau_var, justify="left"
         ).grid(row=1, column=0, padx=5, sticky="W")
+        tk.Checkbutton(
+            optionframe, text="Ký tên hồ sơ bệnh án", variable=kytenhosobenhan_var, justify="left"
+        ).grid(row=2, column=0, padx=5, sticky="W")
 
         button_frame = ButtonFrame(self)
         button_frame.grid(row=0, column=1, rowspan=5, padx=20, sticky="S", pady=(0, 20))
@@ -52,6 +56,7 @@ class App(tk.Frame):
             user.set_department(cfg.department)
             dinhduong_var.set(cfg.dinhduong)
             nhommau_var.set(cfg.nhommau)
+            kytenhosobenhan_var.set(cfg.kytenhosobenhan)
 
             button_frame.load_config()
 
@@ -61,6 +66,7 @@ class App(tk.Frame):
                 user.get_department(),
                 dinhduong_var.get(),
                 nhommau_var.get(),
+                kytenhosobenhan_var.get(),
             )
 
         def save():
@@ -85,10 +91,13 @@ def run(cfg: Config, run_cfg: RunConfig):
         processes.append(nhommau)
     if cfg.dinhduong:
         processes.append(dinhduong)
+    if cfg.kytenhosobenhan:
+        processes.append(kytenhosobenhan)
 
     with start_driver(headless=run_cfg.headless, profile_path=PROFILE_PATH) as d:
         with auth.session(d, cfg.user.name, cfg.user.password, cfg.department):
             danhsachnguoibenhnoitru.load(d)
+            danhsachnguoibenhnoitru.huytimkiem(d)
             danhsachnguoibenhnoitru.iterate_all_and_do(
                 d, lambda d: [m.run(d) for m in processes]
             )

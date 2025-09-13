@@ -11,9 +11,10 @@ from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig
 
 from cch_his_auto_lib.driver import start_driver
 from cch_his_auto_lib.action import auth
-from cch_his_auto_lib.action import danhsachhoichan
+from cch_his_auto_lib.action import danhsachnguoibenhnoitru
+from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom import sanglocdinhduong
 
-from . import config
+from .config import Config
 
 
 TITLE = "TEST"
@@ -26,32 +27,30 @@ class App(tk.Frame):
         self.rowconfigure(4, weight=1)
 
         info = tk.LabelFrame(self, text="Thông tin đăng nhập")
-        bacsi = UsernamePasswordDeptFrame(info, text="Bác sĩ ký tên")
-        bacsi.grid(row=0, column=0)
+        user = UsernamePasswordDeptFrame(info, text="Bác sĩ ký tên")
+        user.grid(row=0, column=0)
         info.grid(row=0, column=0, sticky="N", pady=20)
 
         button_frame = ButtonFrame(self)
         button_frame.grid(row=0, column=1, rowspan=5, padx=20, sticky="S", pady=(0, 20))
 
         def load():
-            cfg = config.load()
+            cfg = Config.load()
 
-            bacsi.set_name(cfg["username"])
-            bacsi.set_password(cfg["password"])
-            bacsi.set_department(cfg["department"])
+            user.set_user(cfg.user)
+            user.set_department(cfg.department)
 
             button_frame.load_config()
 
         def get_config() -> config.Config:
-            return {
-                "username": bacsi.get_name(),
-                "password": bacsi.get_password(),
-                "department": bacsi.get_department(),
-            }
+            return Config(
+                user.get_user(),
+                user.get_department(),
+            )
 
         def save():
             if messagebox.askyesno(message="Save?"):
-                config.save(get_config())
+                get_config().save()
                 button_frame.save_config()
                 messagebox.showinfo(message="Đã lưu")
 
@@ -61,19 +60,13 @@ class App(tk.Frame):
 
 
 def run(cfg: config.Config, run_cfg: RunConfig):
-    if not config.is_valid(cfg):
-        messagebox.showerror(message="chưa đủ thông tin")
+    if not cfg.is_valid():
         return
 
-    with start_driver(headless=run_cfg["headless"], profile_path=PROFILE_PATH) as d:
-        with auth.session(d, cfg["username"], cfg["password"], cfg["department"]):
-            danhsachhoichan.load(d)
-            danhsachhoichan.set_date(d, dt.date.today())
-            danhsachhoichan.set_dept(d, cfg["department"])
-            time.sleep(5)  # no UI change
-            danhsachhoichan.iterate_all_and_do(
-                d, danhsachhoichan.open_BBHC_editor, lambda d: print("ASD")
-            )
-            time.sleep(100)
+    with start_driver(headless=run_cfg.headless, profile_path=PROFILE_PATH) as d:
+        with auth.session(d, cfg.user.name, cfg.user.password, cfg.department):
+            danhsachnguoibenhnoitru.load(d)
+            danhsachnguoibenhnoitru.goto_patient(d, 2508310665)
+            sanglocdinhduong.add_all_phieusanglocdinhduong(d)
 
     messagebox.showinfo(message="finish")
