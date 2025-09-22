@@ -50,7 +50,6 @@ def ingiayto(d: Driver, name: str):
         d.clicking(".footer-btn .right button:nth-child(1)", "close menu In giấy tờ")
         raise EndOfLoopException(f"can't find ingiayto -> {name}")
 
-
 def phieuchidinh(d: Driver):
     "Inside *tờ điều trị*, try to sign *phiếu chỉ định*"
 
@@ -62,9 +61,9 @@ def phieuchidinh(d: Driver):
         Huy = "Hủy ký Bác sĩ"
 
     ingiayto(d, "Phiếu chỉ định")
-    d.waiting_to_startswith(
-        f"{PHIEUCHIDINH_DIALOG} .__button > button:nth-child(2)", State.Trinh
-    )
+    # d.waiting_to_startswith(
+    #     f"{PHIEUCHIDINH_DIALOG} .__button > button:nth-child(2)", State.Trinh
+    # )
     d.waiting_to_startswith(
         f"{PHIEUCHIDINH_DIALOG} .__button > button:first-child", State.Ky
     )

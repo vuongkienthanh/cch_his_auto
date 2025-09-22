@@ -121,11 +121,11 @@ def get_bloodtype(d: Driver) -> str | None:
     try:
         ele = d.find(
             f"{THONGTINVAOVIEN_CSS} .ant-col:nth-child(1) .item-sub:nth-child(6) b",
-        ).text
+        ).text.strip()
     except NoSuchElementException:
         return None
     else:
         _lgr.info(f"bloodtype={ele}")
-        if ele.strip() == "Chưa xác định":
+        if ele == "Chưa xác định" or ele == "":
             return None
         return ele

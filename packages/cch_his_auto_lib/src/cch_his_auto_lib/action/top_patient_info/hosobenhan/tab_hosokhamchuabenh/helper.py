@@ -1,8 +1,7 @@
-from enum import StrEnum
+from enum import Enum
 import datetime as dt
 import time
 from typing import Callable
-from functools import partial
 
 from selenium.webdriver import Keys
 from selenium.common import NoSuchElementException, StaleElementReferenceException
@@ -62,7 +61,7 @@ def filter_check_expand_sign(
     if `date` provided, only sign those with this date
     """
 
-    class Status(StrEnum):
+    class Status(Enum):
         "Possible statuses for each document"
 
         CHUAKY = "Chưa ký"
@@ -72,13 +71,13 @@ def filter_check_expand_sign(
     def is_row_status(d: Driver, idx: int, status: Status) -> bool:
         "Check if row at `idx` is `status`, first row is idx=2"
         try:
-            _lgr.debug(f"checking status = {status}")
+            _lgr.debug(f"checking status = {status.value}")
             return (
                 d.waiting(
                     f"{RIGHT_PANEL} tr:nth-child({idx}) td:nth-child(3)",
                     f"row {idx} status",
                 ).text.strip()
-                == status
+                == status.value
             )
         except StaleElementReferenceException:
             return is_row_status(d, idx, status)
@@ -138,51 +137,52 @@ def filter_check_expand_sign(
         name = d.waiting(f"{RIGHT_PANEL} tr:nth-child({i}) td:nth-child(2)").text
         _lgr.debug(f"checking {name}")
         if is_row_status(d, i, Status.CHUAKY):
-            _lgr.info(f"row condition not met -> {Status.CHUAKY}")
+            _lgr.info(f"row condition not met -> {Status.CHUAKY.value}")
             chuaky_fn(d, i)
             time.sleep(3)
         elif is_row_status(d, i, Status.DANGKY):
-            _lgr.info(f"row condition not met -> {Status.DANGKY}")
+            _lgr.info(f"row condition not met -> {Status.DANGKY.value}")
             dangky_fn(d, i)
             time.sleep(3)
         else:
             _lgr.info("row condition: OK")
 
-    def check_and_sign_date(
+    def expanded_check_and_sign(
         d: Driver,
         i: int,
-        date: dt.date,
         chuaky_fn: SIGN_AT_ROW_FN,
         dangky_fn: SIGN_AT_ROW_FN,
+        date: dt.date | None = None,
     ):
         name = d.waiting(f"{RIGHT_PANEL} tr:nth-child({i}) td:nth-child(2)").text
         row_date = dt.datetime.strptime(name.lstrip()[:10], "%d/%m/%Y").date()
-        _lgr.debug(f"checking {name}")
-        if row_date == date and row_date <= dt.date.today():
-            if is_row_status(d, i, Status.CHUAKY):
-                _lgr.info(f"row condition not met -> {Status.CHUAKY}")
-                chuaky_fn(d, i)
-                time.sleep(3)
-            elif is_row_status(d, i, Status.DANGKY):
-                _lgr.info(f"row condition not met -> {Status.DANGKY}")
-                dangky_fn(d, i)
-                time.sleep(3)
-            else:
-                _lgr.info("row condition: OK")
+        _lgr.info(f"row date = {row_date}")
+        if date is None:
+            if row_date > dt.date.today():
+                _lgr.info("-> skipped")
+                return
         else:
-            _lgr.debug(f"-> {name} skipped")
+            if row_date != date:
+                _lgr.info("-> skipped")
+                return
+
+        if is_row_status(d, i, Status.CHUAKY):
+            _lgr.info(f"row condition not met -> {Status.CHUAKY.value}")
+            chuaky_fn(d, i)
+            time.sleep(3)
+        elif is_row_status(d, i, Status.DANGKY):
+            _lgr.info(f"row condition not met -> {Status.DANGKY.value}")
+            dangky_fn(d, i)
+            time.sleep(3)
+        else:
+            _lgr.info("row condition: OK")
 
     if filter(d, name) and not is_row_status(d, 2, Status.HOANTHANH):
         if is_row_expandable(d, 2):
-            if date:
-                check_and_sign_fn = partial(check_and_sign_date, date=date)
-            else:
-                check_and_sign_fn = check_and_sign
-
             expand_row(d, 2)
             for i in range(
                 3, len(d.find_all(f"{RIGHT_PANEL} .ant-table-row-level-1")) + 3
             ):
-                check_and_sign_fn(d, i, chuaky_fn, dangky_fn)
+                expanded_check_and_sign(d, i, chuaky_fn, dangky_fn, date)
         else:
             check_and_sign(d, 2, chuaky_fn, dangky_fn)

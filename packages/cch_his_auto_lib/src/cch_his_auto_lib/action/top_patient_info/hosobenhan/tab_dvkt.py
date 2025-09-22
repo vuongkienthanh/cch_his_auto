@@ -21,12 +21,20 @@ def get_bloodtype(d: Driver) -> str | None:
     except NoSuchElementException:
         _lgr.warning("There is no bloodtype lab test")
         return None
+    try:
+        d.waiting_to_startswith(
+            f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:nth-child(5)",
+            "Đã kết luận",
+        )
+    except NoSuchElementException:
+        _lgr.warning("Bloodtype lab test is not complete")
+        return None
     d.clicking2(f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:last-child svg")
     try:
         abo = d.waiting(
             f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(7) td:nth-child(2)"
         ).text.strip()
-        if abo == "KHÔNG XÁC ĐỊNH":
+        if abo not in ["A", "B", "AB", "O"]:
             return None
 
         if (
