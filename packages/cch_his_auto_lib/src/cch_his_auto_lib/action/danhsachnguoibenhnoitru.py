@@ -18,7 +18,7 @@ _trace = tracing(_lgr)
 
 
 def wait_loaded(d: Driver):
-    WebDriverWait(d, 30).until(
+    WebDriverWait(d, 120).until(
         lambda _: len(d.find_all(".main__container tr.ant-table-row")) >= 1
     )
     time.sleep(5)

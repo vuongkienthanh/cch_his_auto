@@ -18,10 +18,10 @@ def pprint_patient_info(p: dict[str, str]):
                 "",
                 "[red]" + "~" * 50 + "[/red]",
                 "[red]~"
-                + f"[white bold]patient: {p['name']}[/white bold]".center(72)
+                + f"[white bold]patient: {p['name']}[/white bold]".center(73)
                 + "~[/red]",
                 "[red]~"
-                + f"[white bold]ma_hs: {p['ma_hs']}[/white bold]".center(72)
+                + f"[white bold]ma_hs: {p['ma_hs']}[/white bold]".center(73)
                 + "~[/red]",
                 "[red]" + "~" * 50 + "[/red]",
                 "",

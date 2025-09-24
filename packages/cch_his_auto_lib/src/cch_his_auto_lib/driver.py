@@ -113,9 +113,12 @@ class Driver(webdriver.Chrome):
         else:
             for _ in range(120):
                 time.sleep(1)
-                if (ele := self.find(css)).text.strip().startswith(w.strip()):
-                    _lgr.debug(f"-> done waiting {name or css} startswith {w}")
-                    return ele
+                try:
+                    if (ele := self.find(css)).text.strip().startswith(w.strip()):
+                        _lgr.debug(f"-> done waiting {name or css} startswith {w}")
+                        return ele
+                except StaleElementReferenceException:
+                    continue
             else:
                 txt = self.find(css).text.strip()
                 ctx = f"-> found {name or css} but not startswith {w}. Found {txt} instead."
