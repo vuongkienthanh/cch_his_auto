@@ -3,7 +3,7 @@ from pathlib import PurePath
 from typing import Self
 from validators import url
 
-from cch_his_auto.common_structs import User, ABCConfig
+from cch_his_auto.common_structs import User, ABCConfig,ABCChildConfig
 
 
 type k3 = tuple[bool, bool, bool, bool, bool]
@@ -11,7 +11,7 @@ k3_default = (False, False, False, False, False)
 
 
 @dataclass(eq=False, repr=False, frozen=True)
-class Ky_3tra:
+class Ky_3tra(ABCChildConfig):
     bacsi: k3 = k3_default
     dieuduong: k3 = k3_default
     benhnhan: k3 = k3_default
@@ -22,7 +22,7 @@ class Ky_3tra:
 
 
 @dataclass(eq=False, repr=False, frozen=True)
-class Todieutri:
+class Todieutri(ABCChildConfig):
     url: str = ""
     note: str = ""
     ky_xn: bool = False
@@ -41,7 +41,7 @@ class Todieutri:
 
 
 @dataclass(eq=False, repr=False, frozen=True)
-class Bienbanhoichan:
+class Bienbanhoichan(ABCChildConfig):
     url: str = ""
     note: str = ""
     ky_thuky: bool = False

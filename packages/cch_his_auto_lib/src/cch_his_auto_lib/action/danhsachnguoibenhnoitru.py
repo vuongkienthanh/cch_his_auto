@@ -3,13 +3,14 @@ import time
 import datetime as dt
 from contextlib import contextmanager
 
+from selenium.common import TimeoutException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 
 from cch_his_auto_lib.driver import Driver, DriverFn
 from cch_his_auto_lib.tracing import tracing
 from cch_his_auto_lib.action import top_patient_info, danhsachnguoibenhnoitru
-from cch_his_auto.common_tasks.navigation import pprint_patient_info
+from cch_his_auto_lib.common_tasks import pprint_patient_info
 
 URL = "http://emr.ndtp.org/quan-ly-noi-tru/danh-sach-nguoi-benh-noi-tru"
 
@@ -18,10 +19,17 @@ _trace = tracing(_lgr)
 
 
 def wait_loaded(d: Driver):
-    WebDriverWait(d, 120).until(
-        lambda _: len(d.find_all(".main__container tr.ant-table-row")) >= 1
-    )
-    time.sleep(5)
+    try:
+        WebDriverWait(d, 120).until(
+            lambda _: len(d.find_all(".main__container tr.ant-table-row")) >= 1
+        )
+    except TimeoutException:
+        d.refresh()
+        WebDriverWait(d, 120).until(
+            lambda _: len(d.find_all(".main__container tr.ant-table-row")) >= 1
+        )
+    finally:
+        time.sleep(5)
 
 
 def load(d: Driver):
@@ -166,11 +174,3 @@ def open_patient(d: Driver, i: int):
     top_patient_info.wait_loaded(d)
 
 
-def iterate_all_and_do(d: Driver, f: DriverFn):
-    l = len(d.find_all(f"{MAIN_TABLE} tr.ant-table-row"))
-    for i in range(2, l + 2):
-        danhsachnguoibenhnoitru.load(d)
-        open_patient(d, i)
-        pinfo = top_patient_info.get_patient_info(d)
-        pprint_patient_info(pinfo)
-        f(d)

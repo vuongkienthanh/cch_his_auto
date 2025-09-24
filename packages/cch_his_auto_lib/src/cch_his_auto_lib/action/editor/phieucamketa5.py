@@ -12,9 +12,7 @@ def bs(d: Driver):
     )
 
 
-def bn(d: Driver, signature: str | None):
-    if signature is None:
-        return
+def bn(d: Driver, signature: str):
     wait_loaded(d)
     d.sign_patient_signature(
         btn_css=".sign-image button",

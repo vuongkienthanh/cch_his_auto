@@ -1,8 +1,14 @@
+from selenium.common import NoSuchElementException
 from cch_his_auto_lib.driver import Driver
 
 
 def wait_loaded(d: Driver):
-    d.waiting(".toolbar")
+    try:
+        d.waiting(".toolbar")
+    except NoSuchElementException:
+        d.refresh()
+        d.waiting(".toolbar")
+
 
 
 def tobiabenhannhikhoa(d: Driver):

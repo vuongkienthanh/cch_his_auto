@@ -3,6 +3,7 @@ import datetime as dt
 from functools import partial
 from typing import Callable
 
+from selenium.common import NoSuchElementException
 from selenium.webdriver import Keys
 
 from cch_his_auto_lib.driver import Driver, DriverFn
@@ -15,7 +16,11 @@ _lgr = logging.getLogger("hoichan")
 
 
 def wait_loaded(d: Driver):
-    d.waiting(".main__container")
+    try:
+        d.waiting(".main__container")
+    except NoSuchElementException:
+        d.refresh()
+        d.waiting(".main__container")
 
 
 def load(d: Driver):

@@ -22,9 +22,7 @@ def bsthuchien(d: Driver):
     )
 
 
-def bn(d: Driver, signature: str | None):
-    if signature is None:
-        return
+def bn(d: Driver, signature: str):
     wait_loaded(d)
     d.sign_patient_signature(
         btn_css=".layout-line-item:nth-child(2) .layout-line-item:nth-child(29) .sign-image button",

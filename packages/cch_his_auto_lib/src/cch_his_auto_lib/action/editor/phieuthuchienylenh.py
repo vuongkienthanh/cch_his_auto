@@ -37,10 +37,8 @@ def dd(d: Driver, arr: tuple[bool, bool, bool, bool, bool]):
         )
 
 
-def bn(d: Driver, arr: tuple[bool, bool, bool, bool, bool], signature: str | None):
+def bn(d: Driver, arr: tuple[bool, bool, bool, bool, bool], signature: str):
     "*Phiếu thực hiện y lệnh (bệnh nhân)*"
-    if signature is None:
-        return
     wait_loaded(d)
     print("[red] signing phieu thuc hien y lenh, may take a while")
     d.waiting(".table-tbody")

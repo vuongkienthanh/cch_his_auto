@@ -1,4 +1,5 @@
 import tkinter as tk
+from dataclasses import astuple
 from tkinter import messagebox
 
 from cch_his_auto.app import PROFILE_PATH
@@ -10,9 +11,10 @@ from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig
 from cch_his_auto_lib.driver import start_driver
 from cch_his_auto_lib.action import danhsachnguoibenhnoitru
 from cch_his_auto_lib.action import auth
+from cch_his_auto_lib.common_tasks import iterate_all_patient
 
 from . import dinhduong, nhommau, kytenhosobenhan
-from .config import Config
+from .config import Config, Kytenhosobenhan
 
 
 TITLE = "Kiểm tra hồ sơ toàn khoa"
@@ -31,7 +33,29 @@ class App(tk.Frame):
 
         dinhduong_var = tk.BooleanVar()
         nhommau_var = tk.BooleanVar()
+
         kytenhosobenhan_var = tk.BooleanVar()
+        mucAbenhannhikhoa_var = tk.BooleanVar()
+        phieukhambenhvaovien_var = tk.BooleanVar()
+        phieusanglocdinhduong_var = tk.BooleanVar()
+        phieusoket15ngay_var = tk.BooleanVar()
+        phieuchidinhxetnghiem_var = tk.BooleanVar()
+        phieuCT_var = tk.BooleanVar()
+        phieuMRI_var = tk.BooleanVar()
+        donthuoc_var = tk.BooleanVar()
+        todieutri_var = tk.BooleanVar()
+
+        def check_all():
+            val = kytenhosobenhan_var.get()
+            mucAbenhannhikhoa_var.set(val)
+            phieukhambenhvaovien_var.set(val)
+            phieusanglocdinhduong_var.set(val)
+            phieusoket15ngay_var.set(val)
+            phieuchidinhxetnghiem_var.set(val)
+            phieuCT_var.set(val)
+            phieuMRI_var.set(val)
+            donthuoc_var.set(val)
+            todieutri_var.set(val)
 
         optionframe = tk.Frame(self)
         optionframe.grid(row=1, column=0, sticky="NSEW", padx=10)
@@ -42,9 +66,34 @@ class App(tk.Frame):
         tk.Checkbutton(
             optionframe, text="Nhóm máu", variable=nhommau_var, justify="left"
         ).grid(row=1, column=0, padx=5, sticky="W")
+
         tk.Checkbutton(
-            optionframe, text="Ký tên hồ sơ bệnh án", variable=kytenhosobenhan_var, justify="left"
+            optionframe,
+            text="Ký tên hồ sơ bệnh án",
+            variable=kytenhosobenhan_var,
+            justify="left",
+            command=check_all,
         ).grid(row=2, column=0, padx=5, sticky="W")
+        for i, (a, b) in enumerate(
+            [
+                ("mục A bệnh án nhi khoa", mucAbenhannhikhoa_var),
+                ("phiếu khám bệnh vào viện", phieukhambenhvaovien_var),
+                ("phiếu sàng lọc dinh dưỡng", phieusanglocdinhduong_var),
+                ("phiếu sơ kết 15 ngày", phieusoket15ngay_var),
+                ("phiếu chỉ định xét nghiệm", phieuchidinhxetnghiem_var),
+                ("phiếu CT", phieuCT_var),
+                ("phiếu MRI", phieuMRI_var),
+                ("đơn thuốc", donthuoc_var),
+                ("tờ điều trị", todieutri_var),
+            ],
+            4,
+        ):
+            tk.Checkbutton(
+                optionframe,
+                text=a,
+                variable=b,
+                justify="left",
+            ).grid(row=i, column=0, padx=30, sticky="W")
 
         button_frame = ButtonFrame(self)
         button_frame.grid(row=0, column=1, rowspan=5, padx=20, sticky="S", pady=(0, 20))
@@ -56,7 +105,16 @@ class App(tk.Frame):
             user.set_department(cfg.department)
             dinhduong_var.set(cfg.dinhduong)
             nhommau_var.set(cfg.nhommau)
-            kytenhosobenhan_var.set(cfg.kytenhosobenhan)
+            mucAbenhannhikhoa_var.set(cfg.kytenhosobenhan.mucAbenhannhikhoa)
+            phieukhambenhvaovien_var.set(cfg.kytenhosobenhan.phieukhambenhvaovien)
+            phieusanglocdinhduong_var.set(cfg.kytenhosobenhan.phieusanglocdinhduong)
+            phieusoket15ngay_var.set(cfg.kytenhosobenhan.phieusoket15ngay)
+            phieuchidinhxetnghiem_var.set(cfg.kytenhosobenhan.phieuchidinhxetnghiem)
+            phieuCT_var.set(cfg.kytenhosobenhan.phieuCT)
+            phieuMRI_var.set(cfg.kytenhosobenhan.phieuMRI)
+            donthuoc_var.set(cfg.kytenhosobenhan.donthuoc)
+            todieutri_var.set(cfg.kytenhosobenhan.todieutri)
+            kytenhosobenhan_var.set(all(astuple(cfg.kytenhosobenhan)))
 
             button_frame.load_config()
 
@@ -66,7 +124,17 @@ class App(tk.Frame):
                 user.get_department(),
                 dinhduong_var.get(),
                 nhommau_var.get(),
-                kytenhosobenhan_var.get(),
+                Kytenhosobenhan(
+                    mucAbenhannhikhoa_var.get(),
+                    phieukhambenhvaovien_var.get(),
+                    phieusanglocdinhduong_var.get(),
+                    phieusoket15ngay_var.get(),
+                    phieuchidinhxetnghiem_var.get(),
+                    phieuCT_var.get(),
+                    phieuMRI_var.get(),
+                    donthuoc_var.get(),
+                    todieutri_var.get(),
+                ),
             )
 
         def save():
@@ -98,7 +166,7 @@ def run(cfg: Config, run_cfg: RunConfig):
         with auth.session(d, cfg.user.name, cfg.user.password, cfg.department):
             danhsachnguoibenhnoitru.load(d)
             danhsachnguoibenhnoitru.huytimkiem(d)
-            danhsachnguoibenhnoitru.iterate_all_and_do(
+            iterate_all_patient(
                 d, lambda d: [m.run(d) for m in processes]
             )
 

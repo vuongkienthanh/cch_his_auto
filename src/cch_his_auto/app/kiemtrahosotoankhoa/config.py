@@ -1,7 +1,35 @@
 from dataclasses import dataclass
 from typing import Self
-from cch_his_auto.common_structs import User, ABCConfig
+
+from cch_his_auto.common_structs import ABCChildConfig, User, ABCConfig
 from pathlib import PurePath
+
+
+@dataclass(repr=False, eq=False, frozen=True)
+class Kytenhosobenhan(ABCChildConfig):
+    mucAbenhannhikhoa: bool = True
+    phieukhambenhvaovien: bool = True
+    phieusanglocdinhduong: bool = True
+    phieusoket15ngay: bool = True
+    phieuchidinhxetnghiem: bool = True
+    phieuCT: bool = True
+    phieuMRI: bool = True
+    donthuoc: bool = True
+    todieutri: bool = True
+
+    @classmethod
+    def from_dict(cls, value) -> Self:
+        return cls(
+            value["mucAbenhannhikhoa"],
+            value["phieukhambenhvaovien"],
+            value["phieusanglocdinhduong"],
+            value["phieusoket15ngay"],
+            value["phieuchidinhxetnghiem"],
+            value["phieuCT"],
+            value["phieuMRI"],
+            value["donthuoc"],
+            value["todieutri"],
+        )
 
 
 @dataclass(repr=False, eq=False, frozen=True)
@@ -13,7 +41,7 @@ class Config(ABCConfig):
     department: str = ""
     dinhduong: bool = True
     nhommau: bool = True
-    kytenhosobenhan: bool = True
+    kytenhosobenhan: Kytenhosobenhan = Kytenhosobenhan()
 
     @classmethod
     def from_dict(cls, value) -> Self:
@@ -22,7 +50,7 @@ class Config(ABCConfig):
             value["department"],
             value["dinhduong"],
             value["nhommau"],
-            value["kytenhosobenhan"],
+            Kytenhosobenhan.from_dict(value["kytenhosobenhan"]),
         )
 
     def is_valid(self) -> bool:

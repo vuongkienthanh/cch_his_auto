@@ -7,7 +7,7 @@ from cch_his_auto.global_db import create_connection
 from cch_his_auto.common_ui.user_frame import UsernamePasswordFrame
 from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig
 from cch_his_auto.common_tasks.signature import try_get_signature
-from cch_his_auto.common_tasks.navigation import pprint_patient_info
+from cch_his_auto_lib.common_tasks import pprint_patient_info
 
 from . import todieutri_tab, bienbanhoichan_tab
 from .tabbed_listframe import TabbedListFrame
@@ -220,13 +220,13 @@ def run_bn(d: Driver, cfg: Config):
             pprint_patient_info(pinfo)
 
             ma_hs = int(pinfo["ma_hs"])
-            signature = try_get_signature(d, con, ma_hs)
-            d.do_next_tab_do(
-                f1=lambda d: todieutri.ingiayto(d, name="Phiếu thực hiện y lệnh"),
-                f2=lambda d: editor_phieuthuchienylenh.bn(
-                    d, p.ky_3tra.benhnhan, signature
-                ),
-            )
+            if signature := try_get_signature(d, con, ma_hs):
+                d.do_next_tab_do(
+                    f1=lambda d: todieutri.ingiayto(d, name="Phiếu thực hiện y lệnh"),
+                    f2=lambda d: editor_phieuthuchienylenh.bn(
+                        d, p.ky_3tra.benhnhan, signature
+                    ),
+                )
 
 
 def run_tk(d: Driver, cfg: Config):

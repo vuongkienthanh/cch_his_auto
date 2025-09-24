@@ -1,6 +1,6 @@
 import logging
 import time
-from enum import StrEnum
+from enum import Enum
 
 from selenium.common import NoSuchElementException, StaleElementReferenceException
 
@@ -55,7 +55,7 @@ def phieuchidinh(d: Driver):
 
     PHIEUCHIDINH_DIALOG = ".ant-modal:has(.__list)"
 
-    class State(StrEnum):
+    class State(Enum):
         Trinh = "Trình ký"
         Ky = "Ký Bác sĩ"
         Huy = "Hủy ký Bác sĩ"
@@ -65,7 +65,7 @@ def phieuchidinh(d: Driver):
     #     f"{PHIEUCHIDINH_DIALOG} .__button > button:nth-child(2)", State.Trinh
     # )
     d.waiting_to_startswith(
-        f"{PHIEUCHIDINH_DIALOG} .__button > button:first-child", State.Ky
+        f"{PHIEUCHIDINH_DIALOG} .__button > button:first-child", State.Ky.value
     )
     d.clicking(f"{PHIEUCHIDINH_DIALOG} .__button > button:first-child")
     try:
@@ -75,7 +75,7 @@ def phieuchidinh(d: Driver):
             for ele in d.find_all(f"{PHIEUCHIDINH_DIALOG} .__button > button"):
                 try:
                     if ele.text == State.Huy:
-                        _lgr.debug(f" found button state is {State.Huy}")
+                        _lgr.debug(f" found button state is {State.Huy.value}")
                         break
                 except StaleElementReferenceException as e:
                     _lgr.warning(f"get {e}")

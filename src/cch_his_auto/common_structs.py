@@ -23,13 +23,16 @@ class User:
 
 
 @dataclass(repr=False, eq=False, frozen=True)
-class ABCConfig(ABC):
-    APP_PATH: ClassVar[PurePath]
-    FILE_PATH: ClassVar[PurePath]
-
+class ABCChildConfig(ABC):
     @classmethod
     @abstractmethod
     def from_dict(cls, value) -> Self: ...
+
+
+@dataclass(repr=False, eq=False, frozen=True)
+class ABCConfig(ABCChildConfig, ABC):
+    APP_PATH: ClassVar[PurePath]
+    FILE_PATH: ClassVar[PurePath]
 
     @abstractmethod
     def is_valid(self) -> bool: ...
