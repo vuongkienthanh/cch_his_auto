@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.errors import EndOfLoopException
+from cch_his_auto_lib.errors import TaskUncompleteException
 from cch_his_auto_lib.tracing import tracing
 from cch_his_auto_lib.action import danhsachnguoibenhnoitru
 
@@ -59,7 +59,7 @@ def login(d: Driver, username: str, password: str):
             d.wait_disappearing(LOGIN_PANE_CSS, "login page")
             return
     else:
-        raise EndOfLoopException("can't log in")
+        raise TaskUncompleteException("can't log in")
 
 
 @_trace
@@ -112,7 +112,7 @@ def set_dept(d: Driver, dept: str):
             _set_dept_in_dialog()
             return
     else:
-        raise EndOfLoopException("can't set dept")
+        raise TaskUncompleteException("can't set dept")
 
 
 @contextmanager

@@ -6,7 +6,6 @@ from selenium.common import NoSuchElementException, StaleElementReferenceExcepti
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tracing import tracing
-from cch_his_auto_lib.errors import EndOfLoopException
 from cch_his_auto_lib.action import top_patient_info
 
 URL = "http://emr.ndtp.org/quan-ly-noi-tru/chi-tiet-nguoi-benh-noi-tru/to-dieu-tri"
@@ -48,7 +47,8 @@ def ingiayto(d: Driver, name: str):
                 return
     else:
         d.clicking(".footer-btn .right button:nth-child(1)", "close menu In giấy tờ")
-        raise EndOfLoopException(f"can't find ingiayto -> {name}")
+        raise NoSuchElementException(f"can't find ingiayto -> {name}")
+
 
 def phieuchidinh(d: Driver):
     "Inside *tờ điều trị*, try to sign *phiếu chỉ định*"

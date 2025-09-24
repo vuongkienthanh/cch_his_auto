@@ -1,11 +1,11 @@
 import logging
 import datetime as dt
 
+from selenium.common import NoSuchElementException
 from selenium.webdriver.remote.webelement import WebElement
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tracing import tracing
-from cch_his_auto_lib.errors import EndOfLoopException
 from .. import _lgr, ACTIVE_PANE
 
 TAB_NUMBER = 2
@@ -44,12 +44,11 @@ def get_all_todieutri_at_date(d: Driver, date: dt.date) -> list[WebElement]:
                 f"{ACTIVE_PANE} .ant-collapse-item:nth-child({i})>.ant-collapse-content .left"
             )
     else:
-        raise EndOfLoopException(f"can't find todieutri at date= {date}")
+        raise NoSuchElementException(f"can't find todieutri at date= {date}")
 
 
 @_trace
-def open_nearest_todieutri_to_datetime(d:Driver, _dt: dt.datetime):
-
+def open_nearest_todieutri_to_datetime(d: Driver, _dt: dt.datetime):
     def timeval(time: dt.time) -> int:
         return time.hour * 24 + time.minute * 60
 

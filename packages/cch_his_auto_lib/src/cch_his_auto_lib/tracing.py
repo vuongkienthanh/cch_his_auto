@@ -8,14 +8,14 @@ _out.setFormatter(
 )
 
 
-def set_up_logging():
+def enter():
     global _out
     root_logger = logging.getLogger()
     root_logger.addHandler(_out)
     return _out
 
 
-def shutdown_logging():
+def close():
     global _out
     root_logger = logging.getLogger()
     root_logger.removeHandler(_out)

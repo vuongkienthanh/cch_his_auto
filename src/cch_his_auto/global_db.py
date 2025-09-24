@@ -11,26 +11,18 @@ def create_connection():
     con.executescript(f"""
     CREATE TABLE IF NOT EXISTS {DB_NAME} (
         ma_hs INTEGER PRIMARY KEY,
-        url TEXT,
         signature TEXT
     );
     """)
     return con
 
 
-def save_db(con: sqlite3.Connection, ma_hs: int, url: str, signature: str):
+def save_db(con: sqlite3.Connection, ma_hs: int, signature: str):
     con.execute(
-        f"INSERT INTO {DB_NAME} (ma_hs, url, signature) VALUES (?, ?, ?)",
-        (ma_hs, url, signature),
+        f"INSERT INTO {DB_NAME} (ma_hs, signature) VALUES (?, ?)",
+        (ma_hs, signature),
     )
     con.commit()
-
-
-def get_url_from_db(con: sqlite3.Connection, ma_hs: int) -> str | None:
-    if ret := con.execute(
-        f"SELECT url FROM {DB_NAME} WHERE ma_hs=?", (ma_hs,)
-    ).fetchone():
-        return ret[0]
 
 
 def get_signature_from_db(con: sqlite3.Connection, ma_hs: int) -> str | None:

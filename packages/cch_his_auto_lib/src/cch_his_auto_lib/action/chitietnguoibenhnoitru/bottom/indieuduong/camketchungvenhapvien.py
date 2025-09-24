@@ -5,7 +5,7 @@ from cch_his_auto_lib.driver import Driver
 from .. import _lgr
 
 
-def get_signature_from_HIS(d: Driver) -> str | None:
+def get_signature(d: Driver) -> str | None:
     "Get patient signature data in *Cam kết chung khi nhập viện*"
     try:
         ele = d.waiting(".layout-line-item:nth-child(43) img", "patient signature")

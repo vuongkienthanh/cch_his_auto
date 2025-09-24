@@ -16,7 +16,7 @@ from selenium.common import (
 )
 from selenium.webdriver import Keys
 
-from .tracing import set_up_logging, shutdown_logging
+from . import tracing
 from .errors import WaitClosingException
 
 
@@ -33,7 +33,6 @@ class Driver(webdriver.Chrome):
         - `headless`: run driver in headless mode
         - `profile_path`: provide a profile path for more efficient subsequent uses
         """
-        _lgr.info("---opening chrome")
         options = webdriver.ChromeOptions()
         options.add_argument("--disable-infobars")
         options.add_argument("--no-sandbox")
@@ -402,11 +401,12 @@ class DriverFn[T](Protocol):
 
 @contextmanager
 def start_driver(headless: bool, profile_path: str):
-    set_up_logging()
+    tracing.enter()
+    _lgr.info("################## DRIVER STARTING")
     d = Driver(headless, profile_path)
     try:
         yield d
     finally:
-        _lgr.info("---driver quiting")
-        shutdown_logging()
+        _lgr.info("################## DRIVER QUITTING")
+        tracing.close()
         d.quit()

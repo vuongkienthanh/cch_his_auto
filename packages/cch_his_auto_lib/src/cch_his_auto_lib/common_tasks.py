@@ -1,8 +1,15 @@
+import time
+
 from rich import print
 
 from cch_his_auto_lib.action import danhsachnguoibenhnoitru
 from cch_his_auto_lib.action.top_patient_info import danhsachnguoibenh, get_patient_info
 from cch_his_auto_lib.driver import Driver, DriverFn
+from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom import indieuduong
+
+from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom.indieuduong import (
+    camketchungvenhapvien,
+)
 
 
 def pprint_patient_info(p: dict[str, str]):
@@ -43,3 +50,16 @@ def iterate_all_patient(d: Driver, f: DriverFn):
         pinfo = get_patient_info(d)
         pprint_patient_info(pinfo)
         f(d)
+
+
+def get_signature_from_HIS(d: Driver, ma_hs: int) -> str | None:
+    working_url = d.current_url
+    danhsachnguoibenhnoitru.load(d)
+    danhsachnguoibenhnoitru.goto_patient(d, ma_hs)
+    signature = d.do_next_tab_do(
+        f1=lambda d: indieuduong(d, "cam kết"),
+        f2=lambda d: camketchungvenhapvien.get_signature(d),
+    )
+    d.goto(working_url)
+    time.sleep(5)
+    return signature
