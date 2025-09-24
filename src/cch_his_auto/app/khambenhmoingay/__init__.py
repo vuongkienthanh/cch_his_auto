@@ -1,3 +1,4 @@
+from functools import partial
 import tkinter as tk
 from tkinter import messagebox, ttk
 
@@ -175,7 +176,7 @@ def run_bs(d: Driver, cfg: Config):
         if any(tdt.ky_3tra.bacsi):
             d.do_next_tab_do(
                 f1=lambda d: todieutri.ingiayto(d, name="Phiếu thực hiện y lệnh"),
-                f2=lambda d: editor_phieuthuchienylenh.bs(d, tdt.ky_3tra.bacsi),
+                f2=partial(editor_phieuthuchienylenh.bs, arr=tdt.ky_3tra.bacsi),
             )
 
     for bbhc in cfg.bienbanhoichan:
@@ -188,7 +189,7 @@ def run_bs(d: Driver, cfg: Config):
         pprint_patient_info(pinfo)
 
         d.do_next_tab_do(
-            f1=bienbanhoichan.open_editor, f2=lambda d: bbhc_bs(d, bbhc.khac_note)
+            f1=bienbanhoichan.open_editor, f2=partial(bbhc_bs, khac_note=bbhc.khac_note)
         )
 
 
@@ -204,7 +205,7 @@ def run_dd(d: Driver, cfg: Config):
 
         d.do_next_tab_do(
             f1=lambda d: todieutri.ingiayto(d, name="Phiếu thực hiện y lệnh"),
-            f2=lambda d: editor_phieuthuchienylenh.dd(d, p.ky_3tra.dieuduong),
+            f2=partial(editor_phieuthuchienylenh.dd, arr=p.ky_3tra.dieuduong),
         )
 
 
@@ -223,8 +224,10 @@ def run_bn(d: Driver, cfg: Config):
             if signature := try_get_signature(d, con, ma_hs):
                 d.do_next_tab_do(
                     f1=lambda d: todieutri.ingiayto(d, name="Phiếu thực hiện y lệnh"),
-                    f2=lambda d: editor_phieuthuchienylenh.bn(
-                        d, p.ky_3tra.benhnhan, signature
+                    f2=partial(
+                        editor_phieuthuchienylenh.bn,
+                        arr=p.ky_3tra.benhnhan,
+                        signature=signature,
                     ),
                 )
 

@@ -8,9 +8,12 @@ from cch_his_auto_lib.action.top_patient_info.hosobenhan import tab_dvkt
 from cch_his_auto_lib.action.chitietnguoibenhnoitru.tabs.thongtinchung import (
     edit_thongtinvaovien,
 )
+from .config import Config
 
 
-def run(d: Driver):
+def run(d: Driver, cfg:Config):
+    if not cfg.nhommau:
+        return
     print("Start nhommau")
     change_tab(d, thongtinchung.TAB_NUMBER)
     bloodtype = thongtinchung.get_bloodtype(d)

@@ -154,20 +154,15 @@ def run(cfg: Config, run_cfg: RunConfig):
     if not cfg.user.is_valid():
         return
 
-    processes = []
-    if cfg.nhommau:
-        processes.append(nhommau)
-    if cfg.dinhduong:
-        processes.append(dinhduong)
-    if cfg.kytenhosobenhan:
-        processes.append(kytenhosobenhan)
-
     with start_driver(headless=run_cfg.headless, profile_path=PROFILE_PATH) as d:
         with auth.session(d, cfg.user.name, cfg.user.password, cfg.department):
             danhsachnguoibenhnoitru.load(d)
             danhsachnguoibenhnoitru.huytimkiem(d)
             iterate_all_patient(
-                d, lambda d: [m.run(d) for m in processes]
+                d,
+                lambda d: [
+                    m.run(d, cfg) for m in [nhommau, dinhduong, kytenhosobenhan]
+                ],
             )
 
     messagebox.showinfo(message="finish")
