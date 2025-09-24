@@ -24,7 +24,7 @@ def get_bloodtype(d: Driver) -> str | None:
     try:
         d.waiting_to_startswith(
             f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:nth-child(5)",
-            "Đã kết luận",
+            "Đã có kết quả",
         )
     except NoSuchElementException:
         _lgr.warning("Bloodtype lab test is not complete")
