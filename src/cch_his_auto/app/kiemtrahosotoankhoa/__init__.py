@@ -45,7 +45,7 @@ class App(tk.Frame):
         donthuoc_var = tk.BooleanVar()
         todieutri_var = tk.BooleanVar()
 
-        def check_all():
+        def toggle_kyhosobenhan():
             val = kytenhosobenhan_var.get()
             mucAbenhannhikhoa_var.set(val)
             phieukhambenhvaovien_var.set(val)
@@ -72,7 +72,7 @@ class App(tk.Frame):
             text="Ký tên hồ sơ bệnh án",
             variable=kytenhosobenhan_var,
             justify="left",
-            command=check_all,
+            command=toggle_kyhosobenhan,
         ).grid(row=2, column=0, padx=5, sticky="W")
         for i, (a, b) in enumerate(
             [
@@ -157,7 +157,6 @@ def run(cfg: Config, run_cfg: RunConfig):
     with start_driver(headless=run_cfg.headless, profile_path=PROFILE_PATH) as d:
         with auth.session(d, cfg.user.name, cfg.user.password, cfg.department):
             danhsachnguoibenhnoitru.load(d)
-            danhsachnguoibenhnoitru.huytimkiem(d)
             iterate_all_patient(
                 d,
                 lambda d: [

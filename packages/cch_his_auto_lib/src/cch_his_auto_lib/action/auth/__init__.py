@@ -54,7 +54,7 @@ def login(d: Driver, username: str, password: str):
             _lgr.debug("+++++ typing username and password")
             inputs[0].send_keys(username)
             inputs[1].send_keys(password)
-            time.sleep(2)  # wait for js to load
+            time.sleep(5)  # wait for js to load
             d.clicking(".action>button", "submit button")
             d.wait_disappearing(LOGIN_PANE_CSS, "login page")
             return

@@ -3,14 +3,13 @@ import time
 import datetime as dt
 from contextlib import contextmanager
 
-from selenium.common import TimeoutException
+from selenium.common import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 
-from cch_his_auto_lib.driver import Driver, DriverFn
+from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tracing import tracing
-from cch_his_auto_lib.action import top_patient_info, danhsachnguoibenhnoitru
-from cch_his_auto_lib.common_tasks import pprint_patient_info
+from cch_his_auto_lib.action import top_patient_info
 
 URL = "http://emr.ndtp.org/quan-ly-noi-tru/danh-sach-nguoi-benh-noi-tru"
 
@@ -35,6 +34,7 @@ def wait_loaded(d: Driver):
 def load(d: Driver):
     d.goto(URL)
     wait_loaded(d)
+    huytimkiem(d)
 
 
 def get_khoalamviec(d: Driver) -> str:
@@ -174,3 +174,22 @@ def open_patient(d: Driver, i: int):
     top_patient_info.wait_loaded(d)
 
 
+def has_next_page(d: Driver) -> bool:
+    try:
+        d.waiting(".ant-pagination-next:not(.ant-pagination-disabled)")
+        return True
+    except NoSuchElementException:
+        return False
+
+
+def next_page(d: Driver):
+    current_page = d.waiting(
+        ".ant-pagination.patient-paging li.ant-pagination-item-active"
+    ).get_attribute("title")
+    assert current_page is not None
+    next_page = int(current_page) + 1
+    d.clicking(".ant-pagination-next:not(.ant-pagination-disabled) button")
+    d.waiting(
+        f".ant-pagination.patient-paging li.ant-pagination-item-active[title='{next_page}']"
+    )
+    time.sleep(5)

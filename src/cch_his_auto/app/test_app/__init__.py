@@ -1,7 +1,5 @@
 import tkinter as tk
 from tkinter import messagebox
-import time
-import datetime as dt
 
 from cch_his_auto.app import PROFILE_PATH
 
@@ -12,7 +10,8 @@ from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig
 from cch_his_auto_lib.driver import start_driver
 from cch_his_auto_lib.action import auth
 from cch_his_auto_lib.action import danhsachnguoibenhnoitru
-from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom import sanglocdinhduong
+from cch_his_auto_lib.action.top_patient_info import hosobenhan
+from cch_his_auto_lib.action.top_patient_info.hosobenhan import tab_hosokhamchuabenh
 
 from .config import Config
 
@@ -66,7 +65,8 @@ def run(cfg: config.Config, run_cfg: RunConfig):
     with start_driver(headless=run_cfg.headless, profile_path=PROFILE_PATH) as d:
         with auth.session(d, cfg.user.name, cfg.user.password, cfg.department):
             danhsachnguoibenhnoitru.load(d)
-            danhsachnguoibenhnoitru.goto_patient(d, 2508310665)
-            sanglocdinhduong.add_all_phieusanglocdinhduong(d)
+            danhsachnguoibenhnoitru.goto_patient(d, 2508051624)
+            with hosobenhan.session(d):
+                tab_hosokhamchuabenh.todieutri(d)
 
     messagebox.showinfo(message="finish")

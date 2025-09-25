@@ -4,10 +4,10 @@ from cch_his_auto_lib.driver import Driver
 
 def wait_loaded(d: Driver):
     try:
-        d.waiting(".toolbar")
+        d.waiting(".app-main")
     except NoSuchElementException:
         d.refresh()
-        d.waiting(".toolbar")
+        d.waiting(".app-main")
 
 
 

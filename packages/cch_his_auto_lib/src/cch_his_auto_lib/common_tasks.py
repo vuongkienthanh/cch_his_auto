@@ -50,6 +50,9 @@ def iterate_all_patient(d: Driver, f: DriverFn):
         pinfo = get_patient_info(d)
         pprint_patient_info(pinfo)
         f(d)
+    if danhsachnguoibenhnoitru.has_next_page(d):
+        danhsachnguoibenhnoitru.next_page(d)
+        iterate_all_patient(d, f)
 
 
 def get_signature_from_HIS(d: Driver, ma_hs: int) -> str | None:
