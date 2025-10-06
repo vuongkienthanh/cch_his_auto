@@ -31,4 +31,4 @@ def select_item_dropdown(d: Driver, i: int):
 
 def save(d: Driver):
     d.clicking(DIALOG_OK_CSS, "save dialog button")
-    d.wait_disappearing(DIALOG_CSS, "search dialog")
+    d.wait_closing(DIALOG_CSS, "search dialog")

@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.errors import TaskUncompleteException
+from cch_his_auto_lib.errors import TaskUncompleteException, WaitClosingException
 from cch_his_auto_lib.tracing import tracing
 from cch_his_auto_lib.action import danhsachnguoibenhnoitru
 
@@ -56,7 +56,12 @@ def login(d: Driver, username: str, password: str):
             inputs[1].send_keys(password)
             time.sleep(5)  # wait for js to load
             d.clicking(".action>button", "submit button")
-            d.wait_disappearing(LOGIN_PANE_CSS, "login page")
+            try:
+                d.wait_closing(LOGIN_PANE_CSS, "login page")
+            except WaitClosingException:
+                # one more time, cuz sometimes submit button doesn't work
+                d.clicking(".action>button", "submit button")
+                d.wait_closing(LOGIN_PANE_CSS, "login page")
             return
     else:
         raise TaskUncompleteException("can't log in")

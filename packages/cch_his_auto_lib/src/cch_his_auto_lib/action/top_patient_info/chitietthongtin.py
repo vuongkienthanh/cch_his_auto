@@ -19,7 +19,7 @@ def session(d: Driver):
         yield
     finally:
         d.clicking(f"{DIALOG_CSS} button.ant-modal-close")
-        d.wait_disappearing(DIALOG_CSS)
+        d.wait_closing(DIALOG_CSS)
 
 
 # CHIEUCAO_CSS = f"{DIALOG_CSS} .ant-col:nth-child(5) .ant-row:nth-child(1) .ant-col:nth-child(5) input"

@@ -21,7 +21,7 @@ def session(d: Driver):
             f"{DIALOG_CSS} .ant-modal-close",
             "close button",
         )
-        d.wait_disappearing(DIALOG_CSS, "edit thongtinravien dialog")
+        d.wait_closing(DIALOG_CSS, "edit thongtinravien dialog")
 
 
 def set_discharge_diagnosis_detail(d: Driver, value: str):

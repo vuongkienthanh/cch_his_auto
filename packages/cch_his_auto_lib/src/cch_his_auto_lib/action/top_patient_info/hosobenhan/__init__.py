@@ -28,7 +28,7 @@ def session(d: Driver, tab: int = 1):
         yield
     finally:
         d.clicking(f"{DIALOG_CSS} .ant-modal-close", "close button")
-        d.wait_disappearing(DIALOG_CSS, "Hồ sơ bệnh án dialog")
+        d.wait_closing(DIALOG_CSS, "Hồ sơ bệnh án dialog")
 
 
 def change_tab(d: Driver, tab: int):

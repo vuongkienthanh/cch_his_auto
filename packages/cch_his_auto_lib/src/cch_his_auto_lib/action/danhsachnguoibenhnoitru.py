@@ -67,7 +67,7 @@ def open_trangthainguoibenh(d: Driver):
             "#base-search_component .ant-col:nth-child(7) button",
             "close menu trạng thái người bệnh",
         )
-        d.wait_disappearing(TRANGTHAINGUOIBENH_POPOVER)
+        d.wait_closing(TRANGTHAINGUOIBENH_POPOVER)
 
 
 @_trace
@@ -118,7 +118,7 @@ def open_boloc(d: Driver):
         yield
     finally:
         d.clicking(f"{BOLOC_POPOVER} form +div button", "Tìm button")
-        d.wait_disappearing(BOLOC_POPOVER)
+        d.wait_closing(BOLOC_POPOVER)
 
 
 @_trace
@@ -159,7 +159,7 @@ def filter_patient(d: Driver, ma_hs: int):
     ele = d.clear_input(".base-search_component .ant-col:nth-child(2) input")
     ele.send_keys(str(ma_hs))
     ele.send_keys(Keys.ENTER)
-    d.wait_disappearing(f"{MAIN_TABLE} .ant-table-row:nth-child(3)")
+    d.wait_closing(f"{MAIN_TABLE} .ant-table-row:nth-child(3)")
 
 
 def goto_patient(d: Driver, ma_hs: int):

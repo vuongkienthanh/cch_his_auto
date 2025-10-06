@@ -31,7 +31,7 @@ def open_dialog(d: Driver) -> bool:
 def close_dialog(d: Driver):
     "Close *Sàng lọc dinh dưỡng* dialog"
     d.clicking(f"{DIALOG_CSS} button.ant-modal-close")
-    d.wait_disappearing(DIALOG_CSS)
+    d.wait_closing(DIALOG_CSS)
 
 
 def open_phieusangloc(d: Driver, i: int):

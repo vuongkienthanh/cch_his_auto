@@ -50,7 +50,7 @@ def set_dept(d: Driver, dept: str):
         ele.send_keys(Keys.ENTER)
     finally:
         d.clicking(f"{CSS} button")
-        d.wait_disappearing(CSS)
+        d.wait_closing(CSS)
 
 
 def set_date(d: Driver, date: dt.date):

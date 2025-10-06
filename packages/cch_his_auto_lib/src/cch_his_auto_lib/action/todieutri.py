@@ -83,4 +83,4 @@ def phieuchidinh(d: Driver):
             _lgr.warning("can't assure phieuchidinh signed while in dialog, maybe MRI")
     finally:
         d.clicking(f"{PHIEUCHIDINH_DIALOG} button.ant-modal-close")
-        d.wait_disappearing(PHIEUCHIDINH_DIALOG)
+        d.wait_closing(PHIEUCHIDINH_DIALOG)

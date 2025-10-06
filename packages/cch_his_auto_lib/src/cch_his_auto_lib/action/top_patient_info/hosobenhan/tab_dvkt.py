@@ -37,15 +37,15 @@ def get_bloodtype(d: Driver) -> str | None:
         if abo not in ["A", "B", "AB", "O"]:
             return None
 
-        if (
-            d.waiting(
-                f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(11) td:nth-child(2)"
-            ).text.strip()
-            == "DƯƠNG TÍNH"
-        ):
+        rh = d.waiting(
+            f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(11) td:nth-child(2)"
+        ).text.strip()
+        if (rh == "DƯƠNG TÍNH") or (rh == "+"):
             rh = "+"
         else:
             rh = "-"
+        if rh == "-":
+            return None  # need human manual check
         return f"{abo}{rh}"
     except:
         return None
