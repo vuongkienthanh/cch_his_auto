@@ -60,7 +60,7 @@ def login(d: Driver, username: str, password: str):
                 d.wait_closing(LOGIN_PANE_CSS, "login page")
             except WaitClosingException:
                 # one more time, cuz sometimes submit button doesn't work
-                d.clicking(".action>button", "submit button")
+                d.clicking(".action>button", "submit button one more time")
                 d.wait_closing(LOGIN_PANE_CSS, "login page")
             return
     else:

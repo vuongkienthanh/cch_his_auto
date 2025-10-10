@@ -74,7 +74,7 @@ def phieuchidinh(d: Driver):
             _lgr.debug(f"checking button state {i}...")
             for ele in d.find_all(f"{PHIEUCHIDINH_DIALOG} .__button > button"):
                 try:
-                    if ele.text == State.Huy:
+                    if ele.text == State.Huy.value:
                         _lgr.debug(f" found button state is {State.Huy.value}")
                         break
                 except StaleElementReferenceException as e:
