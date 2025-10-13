@@ -72,13 +72,17 @@ def phieuchidinh(d: Driver):
         for i in range(30):
             time.sleep(1)
             _lgr.debug(f"checking button state {i}...")
+            found = False
             for ele in d.find_all(f"{PHIEUCHIDINH_DIALOG} .__button > button"):
                 try:
                     if ele.text == State.Huy.value:
                         _lgr.debug(f" found button state is {State.Huy.value}")
+                        found = True
                         break
                 except StaleElementReferenceException as e:
                     _lgr.warning(f"get {e}")
+            if found:
+                break
         else:
             _lgr.warning("can't assure phieuchidinh signed while in dialog, maybe MRI")
     finally:
