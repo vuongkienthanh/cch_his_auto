@@ -4,7 +4,7 @@ from typing import Callable
 
 from rich.logging import RichHandler
 
-_rich = RichHandler(log_time_format="[%X]")
+_rich = RichHandler(log_time_format="[%X]",show_path=False)
 _rich.setFormatter(logging.Formatter(fmt="{name}:{message}", style="{"))
 _rich.setLevel(logging.INFO)
 
