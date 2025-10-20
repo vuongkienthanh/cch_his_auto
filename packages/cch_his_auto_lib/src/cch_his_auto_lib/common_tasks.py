@@ -1,6 +1,7 @@
 import time
 
 from rich import print
+from rich.panel import Panel
 
 from cch_his_auto_lib.action import danhsachnguoibenhnoitru
 from cch_his_auto_lib.action.top_patient_info import danhsachnguoibenh, get_patient_info
@@ -14,19 +15,15 @@ from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom.indieuduong import (
 
 def pprint_patient_info(p: dict[str, str]):
     print(
-        "\n".join(
-            [
-                "",
-                "[red]" + "~" * 50 + "[/red]",
-                "[red]~"
-                + f"[white bold]patient: {p['name']}[/white bold]".center(73)
-                + "~[/red]",
-                "[red]~"
-                + f"[white bold]ma_hs: {p['ma_hs']}[/white bold]".center(73)
-                + "~[/red]",
-                "[red]" + "~" * 50 + "[/red]",
-                "",
-            ]
+        Panel(
+            "\n".join(
+                [
+                    f"patient: {p['name']}",
+                    f"ma_hs: {p['ma_hs']}",
+                ]
+            ),
+            expand=False,
+            style="white bold",
         )
     )
 
@@ -40,6 +37,7 @@ def iterate_patient_list(d: Driver, listing: list[int], f: DriverFn):
     while len(listing) > 0:
         next_patient = listing.pop()
         danhsachnguoibenh.goto_patient(d, next_patient)
+        f(d)
 
 
 def iterate_all_patient(d: Driver, f: DriverFn):

@@ -1,5 +1,4 @@
 import time
-import logging
 from pathlib import PurePath
 from contextlib import contextmanager
 from typing import Protocol
@@ -16,11 +15,11 @@ from selenium.common import (
 )
 from selenium.webdriver import Keys
 
-from . import tracing
+from .tracing import _root_lgr
 from .errors import WaitClosingException
 
 
-_lgr = logging.getLogger("driver")
+_lgr = _root_lgr.getChild("driver")
 
 
 class Driver(webdriver.Chrome):
@@ -256,6 +255,8 @@ class Driver(webdriver.Chrome):
         You can also provide a `name` for logging
         Can raise NoSuchElementException
         """
+        # TODO
+        raise Exception("not working, need update")
         for _ in range(120):
             try:
                 _lgr.debug(f"finding {name} button")
@@ -401,12 +402,10 @@ class DriverFn[T](Protocol):
 
 @contextmanager
 def start_driver(headless: bool, profile_path: str):
-    tracing.enter()
     _lgr.info("################## DRIVER STARTING")
     d = Driver(headless, profile_path)
     try:
         yield d
     finally:
         _lgr.info("################## DRIVER QUITTING")
-        tracing.close()
         d.quit()

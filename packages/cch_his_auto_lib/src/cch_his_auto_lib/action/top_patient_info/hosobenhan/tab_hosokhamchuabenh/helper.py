@@ -155,16 +155,20 @@ def filter_check_expand_sign(
         date: dt.date | None = None,
     ):
         name = d.waiting(f"{RIGHT_PANEL} tr:nth-child({i}) td:nth-child(2)").text
-        row_date = dt.datetime.strptime(name.lstrip()[:10], "%d/%m/%Y").date()
-        _lgr.info(f"row date = {row_date}")
-        if date is None:
-            if row_date > dt.date.today():
-                _lgr.info("-> skipped")
-                return
+        try:
+            row_date = dt.datetime.strptime(name.lstrip()[:10], "%d/%m/%Y").date()
+            _lgr.info(f"row date = {row_date}")
+        except ValueError:
+            _lgr.warning("can't parse date. Maybe this line has no date info.")
         else:
-            if row_date != date:
-                _lgr.info("-> skipped")
-                return
+            if date is None:
+                if row_date > dt.date.today():
+                    _lgr.info("-> skipped")
+                    return
+            else:
+                if row_date != date:
+                    _lgr.info("-> skipped")
+                    return
 
         if is_row_status(d, i, Status.CHUAKY):
             _lgr.info(f"row condition not met -> {Status.CHUAKY.value}")
