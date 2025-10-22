@@ -1,12 +1,12 @@
 from contextlib import contextmanager
-import logging
 
 from selenium.common import NoSuchElementException
 
-from cch_his_auto_lib.driver import Driver
 from .. import TOP_BTN_CSS
+from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.tracing import _root_lgr
 
-_lgr = logging.getLogger("top_hosobenhan")
+_lgr = _root_lgr.getChild("top_hosobenhan")
 
 DIALOG_CSS = ".ant-modal:has(.img-avatar)"
 NAV_CSS = f"{DIALOG_CSS} .ant-tabs-nav-list"
@@ -14,17 +14,13 @@ ACTIVE_PANE = f"{DIALOG_CSS} .ant-tabs-tabpane-active"
 
 
 @contextmanager
-def session(d: Driver, tab: int = 1):
+def dialog(d: Driver, tab: int = 1):
     "use as contextmanager for open and close hosobenhan dialog"
     assert tab > 0
     try:
         d.clicking(f"{TOP_BTN_CSS}>div:nth-child(3)", "xem ho so benh an")
         if tab != 1:
             change_tab(d, tab)
-        # d.waiting(
-        #     f"{DIALOG_CSS} .right-content tbody tr:nth-child(2)",
-        #     "Danh sách phiếu first item",
-        # )
         yield
     finally:
         d.clicking(f"{DIALOG_CSS} .ant-modal-close", "close button")

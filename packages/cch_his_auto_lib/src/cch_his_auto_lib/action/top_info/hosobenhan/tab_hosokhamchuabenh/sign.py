@@ -1,53 +1,50 @@
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.tracing import tracing
-from .. import _lgr
-
-TAB_NUMBER = 1
-_lgr = _lgr.getChild("tab_hosokhamchuabenh")
-_trace = tracing(_lgr)
-
-from .helper import (
+from cch_his_auto_lib.action.editor import (
+    tobiabenhannhikhoa as editor_tobiabenhannhikhoa,
+    mucAbenhannhikhoa as editor_mucAbenhannhikhoa,
+    mucBtongketbenhan as editor_mucBtongketbenhan,
+    todieutri as editor_todieutri,
+    giaiphaubenh as editor_giaiphaubenh,
+    CT as editor_CT,
+    MRI as editor_MRI,
+)
+from .sign_helper import (
     filter_check_expand_sign,
     goto_row_and_click_edit,
     sign_current,
     sign_current2,
     sign_current_both,
 )
-from cch_his_auto_lib.action import editor
-from cch_his_auto_lib.action.editor import CT, MRI
 
 
-@_trace
 def tobiabenhannhikhoa(d: Driver):
     "Filter and sign name: *Tờ bìa bệnh án nhi khoa*"
 
     def chuaky_fn(d: Driver, i: int):
         d.do_next_tab_do(
-            f1=lambda d: goto_row_and_click_edit(d, i), f2=editor.tobiabenhannhikhoa
+            f1=lambda d: goto_row_and_click_edit(d, i), f2=editor_tobiabenhannhikhoa.bs
         )
 
     filter_check_expand_sign(d, "Tờ bìa bệnh án Nhi khoa", chuaky_fn)
 
 
-@_trace
 def mucAbenhannhikhoa(d: Driver):
     "Filter and sign name: *Mục A bệnh án nhi khoa*"
 
     def chuaky_fn(d: Driver, i: int):
         d.do_next_tab_do(
-            f1=lambda d: goto_row_and_click_edit(d, i), f2=editor.mucAbenhannhikhoa
+            f1=lambda d: goto_row_and_click_edit(d, i), f2=editor_mucAbenhannhikhoa.bs
         )
 
     filter_check_expand_sign(d, "Mục A - Bệnh án Nhi khoa", chuaky_fn)
 
 
-@_trace
 def mucBtongketbenhan(d: Driver):
     "Filter and sign name: *Mục B tổng kết bệnh án*"
 
     def chuaky_fn(d: Driver, i: int):
         d.do_next_tab_do(
-            f1=lambda d: goto_row_and_click_edit(d, i), f2=editor.mucBtongketbenhan
+            f1=lambda d: goto_row_and_click_edit(d, i), f2=editor_mucBtongketbenhan.bs
         )
 
     filter_check_expand_sign(
@@ -57,54 +54,49 @@ def mucBtongketbenhan(d: Driver):
     )
 
 
-@_trace
 def phieukhambenhvaovien(d: Driver):
     "Filter and sign name: *Phiếu khám bệnh vào viện*"
     filter_check_expand_sign(d, "Phiếu khám bệnh vào viện", sign_current)
 
 
-@_trace
 def phieuchidinhxetnghiem(d: Driver):
     "Filter and sign name: *Phiếu chỉ định xét nghiệm*"
     filter_check_expand_sign(d, "Phiếu chỉ định xét nghiệm", sign_current)
 
 
-@_trace
 def todieutri(d: Driver):
     "Filter and sign name: *Tờ điều trị* those before `_dt`"
 
     def chuaky_fn(d: Driver, i: int):
         d.do_next_tab_do(
-            f1=lambda d: goto_row_and_click_edit(d, i), f2=editor.todieutri
+            f1=lambda d: goto_row_and_click_edit(d, i), f2=editor_todieutri.bs
         )
 
     filter_check_expand_sign(d, "Tờ điều trị", chuaky_fn)
 
 
-@_trace
 def phieuchidinhPTTT(d: Driver):
     "Filter and sign name: *Phiếu chỉ định PTTT*"
     filter_check_expand_sign(d, "Phiếu chỉ định PTTT", sign_current)
 
 
-@_trace
 def phieuCT(d: Driver, signature: str | None = None):
     "Filter and sign name: *Phiếu chỉ định chụp CT*"
 
     def chuaky_fn(d: Driver, i: int):
         def f2_fn(d: Driver):
-            CT.bschidinh(d)
-            CT.bsthuchien(d)
+            editor_CT.bschidinh(d)
+            editor_CT.bsthuchien(d)
             if signature:
-                CT.bn(d, signature)
+                editor_CT.bn(d, signature)
 
         d.do_next_tab_do(f1=lambda d: goto_row_and_click_edit(d, i), f2=f2_fn)
 
     def dangky_fn(d: Driver, i: int):
         def f2_fn(d: Driver):
-            CT.bsthuchien(d)
+            editor_CT.bsthuchien(d)
             if signature:
-                CT.bn(d, signature)
+                editor_CT.bn(d, signature)
 
         d.do_next_tab_do(f1=lambda d: goto_row_and_click_edit(d, i), f2=f2_fn)
 
@@ -113,24 +105,23 @@ def phieuCT(d: Driver, signature: str | None = None):
     )
 
 
-@_trace
 def phieuMRI(d: Driver, signature: str | None = None):
     "Filter and sign name: *Phiếu chỉ định chụp MRI*"
 
     def chuaky_fn(d: Driver, i: int):
         def f2_fn(d: Driver):
-            MRI.bschidinh(d)
-            MRI.bsthuchien(d)
+            editor_MRI.bschidinh(d)
+            editor_MRI.bsthuchien(d)
             if signature:
-                MRI.bn(d, signature)
+                editor_MRI.bn(d, signature)
 
         d.do_next_tab_do(f1=lambda d: goto_row_and_click_edit(d, i), f2=f2_fn)
 
     def dangky_fn(d: Driver, i: int):
         def f2_fn(d: Driver):
-            MRI.bsthuchien(d)
+            editor_MRI.bsthuchien(d)
             if signature:
-                MRI.bn(d, signature)
+                editor_MRI.bn(d, signature)
 
         d.do_next_tab_do(f1=lambda d: goto_row_and_click_edit(d, i), f2=f2_fn)
 
@@ -139,19 +130,17 @@ def phieuMRI(d: Driver, signature: str | None = None):
     )
 
 
-@_trace
 def giaiphaubenh(d: Driver):
     "Filter and sign name: *Phiếu xét nghiệm giải phẫu bệnh sinh thiết*"
 
     def chuaky_fn(d: Driver, i: int):
         d.do_next_tab_do(
-            f1=lambda d: goto_row_and_click_edit(d, i), f2=editor.giaiphaubenh
+            f1=lambda d: goto_row_and_click_edit(d, i), f2=editor_giaiphaubenh.bs
         )
 
     filter_check_expand_sign(d, "Phiếu xét nghiệm giải phẫu bệnh sinh thiết", chuaky_fn)
 
 
-@_trace
 def phieusanglocdinhduong(d: Driver):
     "Filter and sign name: *Phiếu sàng lọc dinh dưỡng - Bệnh nhi nội trú*"
     filter_check_expand_sign(
@@ -159,7 +148,6 @@ def phieusanglocdinhduong(d: Driver):
     )
 
 
-@_trace
 def phieusoket15ngay(d: Driver):
     "Filter and sign name: *Phiếu sơ kết 15 ngày điều trị*"
     filter_check_expand_sign(
@@ -167,7 +155,6 @@ def phieusoket15ngay(d: Driver):
     )
 
 
-@_trace
 def donthuoc(d: Driver):
     "Filter and sign name: *Đơn thuốc*"
     filter_check_expand_sign(d, "Đơn thuốc", sign_current)

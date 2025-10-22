@@ -1,18 +1,16 @@
-import logging
 import datetime as dt
 
 from selenium.common import NoSuchElementException
 
+from .. import _lgr, ACTIVE_PANE
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.action.chitietnguoibenhnoitru.tabs import _lgr, ACTIVE_PANE
 
 TAB_NUMBER = 0
 
-_lgr = logging.getLogger("tab_thongtinchung")
+_lgr = _lgr.getChild("tab_thongtinchung")
 
 THONGTINVAOVIEN_CSS = f"{ACTIVE_PANE} .info:nth-child(1)"
 THONGTINRAVIEN_CSS = f"{ACTIVE_PANE} .info:nth-child(3)"
-
 
 def get_admission_date(d: Driver) -> dt.date:
     try:

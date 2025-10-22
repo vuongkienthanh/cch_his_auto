@@ -1,13 +1,13 @@
 import datetime as dt
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.action import top_patient_info
+from cch_his_auto_lib.action import top_info
 from . import _lgr, _trace
 
 
 def back(d: Driver):
     d.clicking(".footer-btn .left button", "go back button")
-    top_patient_info.wait_loaded(d)
+    top_info.wait_loaded(d)
 
 
 def set_date(d: Driver, date: dt.date):
@@ -51,7 +51,7 @@ def save_new_phieusangloc(
 ):
     "Complete this *Phiếu sàng lọc* then go back"
     _lgr.info(f"new phieusangloc: date= {date}")
-    top_patient_info.wait_loaded(d)
+    top_info.wait_loaded(d)
     set_date(d, date)
     set_cannang(d, cannang)
     set_chieucao(d, chieucao)

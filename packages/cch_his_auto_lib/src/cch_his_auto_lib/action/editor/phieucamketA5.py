@@ -1,5 +1,13 @@
+from . import wait_loaded, check_than_click
 from cch_his_auto_lib.driver import Driver
-from . import wait_loaded
+
+
+def check_agree(d: Driver):
+    wait_loaded(d)
+    check_than_click(
+        d,
+        ".component-page .layout-line-item:nth-child(10) .check-item:first-child",
+    )
 
 
 def bs(d: Driver):

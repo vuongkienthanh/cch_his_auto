@@ -1,7 +1,6 @@
 import time
 from contextlib import contextmanager
 
-from rich import print
 
 from selenium.webdriver.common.by import By
 from selenium.common import NoSuchElementException
@@ -128,4 +127,4 @@ def session(d: Driver, username: str, password: str, dept: str):
         yield
     finally:
         logout(d)
-        console.rule(f"[red]LOG OUT", align="left")
+        console.rule("[red]LOG OUT", align="left")

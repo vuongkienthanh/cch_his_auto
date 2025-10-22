@@ -1,6 +1,7 @@
 from selenium.webdriver import ActionChains, Keys
-from cch_his_auto_lib.driver import Driver
+
 from . import wait_loaded
+from cch_his_auto_lib.driver import Driver
 
 
 def thuky(d: Driver):
@@ -26,9 +27,9 @@ def truongkhoa(d: Driver):
 def thanhvienkhac(d: Driver):
     wait_loaded(d)
     d.sign_staff_signature(
-        btn_css=".layout-line-item .layout-line-item:nth-child(39)>div:nth-child(3) .sign-image button",
-        btn_txt="Xác nhận ký Trưởng khoa", # TODO
-        img_css=".layout-line-item .layout-line-item:nth-child(39)>div:nth-child(3) .sign-image img",
+        btn_css=".layout-line-item .layout-line-item:nth-child(39)>div:nth-child(4) .sign-image button",
+        btn_txt="Xác nhận ký Thành Viên",
+        img_css=".layout-line-item .layout-line-item:nth-child(39)>div:nth-child(4) .sign-image img",
         name="bien ban hoi chan (thanh vien khac)",
     )
 

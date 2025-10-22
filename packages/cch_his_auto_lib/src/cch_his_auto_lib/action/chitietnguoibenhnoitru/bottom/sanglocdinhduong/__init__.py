@@ -2,7 +2,8 @@ import datetime as dt
 
 from selenium.common import NoSuchElementException
 
-from cch_his_auto_lib.action import top_patient_info
+from cch_his_auto_lib.action import top_info
+from cch_his_auto_lib.action.top_info import get as top_info_get
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom import _lgr, _trace
 
@@ -24,7 +25,7 @@ def open_dialog(d: Driver) -> bool:
     except NoSuchElementException:
         _lgr.warning("can't open sanglocdinhduong dialog")
         d.goto(current_url)
-        top_patient_info.wait_loaded(d)
+        top_info.wait_loaded(d)
         return False
 
 
@@ -45,7 +46,7 @@ def get_chieucao_cannang_from_first_phieusangloc(d: Driver) -> tuple[str, str] |
         return None
 
     open_phieusangloc(d, 2)
-    top_patient_info.wait_loaded(d)
+    top_info.wait_loaded(d)
     cc = phieusangloc.get_chieucao(d)
     cn = phieusangloc.get_cannang(d)
     phieusangloc.back(d)
@@ -97,7 +98,7 @@ def add_all_phieusanglocdinhduong(d: Driver):
     chedo = machedo(
         calculate_age_in_months(
             dt.datetime.strptime(
-                top_patient_info.get_patient_info(d)["birthdate"], "%d/%m/%Y"
+                top_info_get.patient_info(d)["birthdate"], "%d/%m/%Y"
             )
         )
     )

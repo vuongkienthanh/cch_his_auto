@@ -1,6 +1,7 @@
 from selenium.common import NoSuchElementException
-from cch_his_auto_lib.driver import Driver
+
 from . import ACTIVE_PANE, _lgr
+from cch_his_auto_lib.driver import Driver
 
 TAB_NUMBER = 2
 _lgr = _lgr.getChild("tab_dvkt")

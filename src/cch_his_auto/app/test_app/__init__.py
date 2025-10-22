@@ -9,9 +9,14 @@ from cch_his_auto.common_ui.button_frame import ButtonFrame, RunConfig
 
 from cch_his_auto_lib.driver import start_driver
 from cch_his_auto_lib.action import auth
-from cch_his_auto_lib.action import danhsachnguoibenhnoitru
-from cch_his_auto_lib.action.top_patient_info import hosobenhan
-from cch_his_auto_lib.action.top_patient_info.hosobenhan import tab_hosokhamchuabenh
+from cch_his_auto_lib.action import danhsachnguoibenhnoitru as dsnbnt
+from cch_his_auto_lib.action.danhsachnguoibenhnoitru import (
+    main_table as dsnbnt_main_table,
+)
+from cch_his_auto_lib.action.top_info import hosobenhan
+from cch_his_auto_lib.action.top_info.hosobenhan.tab_hosokhamchuabenh import (
+    sign as tab_hskcb_sign,
+)
 
 from .config import Config
 
@@ -64,9 +69,9 @@ def run(cfg: config.Config, run_cfg: RunConfig):
 
     with start_driver(headless=run_cfg.headless, profile_path=PROFILE_PATH) as d:
         with auth.session(d, cfg.user.name, cfg.user.password, cfg.department):
-            danhsachnguoibenhnoitru.load(d)
-            danhsachnguoibenhnoitru.goto_patient(d, 2508051624)
-            with hosobenhan.session(d):
-                tab_hosokhamchuabenh.phieusoket15ngay(d)
+            dsnbnt.load(d)
+            dsnbnt_main_table.goto_patient(d, 2508051624)
+            with hosobenhan.dialog(d):
+                tab_hskcb_sign.phieusoket15ngay(d)
 
     messagebox.showinfo(message="finish")

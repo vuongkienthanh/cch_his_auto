@@ -1,12 +1,12 @@
-import logging
 import time
 
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.tracing import _root_lgr
 
 
-_lgr = logging.getLogger("top_patient_info")
+_lgr = _root_lgr.getChild("top_info")
 
 TOP_BTN_CSS = "#root .thong-tin-benh-nhan .bunch-icon"
 
@@ -19,7 +19,6 @@ def wait_loaded(d: Driver):
         d.waiting("#root .patient-information")
     finally:
         time.sleep(5)
-
 
 def get_patient_info(d: Driver) -> dict[str, str]:
     ret = {}

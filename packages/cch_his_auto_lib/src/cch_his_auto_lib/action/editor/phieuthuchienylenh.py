@@ -1,6 +1,7 @@
-from cch_his_auto_lib.driver import Driver
-from . import wait_loaded
 from rich import print
+
+from . import wait_loaded
+from cch_his_auto_lib.driver import Driver
 
 
 def bs(d: Driver, arr: tuple[bool, bool, bool, bool, bool]):

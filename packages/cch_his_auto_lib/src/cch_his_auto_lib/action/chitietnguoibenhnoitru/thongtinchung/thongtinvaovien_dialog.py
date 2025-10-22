@@ -10,7 +10,7 @@ DIALOG_CSS = ".ant-modal:has(.ant-col:nth-child(7) textarea)"
 
 
 @contextmanager
-def session(d: Driver):
+def dialog(d: Driver):
     d.clicking2(f"{THONGTINVAOVIEN_CSS} .title svg", "edit thongtinvaovien button")
     d.waiting(DIALOG_CSS, "edit thongtinvaovien dialog")
     try:

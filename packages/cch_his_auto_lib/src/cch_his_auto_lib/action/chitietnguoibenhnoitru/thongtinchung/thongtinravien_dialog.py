@@ -7,7 +7,7 @@ DIALOG_CSS = ".ant-modal:has(.ant-row:first-child+.more-info)"
 
 
 @contextmanager
-def session(d: Driver):
+def dialog(d: Driver):
     d.clicking2(f"{THONGTINRAVIEN_CSS} .title svg", "edit thongtinravien button")
     d.waiting(DIALOG_CSS, "edit thongtinravien dialog")
     try:
