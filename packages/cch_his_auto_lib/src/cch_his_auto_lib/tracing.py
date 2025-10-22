@@ -3,8 +3,12 @@ from logging import FileHandler
 from typing import Callable
 
 from rich.logging import RichHandler
+from rich.console import Console
 
-_rich = RichHandler(log_time_format="[%X]",show_path=False)
+
+console = Console()
+
+_rich = RichHandler(log_time_format="[%X]", show_path=False)
 _rich.setFormatter(logging.Formatter(fmt="{name}:{message}", style="{"))
 _rich.setLevel(logging.INFO)
 
@@ -17,22 +21,22 @@ _root_lgr.addHandler(_rich)
 _root_lgr.addHandler(_file)
 
 
-def tracing(_lgr: logging.Logger) -> Callable:
-    "Add logging to functions"
-
-    def inner(f: Callable):
-        def inner2(*args, **kwargs):
-            name = f.__qualname__
-            _lgr.debug(f"+++ start {name}")
-            try:
-                ret = f(*args, **kwargs)
-            except Exception as e:
-                _lgr.exception(f"??? error running {name}")
-                raise e
-            else:
-                _lgr.info(f">>> finish {name}")
-                return ret
-
-        return inner2
-
-    return inner
+# def tracing(_lgr: logging.Logger) -> Callable:
+#     "Add logging to functions"
+#
+#     def inner(f: Callable):
+#         def inner2(*args, **kwargs):
+#             name = f.__qualname__
+#             _lgr.debug(f"===== starting {name}")
+#             try:
+#                 ret = f(*args, **kwargs)
+#             except Exception as e:
+#                 _lgr.exception(f"===== error running {name}")
+#                 raise e
+#             else:
+#                 _lgr.debug(f"===== finish {name}")
+#                 return ret
+#
+#         return inner2
+#
+#     return inner

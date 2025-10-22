@@ -15,7 +15,11 @@ from .tabbed_listframe import TabbedListFrame
 from .config import Config
 
 from cch_his_auto_lib.driver import Driver, start_driver
-from cch_his_auto_lib.action import auth, todieutri, editor, bienbanhoichan
+from cch_his_auto_lib.action import auth, editor, bienbanhoichan
+from cch_his_auto_lib.action.todieutri import (
+    click as tdt_click,
+    phieuchidinh as tdt_phieuchidinh,
+)
 from cch_his_auto_lib.action.editor import (
     phieuthuchienylenh as editor_phieuthuchienylenh,
     bienbanhoichan as editor_bienbanhoichan,
@@ -167,15 +171,16 @@ def run_bs(d: Driver, cfg: Config):
         pprint_patient_info(pinfo)
 
         if tdt.ky_xn:
-            todieutri.phieuchidinh(d)
+            tdt_click.ingiayto(d, name="Phiếu chỉ định")
+            tdt_phieuchidinh.sign(d)
         if tdt.ky_todieutri:
             d.do_next_tab_do(
-                f1=lambda d: todieutri.ingiayto(d, name="Tờ điều trị"),
+                f1=lambda d: tdt_click.ingiayto(d, name="Tờ điều trị"),
                 f2=editor.todieutri,
             )
         if any(tdt.ky_3tra.bacsi):
             d.do_next_tab_do(
-                f1=lambda d: todieutri.ingiayto(d, name="Phiếu thực hiện y lệnh"),
+                f1=lambda d: tdt_click.ingiayto(d, name="Phiếu thực hiện y lệnh"),
                 f2=partial(editor_phieuthuchienylenh.bs, arr=tdt.ky_3tra.bacsi),
             )
 
@@ -204,7 +209,7 @@ def run_dd(d: Driver, cfg: Config):
         pprint_patient_info(pinfo)
 
         d.do_next_tab_do(
-            f1=lambda d: todieutri.ingiayto(d, name="Phiếu thực hiện y lệnh"),
+            f1=lambda d: tdt_click.ingiayto(d, name="Phiếu thực hiện y lệnh"),
             f2=partial(editor_phieuthuchienylenh.dd, arr=p.ky_3tra.dieuduong),
         )
 
@@ -223,7 +228,7 @@ def run_bn(d: Driver, cfg: Config):
             ma_hs = int(pinfo["ma_hs"])
             if signature := try_get_signature(d, con, ma_hs):
                 d.do_next_tab_do(
-                    f1=lambda d: todieutri.ingiayto(d, name="Phiếu thực hiện y lệnh"),
+                    f1=lambda d: tdt_click.ingiayto(d, name="Phiếu thực hiện y lệnh"),
                     f2=partial(
                         editor_phieuthuchienylenh.bn,
                         arr=p.ky_3tra.benhnhan,

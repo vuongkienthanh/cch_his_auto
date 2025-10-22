@@ -23,16 +23,12 @@ def do_nothing(_d: Driver, *_):
 
 def sign_current(d: Driver, i: int):
     d.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
-    d.clicking(
-        f"{RIGHT_PANEL} .__action button:nth-child(2)", "clicking Ký tên BS dieu tri"
-    )
+    d.clicking(f"{RIGHT_PANEL} .__action button:nth-child(2)", "Ký tên BS dieu tri")
 
 
 def sign_current2(d: Driver, i: int):
     d.clicking(f"{RIGHT_PANEL} tr:nth-child({i})")
-    d.clicking(
-        f"{RIGHT_PANEL} .__action button:nth-child(3)", "clicking Ký tên BS truong khoa"
-    )
+    d.clicking(f"{RIGHT_PANEL} .__action button:nth-child(3)", "Ký tên BS truong khoa")
 
 
 def sign_current_both(d: Driver, i: int):

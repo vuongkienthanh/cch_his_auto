@@ -67,6 +67,6 @@ def run(cfg: config.Config, run_cfg: RunConfig):
             danhsachnguoibenhnoitru.load(d)
             danhsachnguoibenhnoitru.goto_patient(d, 2508051624)
             with hosobenhan.session(d):
-                tab_hosokhamchuabenh.todieutri(d)
+                tab_hosokhamchuabenh.phieusoket15ngay(d)
 
     messagebox.showinfo(message="finish")

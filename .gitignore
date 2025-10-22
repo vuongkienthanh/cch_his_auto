@@ -6,3 +6,4 @@
 build/
 dist/
 **/*.egg-info
+cch_his_auto_lib.log

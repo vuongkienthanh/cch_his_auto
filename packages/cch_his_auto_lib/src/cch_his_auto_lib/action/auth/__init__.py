@@ -1,5 +1,4 @@
 import time
-import logging
 from contextlib import contextmanager
 
 from rich import print
@@ -8,12 +7,11 @@ from selenium.webdriver.common.by import By
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.errors import TaskUncompleteException, WaitClosingException
-from cch_his_auto_lib.tracing import tracing
+from cch_his_auto_lib.tracing import console, _root_lgr
+from cch_his_auto_lib.errors import TaskCantCompleteException, WaitClosingException
 from cch_his_auto_lib.action import danhsachnguoibenhnoitru
 
-_lgr = logging.getLogger("auth")
-_trace = tracing(_lgr)
+_lgr = _root_lgr.getChild("auth")
 
 
 from . import dept_dialog
@@ -22,11 +20,9 @@ from . import dept_dialog
 LOGIN_PANE_CSS = ".login-body"
 
 
-@_trace
 def login(d: Driver, username: str, password: str):
     "login with provided `username` and `password`"
     URL = "http://emr.ndtp.org/login"
-    _lgr.info(f"login with username={username}")
     if not d.current_url.startswith(URL):
         d.goto(URL)
     for i in range(120):
@@ -64,10 +60,9 @@ def login(d: Driver, username: str, password: str):
                 d.wait_closing(LOGIN_PANE_CSS, "login page")
             return
     else:
-        raise TaskUncompleteException("can't log in")
+        raise TaskCantCompleteException("can't log in")
 
 
-@_trace
 def logout(d: Driver):
     "logout, then back to login page"
     URL = "http://emr.ndtp.org/logout"
@@ -79,10 +74,8 @@ def logout(d: Driver):
         logout(d)
 
 
-@_trace
 def set_dept(d: Driver, dept: str):
     "Set department with exact `dept`"
-    _lgr.info(f"dept={dept}")
 
     def _set_dept_in_dialog():
         dept_dialog.filter(d, dept)
@@ -117,17 +110,22 @@ def set_dept(d: Driver, dept: str):
             _set_dept_in_dialog()
             return
     else:
-        raise TaskUncompleteException("can't set dept")
+        raise TaskCantCompleteException("can't set dept")
 
 
 @contextmanager
 def session(d: Driver, username: str, password: str, dept: str):
-    print("[red]============start session============")
-    login(d, username, password)
+    console.rule(f"[red]LOG IN: {username} dept: {dept}", align="left")
+
+    with console.status("Logging in..."):
+        login(d, username, password)
+
     d.goto(danhsachnguoibenhnoitru.URL)
-    set_dept(d, dept)
+    with console.status("Setting dept..."):
+        set_dept(d, dept)
+
     try:
         yield
     finally:
         logout(d)
-        print("[red]============end session============")
+        console.rule(f"[red]LOG OUT", align="left")
