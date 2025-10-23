@@ -78,6 +78,8 @@ def iterate_all_and_do(d: Driver, open_fn: Callable[[Driver, int], None], f: Dri
 
 
 def open_BBHC_editor(d: Driver, i: int):
-    d.clicking2(f"{MAIN_TABLE} tr.ant-table-row:nth-child({i}) td:last-child svg:nth-child(3)")
-    d.clicking(f".ant-dropdown li:first-child a")
+    d.clicking2(
+        f"{MAIN_TABLE} tr.ant-table-row:nth-child({i}) td:last-child svg:nth-child(3)"
+    )
+    d.clicking(".ant-dropdown li:first-child a")
     editor.wait_loaded(d)

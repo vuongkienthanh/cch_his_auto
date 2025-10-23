@@ -8,7 +8,7 @@ from cch_his_auto_lib.action.editor import (
     CT as editor_CT,
     MRI as editor_MRI,
 )
-from .sign_helper import (
+from ._sign import (
     filter_check_expand_sign,
     goto_row_and_click_edit,
     sign_current,

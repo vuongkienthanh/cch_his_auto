@@ -7,13 +7,11 @@ from cch_his_auto_lib.driver import Driver, DriverFn
 from cch_his_auto_lib.action import danhsachnguoibenhnoitru as dsnbnt
 from cch_his_auto_lib.action.danhsachnguoibenhnoitru import (
     main_table as dsnbnt_main_table,
-    get as dsnbnt_get,
-    click as dsnbnt_click,
 )
 from cch_his_auto_lib.action import top_info
 from cch_his_auto_lib.action.top_info import danhsachnguoibenh
-from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom import indieuduong
-from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom.indieuduong import (
+from cch_his_auto_lib.action import chitietnguoibenhnoitru
+from cch_his_auto_lib.action.chitietnguoibenhnoitru.indieuduong import (
     camketchungvenhapvien,
 )
 
@@ -53,8 +51,8 @@ def iterate_all_patient(d: Driver, f: DriverFn):
         pinfo = top_info.get_patient_info(d)
         pprint_patient_info(pinfo)
         f(d)
-    if dsnbnt_get.has_next_page(d):
-        dsnbnt_click.next_page(d)
+    if dsnbnt.has_next_page(d):
+        dsnbnt.click_next_page(d)
         iterate_all_patient(d, f)
 
 
@@ -63,7 +61,7 @@ def get_signature_from_HIS(d: Driver, ma_hs: int) -> str | None:
     dsnbnt.load(d)
     dsnbnt_main_table.goto_patient(d, ma_hs)
     signature = d.do_next_tab_do(
-        f1=lambda d: indieuduong(d, "cam kết"),
+        f1=lambda d: chitietnguoibenhnoitru.click_inbacsi(d, "cam kết"),
         f2=lambda d: camketchungvenhapvien.get_signature(d),
     )
     d.goto(working_url)

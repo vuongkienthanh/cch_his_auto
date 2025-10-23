@@ -15,7 +15,7 @@ from selenium.common import (
 )
 from selenium.webdriver import Keys
 
-from .tracing import _root_lgr
+from .tracing import console, _root_lgr
 from .errors import WaitClosingException
 
 

@@ -4,7 +4,7 @@ version = "0.2.0"
 description = "Automate your HIS workflow at CCH"
 readme = "README.md"
 authors = [{ name = "vuongkienthanh", email = "thanhstardust@outlook.com" }]
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = ["cch_his_auto_lib", "rich>=14.1.0", "validators>=0.34.0"]
 
 [dependency-groups]
@@ -15,6 +15,9 @@ cch_his_auto_lib = { workspace = true }
 
 [tool.uv.workspace]
 members = ["packages/*"]
+
+[tool.uv]
+package = true
 
 [project.scripts]
 cch_his_auto = "cch_his_auto:run"

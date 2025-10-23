@@ -1,13 +1,13 @@
+from .. import _lgr
+
+_lgr = _lgr.getChild("sanglocdinhduong")
+
 import datetime as dt
 
 from selenium.common import NoSuchElementException
 
-from cch_his_auto_lib.action import top_info
-from cch_his_auto_lib.action.top_info import get as top_info_get
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom import _lgr, _trace
-
-
+from cch_his_auto_lib.action import top_info
 from .helper import machedo, calculate_age_in_months
 from . import phieusangloc
 
@@ -40,7 +40,6 @@ def open_phieusangloc(d: Driver, i: int):
     d.clicking2(f"{DIALOG_CSS} tbody tr:nth-child({i}) td:last-child svg")
 
 
-@_trace
 def get_chieucao_cannang_from_first_phieusangloc(d: Driver) -> tuple[str, str] | None:
     if not open_dialog(d):
         return None
@@ -84,9 +83,9 @@ def add_new(d: Driver):
     )
 
 
-@_trace
 def add_all_phieusanglocdinhduong(d: Driver):
     "Complete all *Phiếu sàng lọc* from admission_date up til today"
+
     get_chieucao_cannang = get_chieucao_cannang_from_first_phieusangloc(d)
     if get_chieucao_cannang:
         chieucao, cannang = get_chieucao_cannang
@@ -97,9 +96,7 @@ def add_all_phieusanglocdinhduong(d: Driver):
     today = dt.date.today()
     chedo = machedo(
         calculate_age_in_months(
-            dt.datetime.strptime(
-                top_info_get.patient_info(d)["birthdate"], "%d/%m/%Y"
-            )
+            dt.datetime.strptime(top_info.get_patient_info(d)["birthdate"], "%d/%m/%Y")
         )
     )
     open_dialog(d)

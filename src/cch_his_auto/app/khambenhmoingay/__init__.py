@@ -16,21 +16,17 @@ from .config import Config
 
 from cch_his_auto_lib.driver import Driver, start_driver
 from cch_his_auto_lib.action import auth
+from cch_his_auto_lib.action import todieutri
 from cch_his_auto_lib.action.todieutri import (
-    click as tdt_click,
     phieuchidinh as tdt_phieuchidinh,
 )
-from cch_his_auto_lib.action.bienbanhoichan import click as bbhc_click
+from cch_his_auto_lib.action import bienbanhoichan
 from cch_his_auto_lib.action.editor import (
     phieuthuchienylenh as editor_phieuthuchienylenh,
     bienbanhoichan as editor_bienbanhoichan,
     todieutri as editor_todieutri,
 )
-from cch_his_auto_lib.action.top_info import (
-    get as top_info_get,
-    wait_loaded,
-)
-
+from cch_his_auto_lib.action import top_info
 
 TITLE = "Khám bệnh mỗi ngày"
 
@@ -171,21 +167,21 @@ def run_bs(d: Driver, cfg: Config):
             continue
 
         d.goto(tdt.url)
-        wait_loaded(d)
-        pinfo = top_info_get.patient_info(d)
+        top_info.wait_loaded(d)
+        pinfo = top_info.get_patient_info(d)
         pprint_patient_info(pinfo)
 
         if tdt.ky_xn:
-            tdt_click.ingiayto(d, name="Phiếu chỉ định")
+            todieutri.click_ingiayto(d, name="Phiếu chỉ định")
             tdt_phieuchidinh.sign(d)
         if tdt.ky_todieutri:
             d.do_next_tab_do(
-                f1=lambda d: tdt_click.ingiayto(d, name="Tờ điều trị"),
+                f1=lambda d: todieutri.click_ingiayto(d, name="Tờ điều trị"),
                 f2=editor_todieutri.bs,
             )
         if any(tdt.ky_3tra.bacsi):
             d.do_next_tab_do(
-                f1=lambda d: tdt_click.ingiayto(d, name="Phiếu thực hiện y lệnh"),
+                f1=lambda d: todieutri.click_ingiayto(d, name="Phiếu thực hiện y lệnh"),
                 f2=partial(editor_phieuthuchienylenh.bs, arr=tdt.ky_3tra.bacsi),
             )
 
@@ -194,12 +190,12 @@ def run_bs(d: Driver, cfg: Config):
             continue
 
         d.goto(bbhc.url)
-        wait_loaded(d)
-        pinfo = top_info_get.patient_info(d)
+        top_info.wait_loaded(d)
+        pinfo = top_info.get_patient_info(d)
         pprint_patient_info(pinfo)
 
         d.do_next_tab_do(
-            f1=bbhc_click.open_editor, f2=partial(bbhc_bs, khac_note=bbhc.khac_note)
+            f1=bienbanhoichan.open_editor, f2=partial(bbhc_bs, khac_note=bbhc.khac_note)
         )
 
 
@@ -209,12 +205,12 @@ def run_dd(d: Driver, cfg: Config):
             continue
 
         d.goto(p.url)
-        wait_loaded(d)
-        pinfo = top_info_get.patient_info(d)
+        top_info.wait_loaded(d)
+        pinfo = top_info.get_patient_info(d)
         pprint_patient_info(pinfo)
 
         d.do_next_tab_do(
-            f1=lambda d: tdt_click.ingiayto(d, name="Phiếu thực hiện y lệnh"),
+            f1=lambda d: todieutri.click_ingiayto(d, name="Phiếu thực hiện y lệnh"),
             f2=partial(editor_phieuthuchienylenh.dd, arr=p.ky_3tra.dieuduong),
         )
 
@@ -226,14 +222,16 @@ def run_bn(d: Driver, cfg: Config):
                 continue
 
             d.goto(p.url)
-            wait_loaded(d)
-            pinfo = top_info_get.patient_info(d)
+            top_info.wait_loaded(d)
+            pinfo = top_info.get_patient_info(d)
             pprint_patient_info(pinfo)
 
             ma_hs = int(pinfo["ma_hs"])
             if signature := try_get_signature(d, con, ma_hs):
                 d.do_next_tab_do(
-                    f1=lambda d: tdt_click.ingiayto(d, name="Phiếu thực hiện y lệnh"),
+                    f1=lambda d: todieutri.click_ingiayto(
+                        d, name="Phiếu thực hiện y lệnh"
+                    ),
                     f2=partial(
                         editor_phieuthuchienylenh.bn,
                         arr=p.ky_3tra.benhnhan,
@@ -248,11 +246,13 @@ def run_tk(d: Driver, cfg: Config):
             continue
 
         d.goto(bbhc.url)
-        wait_loaded(d)
-        pinfo = top_info_get.patient_info(d)
+        top_info.wait_loaded(d)
+        pinfo = top_info.get_patient_info(d)
         pprint_patient_info(pinfo)
 
-        d.do_next_tab_do(f1=bbhc_click.open_editor, f2=editor_bienbanhoichan.truongkhoa)
+        d.do_next_tab_do(
+            f1=bienbanhoichan.open_editor, f2=editor_bienbanhoichan.truongkhoa
+        )
 
 
 def run_tvk(d: Driver, cfg: Config):
@@ -261,9 +261,9 @@ def run_tvk(d: Driver, cfg: Config):
             continue
 
         d.goto(bbhc.url)
-        pinfo = top_info_get.patient_info(d)
+        pinfo = top_info.get_patient_info(d)
         pprint_patient_info(pinfo)
 
         d.do_next_tab_do(
-            f1=bbhc_click.open_editor, f2=editor_bienbanhoichan.thanhvienkhac
+            f1=bienbanhoichan.open_editor, f2=editor_bienbanhoichan.thanhvienkhac
         )

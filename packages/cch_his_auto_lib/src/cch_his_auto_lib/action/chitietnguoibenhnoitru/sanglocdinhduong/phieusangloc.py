@@ -2,7 +2,7 @@ import datetime as dt
 
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.action import top_info
-from . import _lgr, _trace
+from . import _lgr
 
 
 def back(d: Driver):
@@ -45,7 +45,6 @@ def save(d: Driver):
     d.clicking(".footer-btn .right button:nth-child(2)", "save phieusangloc")
 
 
-@_trace
 def save_new_phieusangloc(
     d: Driver, date: dt.date, cannang: str, chieucao: str, machedo: str
 ):

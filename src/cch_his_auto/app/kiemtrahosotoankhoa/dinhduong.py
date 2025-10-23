@@ -1,9 +1,9 @@
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.action.chitietnguoibenhnoitru.tabs import (
+from cch_his_auto_lib.action.chitietnguoibenhnoitru import (
     thongtinchung,
     change_tab,
 )
-from cch_his_auto_lib.action.chitietnguoibenhnoitru.bottom.sanglocdinhduong import (
+from cch_his_auto_lib.action.chitietnguoibenhnoitru.sanglocdinhduong import (
     add_all_phieusanglocdinhduong,
 )
 from .config import Config
