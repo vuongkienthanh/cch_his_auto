@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 
-from . import _lgr
 from cch_his_auto_lib.driver import Driver
+from . import _lgr
 
 TRANGTHAINGUOIBENH_POPOVER = ".ant-popover:has(.check-all)"
 

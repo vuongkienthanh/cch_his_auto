@@ -1,6 +1,3 @@
-from .. import _lgr
-
-_lgr = _lgr.getChild("sanglocdinhduong")
 
 import datetime as dt
 
@@ -9,7 +6,9 @@ from selenium.common import NoSuchElementException
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.action import top_info
 from .helper import machedo, calculate_age_in_months
-from . import phieusangloc
+from .. import _lgr
+
+_lgr = _lgr.getChild("sanglocdinhduong")
 
 URL = "http://emr.ndtp.org/quan-ly-dinh-duong/phieu-sang-loc/"
 DIALOG_CSS = ".ant-modal:has(.rightTitle):has(table)"
@@ -44,6 +43,7 @@ def get_chieucao_cannang_from_first_phieusangloc(d: Driver) -> tuple[str, str] |
     if not open_dialog(d):
         return None
 
+    from . import phieusangloc
     open_phieusangloc(d, 2)
     top_info.wait_loaded(d)
     cc = phieusangloc.get_chieucao(d)
@@ -102,6 +102,8 @@ def add_all_phieusanglocdinhduong(d: Driver):
     open_dialog(d)
     next_date = get_last_date(d) + dt.timedelta(days=7)
     close_dialog(d)
+
+    from . import phieusangloc
 
     while next_date <= today:
         _lgr.info(f"add new phieu sang loc for {next_date}")

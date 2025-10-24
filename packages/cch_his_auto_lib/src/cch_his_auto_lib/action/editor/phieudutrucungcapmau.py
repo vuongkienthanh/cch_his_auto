@@ -1,5 +1,5 @@
-from . import wait_loaded, check_than_click
 from cch_his_auto_lib.driver import Driver
+from . import wait_loaded, check_than_click
 
 
 def fill_info(

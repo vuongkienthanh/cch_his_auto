@@ -4,6 +4,7 @@ from rich import print
 from rich.panel import Panel
 
 from cch_his_auto_lib.driver import Driver, DriverFn
+from cch_his_auto_lib.tracing import console
 from cch_his_auto_lib.action import danhsachnguoibenhnoitru as dsnbnt
 from cch_his_auto_lib.action.danhsachnguoibenhnoitru import (
     main_table as dsnbnt_main_table,
@@ -52,8 +53,11 @@ def iterate_all_patient(d: Driver, f: DriverFn):
         pprint_patient_info(pinfo)
         f(d)
     if dsnbnt.has_next_page(d):
+        console.print("[bold]Danh sách người bệnh nội trú[/bold]: go to next page")
         dsnbnt.click_next_page(d)
         iterate_all_patient(d, f)
+    else:
+        console.print("[bold]Danh sách người bệnh nội trú[/bold]: reach the end of patient list")
 
 
 def get_signature_from_HIS(d: Driver, ma_hs: int) -> str | None:

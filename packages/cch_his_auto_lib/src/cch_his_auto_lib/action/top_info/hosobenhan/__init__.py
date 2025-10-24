@@ -2,9 +2,9 @@ from contextlib import contextmanager
 
 from selenium.common import NoSuchElementException
 
-from .. import TOP_BTN_CSS
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.tracing import _root_lgr
+from .. import TOP_BTN_CSS
 
 _lgr = _root_lgr.getChild("top_hosobenhan")
 

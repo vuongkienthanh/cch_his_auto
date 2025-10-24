@@ -87,25 +87,27 @@ def set_dept(d: Driver, dept: str):
             _lgr.debug(f"waiting choose dept dialog {i}...")
             d.find(dept_dialog.DIALOG_CSS)
         except NoSuchElementException:
-            _lgr.debug("-> can't find dept dialog")
+            _lgr.debug("can't find dept dialog")
             try:
                 _lgr.debug("checking whether dept is set")
                 khoalamviec = d.find(".khoaLamViec div span")
             except NoSuchElementException:
-                _lgr.debug("-> can't find set dept, maybe the page is still loading")
+                _lgr.debug(
+                    "can't find currently set dept, maybe the page is still loading"
+                )
                 continue
             else:
-                _lgr.debug("-> found set dept, checking whether dept is set right")
+                _lgr.debug("found set dept, checking whether dept is set right")
                 if dept in khoalamviec.text.strip().lower():
-                    _lgr.info("-> dept is set right")
+                    _lgr.info("dept is set right")
                     return
                 else:
-                    _lgr.info(f"-> dept is not set to {dept} -> proceed to set dept")
+                    _lgr.info(f"dept is not set to {dept} -> proceed to set dept")
                     d.clicking2(".khoaLamViec div svg", "change dept button")
                     _set_dept_in_dialog()
                     return
         else:
-            _lgr.debug("-> found dept dialog")
+            _lgr.debug("found dept dialog")
             _set_dept_in_dialog()
             return
     else:
@@ -114,17 +116,18 @@ def set_dept(d: Driver, dept: str):
 
 @contextmanager
 def session(d: Driver, username: str, password: str, dept: str):
-    console.rule(f"[red]LOG IN: {username} dept: {dept}", align="left")
+    console.rule(f"[red bold]LOG IN: username={username} dept={dept}")
 
     with console.status("Logging in..."):
         login(d, username, password)
 
-    d.goto(danhsachnguoibenhnoitru.URL)
     with console.status("Setting dept..."):
+        d.get(danhsachnguoibenhnoitru.URL)
+        danhsachnguoibenhnoitru.wait_loaded(d)
         set_dept(d, dept)
 
     try:
         yield
     finally:
         logout(d)
-        console.rule("[red]LOG OUT", align="left")
+        console.rule("[red bold]LOG OUT")

@@ -6,10 +6,10 @@ from typing import Callable
 from selenium.webdriver import Keys
 from selenium.common import NoSuchElementException, StaleElementReferenceException
 
-from . import _lgr
-from .. import ACTIVE_PANE
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.action import editor
+from . import _lgr
+from .. import ACTIVE_PANE
 
 
 RIGHT_PANEL = f"{ACTIVE_PANE} .right-content"

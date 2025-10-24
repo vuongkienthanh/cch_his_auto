@@ -1,5 +1,5 @@
-from . import wait_loaded
 from cch_his_auto_lib.driver import Driver
+from . import wait_loaded
 
 def bs(d: Driver):
     "*Phiếu xét nghiệm giải phẫu bệnh sinh thiết*"

@@ -2,8 +2,8 @@ import datetime as dt
 
 from selenium.common import NoSuchElementException
 
-from .. import _lgr, ACTIVE_PANE
 from cch_his_auto_lib.driver import Driver
+from .. import _lgr, ACTIVE_PANE
 
 TAB_NUMBER = 0
 

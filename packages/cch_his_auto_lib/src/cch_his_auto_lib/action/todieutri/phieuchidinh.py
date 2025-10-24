@@ -3,8 +3,8 @@ from enum import Enum
 
 from selenium.common import StaleElementReferenceException
 
-from . import _lgr
 from cch_his_auto_lib.driver import Driver
+from . import _lgr
 
 
 def sign(d: Driver):

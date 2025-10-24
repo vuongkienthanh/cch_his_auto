@@ -1,8 +1,8 @@
 from selenium.webdriver.common.keys import Keys
 
-from . import _lgr
 from cch_his_auto_lib.driver import Driver
 from cch_his_auto_lib.action import top_info
+from . import _lgr
 
 MAIN_TABLE = "#base-search_component +div .ant-table table tbody"
 

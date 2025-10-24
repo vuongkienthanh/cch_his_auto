@@ -1,6 +1,5 @@
 from cch_his_auto_lib.driver import Driver
 
-
 from . import _lgr
 
 DIALOG_CSS = ".ant-modal:has(.ant-modal-body>div>div>div>.ant-select)"

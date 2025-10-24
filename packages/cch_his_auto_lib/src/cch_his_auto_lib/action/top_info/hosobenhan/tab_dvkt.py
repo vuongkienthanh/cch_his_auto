@@ -1,7 +1,7 @@
 from selenium.common import NoSuchElementException
 
-from . import ACTIVE_PANE, _lgr
 from cch_his_auto_lib.driver import Driver
+from . import ACTIVE_PANE, _lgr
 
 TAB_NUMBER = 2
 _lgr = _lgr.getChild("tab_dvkt")
@@ -17,7 +17,9 @@ def get_bloodtype(d: Driver) -> str | None:
     ).send_keys(target)
     try:
         d.waiting_to_startswith(
-            f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:nth-child(3)", target
+            f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:nth-child(3)",
+            target,
+            name="xét nghiệm nhóm máu",
         )
     except NoSuchElementException:
         _lgr.warning("There is no bloodtype lab test")
@@ -26,20 +28,26 @@ def get_bloodtype(d: Driver) -> str | None:
         d.waiting_to_startswith(
             f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:nth-child(5)",
             "Đã có kết quả",
+            name="xét nghiệm nhóm máu đã có kết quả",
         )
     except NoSuchElementException:
         _lgr.warning("Bloodtype lab test is not complete")
         return None
-    d.clicking2(f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:last-child svg")
+    d.clicking2(
+        f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:last-child svg",
+        name="mở dialog xem kết quả xn nhóm máu",
+    )
     try:
         abo = d.waiting(
-            f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(7) td:nth-child(2)"
+            f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(7) td:nth-child(2)",
+            name="kết quả ABO",
         ).text.strip()
         if abo not in ["A", "B", "AB", "O"]:
             return None
 
         rh = d.waiting(
-            f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(11) td:nth-child(2)"
+            f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(11) td:nth-child(2)",
+            name="kết quả Rh",
         ).text.strip()
         if (rh == "DƯƠNG TÍNH") or (rh == "+"):
             rh = "+"
@@ -51,4 +59,7 @@ def get_bloodtype(d: Driver) -> str | None:
     except:
         return None
     finally:
-        d.clicking(f"{DICHVU_DIALOG_CSS} .ant-modal-close")
+        d.clicking(
+            f"{DICHVU_DIALOG_CSS} .ant-modal-close",
+            name="đóng dialog xem kết quả xn nhóm máu",
+        )

@@ -322,7 +322,7 @@ class Driver(webdriver.Chrome):
             _lgr.error("-> can't go to new tab")
             raise Exception("can't go to new tab")
 
-    def do_next_tab_do[T](self, f1: "DriverFn", f2: "DriverFn[T]") -> T:
+    def do_next_tab_do[T](self, f1: DriverFn, f2: DriverFn[T]) -> T:
         "Execute `f1` which open a new tab, execute `f2` then go back"
         current_tab = self.current_window_handle
         f1(self)
@@ -335,7 +335,7 @@ class Driver(webdriver.Chrome):
             self.switch_to.window(current_tab)
             time.sleep(2)
 
-    def duplicate_tab_do(self, f: "DriverFn"):
+    def duplicate_tab_do(self, f: DriverFn):
         "Duplicate the current tab and execute `f`"
         current_tab = self.current_window_handle
         url = self.current_url
@@ -402,10 +402,10 @@ class DriverFn[T](Protocol):
 
 @contextmanager
 def start_driver(headless: bool, profile_path: str):
-    _lgr.info("################## DRIVER STARTING")
-    d = Driver(headless, profile_path)
+    with console.status("Chrome Driver starting..."):
+        d = Driver(headless, profile_path)
     try:
         yield d
     finally:
-        _lgr.info("################## DRIVER QUITTING")
-        d.quit()
+        with console.status("Chrome Driver quitting..."):
+            d.quit()

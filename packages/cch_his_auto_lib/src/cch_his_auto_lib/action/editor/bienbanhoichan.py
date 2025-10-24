@@ -1,7 +1,7 @@
 from selenium.webdriver import ActionChains, Keys
 
-from . import wait_loaded
 from cch_his_auto_lib.driver import Driver
+from . import wait_loaded
 
 
 def thuky(d: Driver):
