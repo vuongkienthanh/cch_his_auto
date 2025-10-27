@@ -14,9 +14,7 @@ from cch_his_auto_lib.action.danhsachnguoibenhnoitru import (
     main_table as dsnbnt_main_table,
 )
 from cch_his_auto_lib.action.top_info import hosobenhan
-from cch_his_auto_lib.action.top_info.hosobenhan.tab_hosokhamchuabenh import (
-    sign as tab_hskcb_sign,
-)
+from cch_his_auto_lib.action.top_info.hosobenhan import tab_hosokhamchuabenh  
 
 from .config import Config
 
@@ -72,6 +70,6 @@ def run(cfg: config.Config, run_cfg: RunConfig):
             dsnbnt.load(d)
             dsnbnt_main_table.goto_patient(d, 2508051624)
             with hosobenhan.dialog(d):
-                tab_hskcb_sign.phieusoket15ngay(d)
+                tab_hosokhamchuabenh.sign_phieusoket15ngay(d)
 
     messagebox.showinfo(message="finish")
