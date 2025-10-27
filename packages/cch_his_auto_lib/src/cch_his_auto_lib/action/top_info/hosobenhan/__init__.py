@@ -15,10 +15,9 @@ ACTIVE_PANE = f"{DIALOG_CSS} .ant-tabs-tabpane-active"
 
 @contextmanager
 def dialog(d: Driver, tab: int = 1):
-    "use as contextmanager for open and close hosobenhan dialog"
     assert tab > 0
     try:
-        d.clicking(f"{TOP_BTN_CSS}>div:nth-child(3)", "xem ho so benh an")
+        d.clicking(f"{TOP_BTN_CSS}>div:nth-child(3)", "open Hồ sơ bệnh án dialog")
         if tab != 1:
             change_tab(d, tab)
         yield

@@ -1,6 +1,7 @@
 from selenium.common import NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.tracing import console
 from . import ACTIVE_PANE, _lgr
 
 TAB_NUMBER = 2
@@ -12,54 +13,55 @@ DICHVU_DIALOG_CSS = ".ant-modal:has(.tenDv~.ant-row~.ant-card)"
 def get_bloodtype(d: Driver) -> str | None:
     target = "Định nhóm máu hệ ABO, Rh(D) (Kỹ thuật Scangel Gelcard trên máy tự động)"
 
-    d.clear_input(
-        f"{ACTIVE_PANE} .ant-table-header th:nth-child(3) .custom-header-cell:nth-child(2) input"
-    ).send_keys(target)
-    try:
-        d.waiting_to_startswith(
-            f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:nth-child(3)",
-            target,
-            name="xét nghiệm nhóm máu",
-        )
-    except NoSuchElementException:
-        _lgr.warning("There is no bloodtype lab test")
-        return None
-    try:
-        d.waiting_to_startswith(
-            f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:nth-child(5)",
-            "Đã có kết quả",
-            name="xét nghiệm nhóm máu đã có kết quả",
-        )
-    except NoSuchElementException:
-        _lgr.warning("Bloodtype lab test is not complete")
-        return None
-    d.clicking2(
-        f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:last-child svg",
-        name="mở dialog xem kết quả xn nhóm máu",
-    )
-    try:
-        abo = d.waiting(
-            f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(7) td:nth-child(2)",
-            name="kết quả ABO",
-        ).text.strip()
-        if abo not in ["A", "B", "AB", "O"]:
+    with console.status("Getting bloodtype result"):
+        d.clear_input(
+            f"{ACTIVE_PANE} .ant-table-header th:nth-child(3) .custom-header-cell:nth-child(2) input"
+        ).send_keys(target)
+        try:
+            d.waiting_to_startswith(
+                f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:nth-child(3)",
+                target,
+                name="xét nghiệm nhóm máu",
+            )
+        except NoSuchElementException:
+            _lgr.warning("There is no bloodtype lab test")
             return None
-
-        rh = d.waiting(
-            f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(11) td:nth-child(2)",
-            name="kết quả Rh",
-        ).text.strip()
-        if (rh == "DƯƠNG TÍNH") or (rh == "+"):
-            rh = "+"
-        else:
-            rh = "-"
-        if rh == "-":
-            return None  # need human manual check
-        return f"{abo}{rh}"
-    except:
-        return None
-    finally:
-        d.clicking(
-            f"{DICHVU_DIALOG_CSS} .ant-modal-close",
-            name="đóng dialog xem kết quả xn nhóm máu",
+        try:
+            d.waiting_to_startswith(
+                f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:nth-child(5)",
+                "Đã có kết quả",
+                name="xét nghiệm nhóm máu đã có kết quả",
+            )
+        except NoSuchElementException:
+            _lgr.warning("Bloodtype lab test is not complete")
+            return None
+        d.clicking2(
+            f"{ACTIVE_PANE} .ant-table-body tr:nth-child(3) td:last-child svg",
+            name="mở dialog xem kết quả xn nhóm máu",
         )
+        try:
+            abo = d.waiting(
+                f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(7) td:nth-child(2)",
+                name="kết quả ABO",
+            ).text.strip()
+            if abo not in ["A", "B", "AB", "O"]:
+                return None
+
+            rh = d.waiting(
+                f"{DICHVU_DIALOG_CSS} tbody tr:nth-child(11) td:nth-child(2)",
+                name="kết quả Rh",
+            ).text.strip()
+            if (rh == "DƯƠNG TÍNH") or (rh == "+"):
+                rh = "+"
+            else:
+                rh = "-"
+            if rh == "-":
+                return None  # need human manual check
+            return f"{abo}{rh}"
+        except:
+            return None
+        finally:
+            d.clicking(
+                f"{DICHVU_DIALOG_CSS} .ant-modal-close",
+                name="đóng dialog xem kết quả xn nhóm máu",
+            )

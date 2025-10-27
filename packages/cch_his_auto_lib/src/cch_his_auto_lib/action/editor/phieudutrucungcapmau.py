@@ -1,4 +1,5 @@
 from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.tracing import console
 from . import wait_loaded, check_than_click
 
 
@@ -77,10 +78,11 @@ def fill_info(
 
 
 def bs(d: Driver):
-    wait_loaded(d)
-    d.sign_staff_signature(
-        btn_css=".sign-image button",
-        btn_txt="Xác nhận ký BÁC SĨ ĐIỀU TRỊ",
-        img_css=".sign-image img",
-        name="phieu du tru cung cap mau",
-    )
+    with console.status("signing phiếu dự trù cung cấp máu..."):
+        wait_loaded(d)
+        d.sign_staff_signature(
+            btn_css=".sign-image button",
+            btn_txt="Xác nhận ký BÁC SĨ ĐIỀU TRỊ",
+            img_css=".sign-image img",
+            name="phieu du tru cung cap mau",
+        )

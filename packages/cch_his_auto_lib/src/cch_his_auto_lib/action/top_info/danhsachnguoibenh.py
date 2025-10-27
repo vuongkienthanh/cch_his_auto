@@ -13,7 +13,7 @@ DRAWER_CSS = ".ant-drawer-body"
 
 
 @contextmanager
-def dialog(d: Driver):
+def dialog(d: Driver, need_close=False):
     if get_patient_info(d)["doituong"] == "Bảo hiểm":
         d.clicking(f"{TOP_BTN_CSS}>div:nth-last-child(3)")
     else:
@@ -22,8 +22,9 @@ def dialog(d: Driver):
     try:
         yield
     finally:
-        # d.clicking(".ant-drawer-mask", "outside Danh sách người bệnh panel")
-        # d.wait_closing(DRAWER_CSS, "Danh sách người bệnh panel")
+        if need_close:
+            d.clicking(".ant-drawer-mask", "outside Danh sách người bệnh panel")
+            d.wait_closing(DRAWER_CSS, "Danh sách người bệnh panel")
         pass
 
 
