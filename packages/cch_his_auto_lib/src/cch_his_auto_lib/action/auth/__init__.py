@@ -20,7 +20,6 @@ LOGIN_PANE_CSS = ".login-body"
 
 
 def login(d: Driver, username: str, password: str):
-    "login with provided `username` and `password`"
     URL = "http://emr.ndtp.org/login"
     if not d.current_url.startswith(URL):
         d.goto(URL)
@@ -63,7 +62,6 @@ def login(d: Driver, username: str, password: str):
 
 
 def logout(d: Driver):
-    "logout, then back to login page"
     URL = "http://emr.ndtp.org/logout"
     d.goto(URL)
     try:
@@ -73,8 +71,7 @@ def logout(d: Driver):
         logout(d)
 
 
-def set_dept(d: Driver, dept: str):
-    "Set department with exact `dept`"
+def checked_set_dept(d: Driver, dept: str):
 
     def _set_dept_in_dialog():
         dept_dialog.filter(d, dept)
@@ -123,8 +120,7 @@ def session(d: Driver, username: str, password: str, dept: str):
 
     with console.status("Setting dept..."):
         d.get(danhsachnguoibenhnoitru.URL)
-        danhsachnguoibenhnoitru.wait_loaded(d)
-        set_dept(d, dept)
+        checked_set_dept(d, dept)
 
     try:
         yield
