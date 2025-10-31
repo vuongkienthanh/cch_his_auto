@@ -156,7 +156,7 @@ def run(cfg: Config, run_cfg: RunConfig):
 
     with start_driver(headless=run_cfg.headless, profile_path=PROFILE_PATH) as d:
         with auth.session(d, cfg.user.name, cfg.user.password, cfg.department):
-            danhsachnguoibenhnoitru.load(d)
+            danhsachnguoibenhnoitru.load_and_clear(d)
             iterate_all_patient(
                 d,
                 lambda d: [

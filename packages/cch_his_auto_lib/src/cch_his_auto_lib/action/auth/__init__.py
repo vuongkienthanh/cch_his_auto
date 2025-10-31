@@ -96,7 +96,7 @@ def checked_set_dept(d: Driver, dept: str):
             else:
                 _lgr.debug("found set dept, checking whether dept is set right")
                 if dept in khoalamviec.text.strip().lower():
-                    _lgr.info("dept is set right")
+                    _lgr.debug("dept is set right")
                     return
                 else:
                     _lgr.info(f"dept is not set to {dept} -> proceed to set dept")
@@ -117,10 +117,12 @@ def session(d: Driver, username: str, password: str, dept: str):
 
     with console.status("Logging in..."):
         login(d, username, password)
+        _lgr.info("Log in successfully")
 
     with console.status("Setting dept..."):
         d.get(danhsachnguoibenhnoitru.URL)
         checked_set_dept(d, dept)
+        _lgr.info("Finish setting dept")
 
     try:
         yield

@@ -24,11 +24,14 @@ def wait_loaded(d: Driver):
     finally:
         time.sleep(5)
 
+def load_and_clear(d: Driver):
+    d.goto(URL)
+    wait_loaded(d)
+    click_huytimkiem(d)
 
 def load(d: Driver):
     d.goto(URL)
     wait_loaded(d)
-    click_huytimkiem(d)
 
 
 def get_khoalamviec(d: Driver) -> str:

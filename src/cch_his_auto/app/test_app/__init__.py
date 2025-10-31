@@ -1,4 +1,5 @@
 import tkinter as tk
+import time
 from tkinter import messagebox
 
 from cch_his_auto.app import PROFILE_PATH
@@ -13,7 +14,7 @@ from cch_his_auto_lib.action import danhsachnguoibenhnoitru as dsnbnt
 from cch_his_auto_lib.action.danhsachnguoibenhnoitru import (
     main_table as dsnbnt_main_table,
 )
-from cch_his_auto_lib.action.top_info import hosobenhan
+from cch_his_auto_lib.action.chitietnguoibenhnoitru.thongtinchung import thongtinvaovien_dialog
 from cch_his_auto_lib.action.top_info.hosobenhan import tab_hosokhamchuabenh  
 
 from .config import Config
@@ -67,9 +68,9 @@ def run(cfg: config.Config, run_cfg: RunConfig):
 
     with start_driver(headless=run_cfg.headless, profile_path=PROFILE_PATH) as d:
         with auth.session(d, cfg.user.name, cfg.user.password, cfg.department):
-            dsnbnt.load(d)
-            dsnbnt_main_table.goto_patient(d, 2508051624)
-            with hosobenhan.dialog(d):
-                tab_hosokhamchuabenh.sign_phieusoket15ngay(d)
+            dsnbnt.load_and_clear(d)
+            dsnbnt_main_table.goto_patient(d, 2510301508)
+            with thongtinvaovien_dialog.dialog(d):
+                time.sleep(200)
 
     messagebox.showinfo(message="finish")

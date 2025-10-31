@@ -17,9 +17,9 @@ def run(d: Driver, cfg: Config):
     print("Start nhommau")
     change_tab(d, thongtinchung.TAB_NUMBER)
     bloodtype = thongtinchung.get_bloodtype(d)
-    if bloodtype is None:
+    if not bloodtype:
         with hosobenhan.dialog(d, tab_dvkt.TAB_NUMBER):
             found_bloodtype = tab_dvkt.get_bloodtype(d)
-        if found_bloodtype is not None:
+        if found_bloodtype:
             with thongtinvaovien_dialog.dialog(d):
                 thongtinvaovien_dialog.set_bloodtype(d, found_bloodtype)
