@@ -4,7 +4,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common import TimeoutException, NoSuchElementException
 
 from cch_his_auto_lib.driver import Driver
-from cch_his_auto_lib.tracing import _root_lgr
+from cch_his_auto_lib.tracing import _root_lgr, console
 
 URL = "http://emr.ndtp.org/quan-ly-noi-tru/danh-sach-nguoi-benh-noi-tru"
 
@@ -24,10 +24,13 @@ def wait_loaded(d: Driver):
     finally:
         time.sleep(5)
 
+
 def load_and_clear(d: Driver):
-    d.goto(URL)
-    wait_loaded(d)
-    click_huytimkiem(d)
+    with console.status("load danh sách người bệnh nội trú -> hủy tìm kiếm"):
+        d.get(URL)
+        wait_loaded(d)
+        click_huytimkiem(d)
+
 
 def load(d: Driver):
     d.goto(URL)
