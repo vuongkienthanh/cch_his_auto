@@ -62,10 +62,10 @@ def iterate_all_patient(d: Driver, f: DriverFn):
 
 def get_signature_from_HIS(d: Driver, ma_hs: int) -> str | None:
     working_url = d.current_url
-    dsnbnt.load(d)
+    dsnbnt.load_and_clear(d)
     dsnbnt_main_table.goto_patient(d, ma_hs)
     signature = d.do_next_tab_do(
-        f1=lambda d: chitietnguoibenhnoitru.click_inbacsi(d, "cam kết"),
+        f1=lambda d: chitietnguoibenhnoitru.click_indieuduong(d, "cam kết"),
         f2=lambda d: camketchungvenhapvien.get_signature(d),
     )
     d.goto(working_url)

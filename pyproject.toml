@@ -1,6 +1,6 @@
 [project]
 name = "cch_his_auto"
-version = "1.0.3"
+version = "1.0.4"
 description = "Automate your HIS workflow at CCH"
 readme = "README.md"
 authors = [{ name = "vuongkienthanh", email = "thanhstardust@outlook.com" }]

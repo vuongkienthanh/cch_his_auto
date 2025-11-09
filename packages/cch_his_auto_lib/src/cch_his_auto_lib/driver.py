@@ -132,13 +132,13 @@ class Driver(webdriver.Chrome):
         try:
             _lgr.debug(f"clicking {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
+            ele = self.find(css)
         except TimeoutException:
             _lgr.error(f"-> can't find {name or css}")
             raise NoSuchElementException(f"can't find {name or css}")
         except StaleElementReferenceException:
             return self.clicking(css, name)
         else:
-            ele = self.find(css)
             ActionChains(self).scroll_to_element(ele).pause(1).click(ele).perform()
             _lgr.debug(f"-> done clicking {name or css}")
 
@@ -151,6 +151,7 @@ class Driver(webdriver.Chrome):
         try:
             _lgr.debug(f"clicking non-clickable {name or css}")
             WebDriverWait(self, 120).until(lambda _: self.find(css).is_displayed())
+            self.find(css)
         except TimeoutException:
             _lgr.error(f"-> can't find {name or css}")
             raise NoSuchElementException(f"can't find {name or css}")
