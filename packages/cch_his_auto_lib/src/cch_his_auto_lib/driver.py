@@ -255,8 +255,6 @@ class Driver(webdriver.Chrome):
         You can also provide a `name` for logging
         Can raise NoSuchElementException
         """
-        # TODO
-        raise Exception("not working, need update")
         for _ in range(120):
             try:
                 _lgr.debug(f"finding {name} button")
