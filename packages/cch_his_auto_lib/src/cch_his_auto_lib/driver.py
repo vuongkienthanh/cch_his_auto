@@ -196,18 +196,24 @@ class Driver(webdriver.Chrome):
         else:
             raise NoSuchElementException(f"can't find {btn_css}")
 
-        ele = self.find(btn_css)
         target = btn_txt.strip()
         for _ in range(120):
-            if ele.text.strip().startswith(target):
-                _lgr.debug("-> found sign button with correct btn_txt")
-                break
-            else:
-                _lgr.debug("-> found sign button but wrong btn_txt -> next in loop")
-                time.sleep(1)
+            try:
+                ele = self.find(btn_css)
+                if ele.text.strip().startswith(target):
+                    _lgr.debug("-> found sign button with correct btn_txt")
+                    break
+                else:
+                    _lgr.debug("-> found sign button but wrong btn_txt -> next in loop")
+                    time.sleep(1)
+                    continue
+            except StaleElementReferenceException:
                 continue
         else:
-            raise NoSuchElementException(f"found {btn_css} but not startswith {target}")
+            found = self.find(btn_css).text.strip()
+            raise NoSuchElementException(
+                f"found {btn_css} but not startswith {target}, found {found} instead"
+            )
 
         time.sleep(1)
         ele.click()
@@ -276,18 +282,24 @@ class Driver(webdriver.Chrome):
         else:
             raise NoSuchElementException(f"can't find {btn_css}")
 
-        ele = self.find(btn_css)
         target = btn_txt.strip()
         for _ in range(120):
-            if ele.text.strip().startswith(target):
-                _lgr.debug("-> found sign button with correct btn_txt")
-                break
-            else:
-                _lgr.debug("-> found sign button but wrong btn_txt -> next in loop")
-                time.sleep(1)
+            try:
+                ele = self.find(btn_css)
+                if ele.text.strip().startswith(target):
+                    _lgr.debug("-> found sign button with correct btn_txt")
+                    break
+                else:
+                    _lgr.debug("-> found sign button but wrong btn_txt -> next in loop")
+                    time.sleep(1)
+                    continue
+            except StaleElementReferenceException:
                 continue
         else:
-            raise NoSuchElementException(f"found {btn_css} but not startswith {target}")
+            ele = self.find(btn_css)
+            raise NoSuchElementException(
+                f"found {btn_css} but not startswith {target}, found {ele.text} instead"
+            )
 
         time.sleep(1)
         ele.click()
