@@ -25,8 +25,8 @@ def get_patient_info(d: Driver) -> dict[str, str]:
     ret["name"] = d.waiting("#root .patient-content .text-fullname").text.strip()
 
     moreinfo = d.waiting("#root .patient-content .more-info").text.strip().split("-")
-    ret["gender"] = moreinfo[0][1:].strip()
-    ret["birthdate"] = moreinfo[2].strip()
+    ret["gender"] = moreinfo[0].strip(" (")
+    ret["birthdate"] = moreinfo[2].strip(" )")
 
     ret["ma_hs"] = d.waiting(
         "#root .patient-information span:nth-child(2) b"
