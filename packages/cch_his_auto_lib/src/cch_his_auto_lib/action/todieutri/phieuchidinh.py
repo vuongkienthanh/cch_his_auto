@@ -4,6 +4,7 @@ from enum import Enum
 from selenium.common import StaleElementReferenceException
 
 from cch_his_auto_lib.driver import Driver
+from cch_his_auto_lib.errors import WaitClosingException
 from . import _lgr
 
 
@@ -33,12 +34,18 @@ def sign(d: Driver):
                         _lgr.debug(f" found button state is {State.Huy.value}")
                         found = True
                         break
-                except StaleElementReferenceException as e:
-                    _lgr.warning(f"get {e}")
+                except StaleElementReferenceException:
+                    continue
             if found:
+                time.sleep(5)
                 break
         else:
             _lgr.warning("can't assure phieuchidinh signed while in dialog, maybe MRI")
     finally:
-        d.clicking(f"{PHIEUCHIDINH_DIALOG} button.ant-modal-close")
-        d.wait_closing(PHIEUCHIDINH_DIALOG)
+        for _ in range(2):
+            try:
+                d.clicking(f"{PHIEUCHIDINH_DIALOG} button.ant-modal-close")
+                d.wait_closing(PHIEUCHIDINH_DIALOG)
+                break
+            except WaitClosingException:
+                continue
